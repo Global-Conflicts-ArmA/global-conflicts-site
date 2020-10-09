@@ -1,0 +1,47 @@
+<div class="content">
+
+  <div class="column">
+    <div class="field-container file" [class.invalid]="missionPboInvalid()" (click)="missionFileInput.click()">
+      <label class="inset-label" for="file-input">Select Mission .pbo</label>
+      <input #missionFileInput autocomplete="off" style="display: none" title="Select file" type="file" id="file-input"
+             accept=".pbo" (change)="missionToUpload = $event.target.files[0]">
+      <div class="input-like"
+           [class.placeholder]="missionToUpload==null">{{missionToUpload?.name || 'CO32_Mission_Name_V2.altis.pbo'}}</div>
+    </div>
+
+    <div class="field-container" [class.invalid]="descriptionInvalid()">
+      <label class="inset-label" for="description">Short Description</label>
+      <input maxlength="100" placeholder="2.5:1 | USMC raids ammo depot | Defenders chooses weather"
+             autocomplete="off" type="input" id="description" [(ngModel)]="description">
+    </div>
+
+    <div class="field-container" [class.invalid]="minPLayersInvalid()">
+      <label class="inset-label" for="minPlayers">Min. Player Count</label>
+      <input autocomplete="off" placeholder="22" type="number" id="minPlayers" [(ngModel)]="minPlayers">
+    </div>
+
+    <div class="field-container" [class.invalid]="missionTypeInvalid()">
+      <label class="inset-label">Mission Type</label>
+      <div class="button-row unselectable">
+        <div [class.selected]="missionType==MissionType.COOP" (click)="selectMissionType(MissionType.COOP)">COOP</div>
+        <div [class.selected]="missionType==MissionType.TVT" (click)="selectMissionType(MissionType.TVT)">TVT</div>
+        <div [class.selected]="missionType==MissionType.COTVT" (click)="selectMissionType(MissionType.COTVT)">COTVT
+        </div>
+        <div [class.selected]="missionType==MissionType.LOL" (click)="selectMissionType(MissionType.LOL)">LOL</div>
+      </div>
+    </div>
+
+    <div class="field-container" [class.invalid]="serverTypeInvalid()">
+      <label class="inset-label">Server</label>
+      <div class="button-row unselectable">
+        <div [class.selected]="serverType==ServerType.MAIN" (click)="selectServerType(ServerType.MAIN)">MAIN</div>
+        <div [class.selected]="serverType==ServerType.TEST" (click)="selectServerType(ServerType.TEST)">TEST</div>
+      </div>
+    </div>
+
+    <button class="btn" (click)="upload()"><div>UPLOAD</div></button>
+
+
+  </div>
+
+</div>

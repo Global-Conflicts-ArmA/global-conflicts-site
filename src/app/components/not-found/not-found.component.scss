@@ -1,0 +1,8 @@
+@use "src/colors" as colors;
+
+div{
+	text-align: center;
+	font-size: 100px;
+	margin: 50px;
+	color: colors.$accent;
+}

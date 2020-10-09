@@ -1,0 +1,131 @@
+/* You can add global styles to this file, and also import other style files */
+@use "defaults";
+@use "colors";
+
+@import '~@swimlane/ngx-datatable/index.css';
+@import '~@swimlane/ngx-datatable/themes/bootstrap.scss';
+@import '~@swimlane/ngx-datatable/assets/icons.css';
+
+
+body {
+	background-color: #373737;
+	font-family: Roboto, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	color: white
+}
+
+svg.material-icons {
+	height: 24px;
+	width: auto;
+}
+
+svg.material-icons:not(:last-child) {
+	margin-right: 8px;
+}
+
+a {
+	color: colors.$accent;
+	text-decoration: none;
+}
+
+a:hover {
+	color: colors.$link-highlight;
+
+}
+
+.content {
+	max-width: 1024px;
+	margin: 100px auto;
+}
+
+.column {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+
+	> :not(:last-child) {
+		margin-bottom: 20px;
+	}
+}
+
+.spacer {
+	flex: 1;
+}
+
+
+.btn {
+
+
+	display: inline-block;
+	padding: 6px 12px;
+	margin-bottom: 0;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.42857143;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	-ms-touch-action: manipulation;
+	touch-action: manipulation;
+
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	background-image: none;
+	background-color: colors.$accent;
+	color: white;
+	outline: none;
+	border: none;
+
+
+	transition: all 0.1s ease-in-out;
+
+	div {
+		transition: all 0.1s ease-in-out;
+	}
+
+	cursor: pointer;
+
+	&:hover {
+		box-shadow: inset black 0 1px 1px 0;
+
+		div {
+			transform: translateY(1px);
+		}
+	}
+
+	&:active {
+		box-shadow: inset black 0 2.5px 4px 0;
+
+		div {
+			transform: translateY(4px);
+		}
+	}
+
+}
+
+
+form {
+	> * {
+		margin-bottom: 20px;
+	}
+}
+
+input, .input-like {
+	background-color: colors.$primary;
+	border: none;
+	display: flex;
+	flex: 1;
+	align-items: center;
+	outline: none;
+	color: white;
+	min-height: 58px;
+	padding: 5px 15px;
+	font-size: 25px;
+
+	&.placeholder {
+		color: #757575 !important;
+	}
+}

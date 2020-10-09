@@ -1,0 +1,24 @@
+<div class="content">
+	<input
+		type="text"
+		style="width: 100%;
+    text-align: center;
+    box-sizing: border-box;"
+		placeholder="Type here to filter any column"
+		(keyup)="updateFilter($event)"
+	/>
+	<ngx-datatable
+		#table
+		class="bootstrap"
+		[columns]="columns"
+		[columnMode]="ColumnMode.force"
+		[headerHeight]="50"
+		[footerHeight]="50"
+		rowHeight="auto"
+
+		[rows]="rows"
+	>
+	</ngx-datatable>
+
+
+</div>
