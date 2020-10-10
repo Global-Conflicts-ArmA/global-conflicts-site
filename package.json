@@ -28,6 +28,7 @@
     "@types/axios": "^0.14.0",
     "@types/chart.js": "^2.7.40",
     "@types/datatables.net": "^1.10.19",
+    "@types/dotenv": "^8.2.0",
     "@types/jquery": "^3.5.1",
     "angular-datatables": "^4.4.1",
     "angular-oauth2-oidc": "^10.0.3",
