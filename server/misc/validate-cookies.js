@@ -4,8 +4,7 @@ const {discordJsClient, Discord} = require("../config/discord-bot");
 async function getDiscordUserFromCookies(req, actionErrorMessage) {
 	if (!req.cookies["token"]) {
 		req.authError = 'Not signed in.';
-		return callback(null, false);
-
+		return req;
 	} else {
 		const oauth = new DiscordOauth2({
 			clientId: process.env.DISCORD_APP_ID,
