@@ -5,7 +5,7 @@ const multer = require('multer')
 const fs = require('fs')
 const path = require('path');
 const DiscordOauth2 = require("discord-oauth2");
-const {getDiscordUserFromCookies} = require("../misc/calidate-cookies");
+const {getDiscordUserFromCookies} = require("../misc/validate-cookies");
 const {discordJsClient, Discord} = require("../config/discord-bot");
 
 const trustedUploaderRoles = ['Admin', 'GM', 'Mission Maker'];
