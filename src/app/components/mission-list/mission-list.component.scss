@@ -1,0 +1,12 @@
+@use "../../../colors";
+
+select{
+	width: 100%;
+	height: 45px;
+	padding: 0 24px;
+	color: colors.$accent;
+	font-weight: bold;
+	background-color: colors.$primary-dark;
+	border: none;
+	outline: none;
+}

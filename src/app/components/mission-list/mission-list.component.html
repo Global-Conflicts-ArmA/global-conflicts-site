@@ -1,24 +1,91 @@
 <div class="content">
-	<input
-		type="text"
-		style="width: 100%;
-    text-align: center;
-    box-sizing: border-box;"
-		placeholder="Type here to filter any column"
-		(keyup)="updateFilter($event)"
-	/>
-	<ngx-datatable
-		#table
-		class="bootstrap"
-		[columns]="columns"
-		[columnMode]="ColumnMode.force"
-		[headerHeight]="50"
-		[footerHeight]="50"
-		rowHeight="auto"
+	<div style="position: relative">
+		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">
+			You must join our Discord server and complete the welcoming to see our mission list!
+		</div>
+		<div [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
+			<div>
 
-		[rows]="rows"
-	>
-	</ngx-datatable>
+				<select
+					[(ngModel)]="selectedServerPath" (ngModelChange)="onSelectedServerPathChange($event)">
+					<option value="mainServer/MPMissions">Main Server</option>
+					<option value="testServer/MPMissions">Test Server(MPMissions)</option>
+					<option value="testServer/READY">Test Server(READY)</option>
+				</select>
 
+			</div>
+			<input
+				type="text"
+				style="width: 100%;
+    		text-align: center;
+    		box-sizing: border-box;"
+				placeholder="Type here to filter any column"
+				[(ngModel)]="searchString"
+				(ngModelChange)="updateFilter($event)"/>
+			<ngx-datatable
+				#myTable
+				class="bootstrap"
+				[columnMode]="ColumnMode.force"
+				[headerHeight]="50"
+				[footerHeight]="50"
+				rowHeight="auto"
+				(activate)="onActivate($event)"
+				[rows]="rows"
+			>
+
+				<ngx-datatable-column [width]="20" name="Type"></ngx-datatable-column>
+				<ngx-datatable-column [width]="250" name="Name"></ngx-datatable-column>
+				<ngx-datatable-column [width]="20" name="Version"></ngx-datatable-column>
+				<ngx-datatable-column [width]="110" name="Terrain"></ngx-datatable-column>
+				<ngx-datatable-column [width]="60" name="Max Players"></ngx-datatable-column>
+				<ngx-datatable-column [width]="60" name="Min Players"></ngx-datatable-column>
+				<ngx-datatable-column [width]="70" name="Upload Date">
+
+					<ng-template let-row="row" ngx-datatable-cell-template>
+						{{row.uploadDate | date: 'MM/dd/yyyy'}}
+					</ng-template>
+				</ngx-datatable-column>
+				<ngx-datatable-column [width]="100" name="Author"></ngx-datatable-column>
+
+				<ngx-datatable-column
+					[width]="50"
+					[resizeable]="false"
+					[sortable]="false"
+					[draggable]="false"
+					[canAutoResize]="false"
+					[cellClass]="'button-cell'"
+
+				>
+					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+						<a
+							href="javascript:void(0)"
+							[class.datatable-icon-right]="!expanded"
+							[class.datatable-icon-down]="expanded"
+							title="Expand/Collapse Row"
+
+						>
+						</a>
+					</ng-template>
+				</ngx-datatable-column>
+
+
+				<ngx-datatable-row-detail [rowHeight]="150" #myDetailRow>
+					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+
+
+						<div style="padding:10px;">
+
+							<strong>Description:</strong>
+							<p>{{row.description}}</p>
+
+						</div>
+					</ng-template>
+				</ngx-datatable-row-detail>
+
+			</ngx-datatable>
+		</div>
+
+
+	</div>
 
 </div>

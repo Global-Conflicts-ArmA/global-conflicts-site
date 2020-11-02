@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core'
+import {Component, OnInit} from '@angular/core';
+import {UserService} from '../../services/user.service';
+import {DiscordUser} from '../../models/discorduser';
+
 
 @Component({
 	selector: 'app-toolbar',
@@ -6,7 +9,20 @@ import { Component, OnInit } from '@angular/core'
 	styleUrls: ['./toolbar.component.scss'],
 })
 export class ToolbarComponent implements OnInit {
-	constructor() {}
 
-	ngOnInit(): void {}
+	constructor(private userService: UserService) {
+	}
+
+	discordUser: DiscordUser | null;
+
+	ngOnInit(): void {
+		this.discordUser = this.userService.getUserLocally();
+	}
+
+
+	logout() {
+		this.userService.logout();
+	}
+
+
 }

@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const User = require('../models/user.model');
+const User = require('../models/discordUser.model');
 
 const router = express.Router();
 

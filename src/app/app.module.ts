@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {BrowserModule} from '@angular/platform-browser';
 import {RouterModule} from '@angular/router';
 import {AppRoutingModule} from './app-routing.module';
@@ -10,12 +10,6 @@ import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {LayoutModule} from '@angular/cdk/layout';
 
-import {SharedModule} from './shared/shared.module';
-
-import {ApiService} from './shared/api.service';
-import {AuthGuardWithForcedLogin} from './shared/auth-guard-with-forced-login.service';
-import {AuthGuard} from './shared/auth-guard.service';
-import {AuthService} from './shared/auth.service';
 
 import {OAuthModule} from 'angular-oauth2-oidc';
 import {HomeComponent} from './components/home/home.component';
@@ -23,7 +17,11 @@ import {MissionListComponent} from './components/mission-list/mission-list.compo
 import {MissionUploadComponent} from './components/mission-upload/mission-upload.component';
 import {ToolbarComponent} from './components/toolbar/toolbar.component';
 import {NotFoundComponent} from './components/not-found/not-found.component';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import {NgxDatatableModule} from '@swimlane/ngx-datatable';
+import {HttpErrorInterceptor} from './interceptor/httpInterceptor';
+import {CookieService} from 'ngx-cookie-service';
+import {CustExtBrowserXhr} from './services/cust-ext-browser-xhr';
+import {BrowserXhr} from '@angular/http';
 
 @NgModule({
 	declarations: [
@@ -43,17 +41,19 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 		ReactiveFormsModule,
 		BrowserAnimationsModule,
 		HttpClientModule,
-		SharedModule.forRoot(),
 		OAuthModule.forRoot(),
 		LayoutModule,
 		NgxDatatableModule
 	],
 	bootstrap: [AppComponent],
 	providers: [
-		ApiService,
-		AuthGuardWithForcedLogin,
-		AuthGuard,
-		AuthService
+		CookieService,
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: HttpErrorInterceptor,
+			multi: true
+		},
+		{provide: BrowserXhr, useClass: CustExtBrowserXhr}
 	]
 })
 export class AppModule {

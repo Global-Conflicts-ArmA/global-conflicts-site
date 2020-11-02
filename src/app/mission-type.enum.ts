@@ -1,3 +1,3 @@
 export enum MissionType {
-	COOP, TVT, LOL, COTVT, TRAINING
+	COOP = 'COOP', TVT = 'TVT', LOL = 'LOL', COTVT = 'COTVT', TRAINING = 'TRAINING'
 }
