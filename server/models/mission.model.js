@@ -40,7 +40,7 @@ const MissionSchema = new Schema({
 		required: true
 	},
 	version: {
-		type: String,
+		type: Number,
 		required: true
 	},
 	fileName: {

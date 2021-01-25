@@ -64,6 +64,6 @@ export class MissionListComponent implements OnInit {
 			mission.type.toLowerCase().indexOf(search) !== -1 ||
 			mission.terrain.toLowerCase().indexOf(search) !== -1 ||
 			mission.description.toLowerCase().indexOf(search) !== -1 ||
-			mission.version.toLowerCase().indexOf(search) !== -1) && mission.paths.indexOf(this.selectedServerPath) !== -1;
+			mission.version.toString().toLowerCase().indexOf(search) !== -1) && mission.paths.indexOf(this.selectedServerPath) !== -1;
 	}
 }

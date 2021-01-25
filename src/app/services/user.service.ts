@@ -26,8 +26,9 @@ export class UserService {
 		const username = this.cookieService.get('username');
 		const role = this.cookieService.get('role');
 		const roleColor = this.cookieService.get('roleColor');
+		const avatarLink = 'https://cdn.discordapp.com/avatars/' + this.cookieService.get('id') + '/' + this.cookieService.get('avatar') + '.png';
 		if (token) {
-			return new DiscordUser(token, username, role, roleColor);
+			return new DiscordUser(token, username, role, roleColor, avatarLink);
 		} else {
 			return null;
 		}

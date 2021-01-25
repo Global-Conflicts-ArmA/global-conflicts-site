@@ -45,3 +45,8 @@ Thumbs.db
 
 # Env file
 *.env
+
+# Test Directories
+/TestServer
+/mainServer
+/Archive

@@ -31,7 +31,6 @@ router.get("/logout", function (req, res) {
 
 async function getUser(token) {
 
-
 	const user = await discordOauth2.getUser(token)
 	const guild = await discordJsClient.guilds.cache.get(process.env.DISCORD_SERVER_ID);
 	return guild.members.fetch(user.id)
@@ -41,7 +40,9 @@ async function getUser(token) {
 					token: token,
 					username: member.user.username,
 					role: member.roles.highest.name,
-					roleColor: member.roles.highest.hexColor
+					roleColor: member.roles.highest.hexColor,
+					id: member.user.id,
+					avatar: member.user.avatar,
 				}
 			} else {
 				return {
@@ -70,6 +71,8 @@ router.get("/callback", function (req, res) {
 			if (user.username) res.cookie('username', user.username);
 			if (user.role) res.cookie('role', user.role);
 			if (user.roleColor) res.cookie('roleColor', user.roleColor);
+			if (user.id) res.cookie('id', user.id);
+			if (user.avatar) res.cookie('avatar', user.avatar);
 			return res.redirect('/');
 		}
 	).catch(reason => {

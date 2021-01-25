@@ -1,61 +1,5 @@
 @use "../../../colors";
 
-.field-container {
-	border: solid 1px colors.$accent;
-	border-radius: 4px;
-	display: flex;
-	flex-direction: row;
-	transition: all 200ms;
-
-	&.invalid {
-		border: solid 1px red;
-	}
-
-
-	label {
-		color: white;
-		width: 125px;
-		background-color: colors.$accent;
-		padding: 8px 16px;
-		text-align: center;
-		justify-content: center;
-		align-items: center;
-		display: flex;
-		font-size: 14px;
-		font-weight: 400;
-		vertical-align: middle;
-		-ms-touch-action: manipulation;
-		-webkit-user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
-		z-index: -1;
-	}
-
-	input, .input-like {
-		width: 100%;
-		border-radius: 0 4px 4px 0;
-
-
-	}
-
-	&.file {
-		cursor: pointer;
-		min-height: 68px;
-
-		input {
-			opacity: 0;
-			top: 0;
-			left: 0;
-		}
-
-
-	}
-
-
-}
-
-
 .button-row {
 	display: flex;
 	min-height: 68px;
@@ -102,4 +46,3 @@
 	}
 
 }
-

@@ -1,18 +1,16 @@
 <div class="content">
 	<div style="position: relative">
 		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">
-			You must join our Discord server and complete the welcoming to see our mission list!
+			You must join our Discord server and complete the welcoming process to see our mission list!
 		</div>
 		<div [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
 			<div>
-
 				<select
 					[(ngModel)]="selectedServerPath" (ngModelChange)="onSelectedServerPathChange($event)">
 					<option value="MainServer/MPMissions">Main Server</option>
 					<option value="TestServer/MPMissions">Test Server(MPMissions)</option>
 					<option value="TestServer/READY">Test Server(READY)</option>
 				</select>
-
 			</div>
 			<input
 				type="text"
@@ -32,21 +30,6 @@
 				(activate)="onActivate($event)"
 				[rows]="rows"
 			>
-
-				<ngx-datatable-column [width]="20" name="Type"></ngx-datatable-column>
-				<ngx-datatable-column [width]="250" name="Name"></ngx-datatable-column>
-				<ngx-datatable-column [width]="20" name="Version"></ngx-datatable-column>
-				<ngx-datatable-column [width]="110" name="Terrain"></ngx-datatable-column>
-				<ngx-datatable-column [width]="60" name="Max Players"></ngx-datatable-column>
-				<ngx-datatable-column [width]="60" name="Min Players"></ngx-datatable-column>
-				<ngx-datatable-column [width]="70" name="Upload Date">
-
-					<ng-template let-row="row" ngx-datatable-cell-template>
-						{{row.uploadDate | date: 'MM/dd/yyyy'}}
-					</ng-template>
-				</ngx-datatable-column>
-				<ngx-datatable-column [width]="100" name="Author"></ngx-datatable-column>
-
 				<ngx-datatable-column
 					[width]="50"
 					[resizeable]="false"
@@ -54,7 +37,6 @@
 					[draggable]="false"
 					[canAutoResize]="false"
 					[cellClass]="'button-cell'"
-
 				>
 					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
 						<a
@@ -62,30 +44,31 @@
 							[class.datatable-icon-right]="!expanded"
 							[class.datatable-icon-down]="expanded"
 							title="Expand/Collapse Row"
-
 						>
 						</a>
 					</ng-template>
 				</ngx-datatable-column>
-
-
 				<ngx-datatable-row-detail [rowHeight]="150" #myDetailRow>
 					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
-
-
 						<div style="padding:10px;">
-
 							<strong>Description:</strong>
 							<p>{{row.description}}</p>
-
 						</div>
 					</ng-template>
 				</ngx-datatable-row-detail>
-
+				<ngx-datatable-column [width]="20" name="Type"></ngx-datatable-column>
+				<ngx-datatable-column [width]="250" name="Name"></ngx-datatable-column>
+				<ngx-datatable-column [width]="20" name="Version"></ngx-datatable-column>
+				<ngx-datatable-column [width]="110" name="Terrain"></ngx-datatable-column>
+				<ngx-datatable-column [width]="60" name="Max Players"></ngx-datatable-column>
+				<ngx-datatable-column [width]="60" name="Min Players"></ngx-datatable-column>
+				<ngx-datatable-column [width]="70" name="Upload Date">
+					<ng-template let-row="row" ngx-datatable-cell-template>
+						{{row.uploadDate | date: 'MM/dd/yyyy'}}
+					</ng-template>
+				</ngx-datatable-column>
+				<ngx-datatable-column [width]="100" name="Author"></ngx-datatable-column>
 			</ngx-datatable>
 		</div>
-
-
 	</div>
-
 </div>
