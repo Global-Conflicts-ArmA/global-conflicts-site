@@ -133,7 +133,7 @@
 							        </mat-chip>
 							      </mat-chip-list>
 							    </mat-select-trigger>
-							    <mat-option *ngFor="let tag of mC.MissionTags" [value]="tag">{{tag}}</mat-option>
+							    <mat-option *ngFor="let tag of mC.MissionTags.sort()" [value]="tag">{{tag}}</mat-option>
 							  </mat-select>
 							</mat-form-field>
 							<mat-label class="mr-4 mb-4" style="display: flex;">Time of Day:</mat-label>

@@ -37,6 +37,15 @@ export class MissionConstants {
 		"WAC",
 		"Urban Ops",
 		"Seeder",
+		"Zeus",
+		"Hostage Rescue",
+		"HVT",
+		"Convoy",
+		"Escort",
+		"Mines",
+		"Sabotage",
+		"Raid",
+		"Combined Arms",
 	];
 
 	MissionEras: string[] = [
