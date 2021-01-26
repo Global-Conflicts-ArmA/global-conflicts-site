@@ -34,6 +34,11 @@ import {MatMenuModule} from '@angular/material/menu';
 import {MatInputModule} from '@angular/material/input';
 import {MaterialFileInputModule} from 'ngx-material-file-input';
 import {MatRadioModule} from '@angular/material/radio';
+import {MatSelectModule} from '@angular/material/select';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatSliderModule} from '@angular/material/slider';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+
 import {WikiComponent} from './components/wiki/wiki.component';
 import {AARComponent} from './components/aar/aar.component';
 import {MissionConstants} from './constants/missionConstants';
@@ -72,6 +77,10 @@ import {MissionConstants} from './constants/missionConstants';
 		MaterialFileInputModule,
 		RxReactiveFormsModule,
 		MatRadioModule,
+		MatSelectModule,
+		MatChipsModule,
+		MatSliderModule,
+		MatCheckboxModule,
 	],
 	bootstrap: [AppComponent],
 	providers: [

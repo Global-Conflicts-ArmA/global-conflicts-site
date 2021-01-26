@@ -6,6 +6,7 @@ import {MissionsService} from '../../services/missions.service';
 import {DiscordUser} from '../../models/discorduser';
 import {UserService} from '../../services/user.service';
 import {FileValidator} from 'ngx-material-file-input';
+import {MatSelect, MatSelectChange} from '@angular/material/select';
 
 @Component({
 	selector: 'app-mission-upload',
@@ -24,7 +25,7 @@ export class MissionUploadComponent implements OnInit {
 	}
 
 	discordUser: DiscordUser | null;
-	misType: string = 'COOP';
+	misType: string = 'CO';
 	missionToUpload: File;
 	ratio: string;
 	description: string;
@@ -83,6 +84,14 @@ export class MissionUploadComponent implements OnInit {
 			{
 				minPlayers: new FormControl(''),
 				maxPlayers: new FormControl(''),
+				ratioBluforE: new FormControl({value: true}),
+				ratioBlufor: new FormControl({value: 1, disabled: false}),
+				ratioOpforE: new FormControl({value: true}),
+				ratioOpfor: new FormControl({value: 1, disabled: false}),
+				ratioIndforE: new FormControl({value: true}),
+				ratioIndfor: new FormControl({value: 1, disabled: false}),
+				ratioCivE: new FormControl({value: true}),
+				ratioCiv: new FormControl({value: 1, disabled: false}),
 	    }, { validators: [this.checkMissionSize] }
 		);
 		this.missionEraGroup = this.formBuilder.group({
@@ -91,13 +100,12 @@ export class MissionUploadComponent implements OnInit {
 			]]
     });
 		this.missionDescGroup = this.formBuilder.group({
-			misRatio: ['', [
-				this.checkMissionRatio()
-			]],
       misDescription: ['', [
 				Validators.required,
 				this.checkMissionDesc()
-			]]
+			]],
+			misTags: [''],
+			misTime: [Validators.required],
     });
 		this.fileImageGroup = this.formBuilder.group({
       missionImage: ['', [
@@ -107,6 +115,16 @@ export class MissionUploadComponent implements OnInit {
 			]]
     });
 	}
+
+	onListChipRemoved(multiSelect: MatSelect, matChipIndex: number): void {
+		const misTags = this.missionDescGroup.get('misTags');
+		if (misTags) {
+			const selectedChips = [...misTags.value];
+	    selectedChips.splice(matChipIndex, 1);
+	    misTags.patchValue(selectedChips);
+	    multiSelect.writeValue(selectedChips);
+		}
+  }
 
 	checkFileName() {
 	  return function (control: FormControl) {
@@ -308,7 +326,7 @@ export class MissionUploadComponent implements OnInit {
 	}
 
 	getRatioErrorMessage() {
-		let desc = this.missionDescGroup.get('misRatio');
+		let desc = this.missionSizeGroup.get('misRatio');
 		if (desc) {
 			if (desc.hasError('required')) {
 				return `You must provide a ratio in the format of 1.5:1`;
@@ -418,18 +436,8 @@ export class MissionUploadComponent implements OnInit {
 	}
 
 	buildMissionDesc() {
-		const type = this.missionTypeGroup.get('missionType');
-		const ratio = this.missionDescGroup.get('misRatio');
 		const desc = this.missionDescGroup.get('misDescription');
-		if (type && ratio && desc) {
-			if (type.value == 'TVT' || type.value == 'COTVT') {
-				this.missionDescription = `${ratio.value} | ${desc.value}`
-			} else {
-				this.missionDescription = `${desc.value}`
-			};
-		} else {
-			this.missionDescription = ''
-		}
+		this.missionDescription = desc ? desc.value ?? '' : '';
 	}
 
 	selectMissionType() {

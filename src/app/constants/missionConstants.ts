@@ -7,17 +7,14 @@ export class MissionConstants {
 		},
 		{
 			title: 'LOL',
-			str: 'LOL',
 			ratio: true,
 		},
 		{
 			title: 'TVT',
-			str: 'TVT',
 			ratio: true,
 		},
 		{
 			title: 'COTVT',
-			str: 'COTVT',
 			ratio: true,
 		},
 		{
@@ -55,5 +52,12 @@ export class MissionConstants {
 		'2030s',
 	];
 
+	MissionTimes: string[] = [
+		"Dawn",
+		"Day",
+		"Dusk",
+		"Night",
+		"Custom",
+	]
 
 }
