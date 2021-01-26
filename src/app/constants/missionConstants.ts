@@ -6,15 +6,15 @@ export class MissionConstants {
 			str: 'CO'
 		},
 		{
-			title: 'LOL',
-			ratio: true,
-		},
-		{
 			title: 'TVT',
 			ratio: true,
 		},
 		{
 			title: 'COTVT',
+			ratio: true,
+		},
+		{
+			title: 'LOL',
 			ratio: true,
 		},
 		{
