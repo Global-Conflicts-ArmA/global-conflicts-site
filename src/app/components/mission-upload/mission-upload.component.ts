@@ -94,11 +94,6 @@ export class MissionUploadComponent implements OnInit {
 				ratioCiv: new FormControl({value: 1, disabled: false}),
 	    }, { validators: [this.checkMissionSize] }
 		);
-		this.missionEraGroup = this.formBuilder.group({
-      missionEra: ['', [
-				Validators.required
-			]]
-    });
 		this.missionDescGroup = this.formBuilder.group({
       misDescription: ['', [
 				Validators.required,
@@ -106,6 +101,9 @@ export class MissionUploadComponent implements OnInit {
 			]],
 			misTags: [''],
 			misTime: [Validators.required],
+			missionEra: ['', [
+				Validators.required
+			]]
     });
 		this.fileImageGroup = this.formBuilder.group({
       missionImage: ['', [

@@ -38,6 +38,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 
 import {WikiComponent} from './components/wiki/wiki.component';
 import {AARComponent} from './components/aar/aar.component';
@@ -81,6 +82,7 @@ import {MissionConstants} from './constants/missionConstants';
 		MatChipsModule,
 		MatSliderModule,
 		MatCheckboxModule,
+		MatButtonToggleModule,
 	],
 	bootstrap: [AppComponent],
 	providers: [

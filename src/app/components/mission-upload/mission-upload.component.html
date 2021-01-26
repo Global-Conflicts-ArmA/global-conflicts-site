@@ -110,23 +110,6 @@
 						<button mat-button matStepperNext>Next</button>
 			    </form>
 			  </mat-step>
-				<mat-step [stepControl]="missionEraGroup">
-			    <form [formGroup]="missionEraGroup">
-			      <ng-template matStepLabel>Era</ng-template>
-						<div>
-							<mat-radio-group formControlName="missionEra" #missionEra required >
-								<ul>
-									<li *ngFor="let era of mC.MissionEras" class="mb-2">
-										<mat-radio-button [value]="era">
-											{{era}}
-										</mat-radio-button>
-									</li>
-								</ul>
-							</mat-radio-group>
-						</div>
-						<button mat-button matStepperNext>Next</button>
-			    </form>
-			  </mat-step>
 				<mat-step [stepControl]="missionDescGroup">
 			    <form [formGroup]="missionDescGroup">
 			      <ng-template matStepLabel>Description</ng-template>
@@ -153,12 +136,27 @@
 							    <mat-option *ngFor="let tag of mC.MissionTags" [value]="tag">{{tag}}</mat-option>
 							  </mat-select>
 							</mat-form-field>
-							<mat-label class="mr-4">Time of Day:</mat-label>
+							<mat-label class="mr-4 mb-4" style="display: flex;">Time of Day:</mat-label>
 							<mat-radio-group formControlName="misTime" #misTime required>
 								<mat-radio-button *ngFor="let time of mC.MissionTimes" [value]="time">
 									{{time}}
 								</mat-radio-button>
 							</mat-radio-group>
+							<mat-label class="mr-4 mb-4 mt-4" style="display: flex;">Era:</mat-label>
+							<mat-button-toggle-group formControlName="missionEra" #missionEra required>
+								<mat-button-toggle *ngFor="let era of mC.MissionEras" [value]="era">
+									{{era}}
+								</mat-button-toggle>
+							</mat-button-toggle-group>
+							<!--<mat-radio-group formControlName="missionEra" #missionEra required >
+								<ul>
+									<li *ngFor="let era of mC.MissionEras" class="mb-2">
+										<mat-radio-button [value]="era">
+											{{era}}
+										</mat-radio-button>
+									</li>
+								</ul>
+							</mat-radio-group>-->
 						</div>
 						<button mat-button matStepperNext>Next</button>
 			    </form>
