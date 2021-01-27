@@ -524,7 +524,7 @@ export class MissionUploadComponent implements OnInit {
 		const misType = this.missionTypeGroup.get('missionType')?.value;
 		formData.append('type', misType.title);
 		formData.append('size', [this.missionSizeGroup.get('minPlayers')?.value, this.missionSizeGroup.get('maxPlayers')?.value]);
-		if (misType.ratio) {
+		if (misType.ratio || this.missionTypeGroup.get('ratioLOL')?.value) {
 			const parsedRatios: number[] = [
 				this.missionSizeGroup.get('ratioBluforE')?.value ? this.missionSizeGroup.get('ratioBlufor')?.value : -1,
 				this.missionSizeGroup.get('ratioOpforE')?.value ? this.missionSizeGroup.get('ratioOpfor')?.value : -1,

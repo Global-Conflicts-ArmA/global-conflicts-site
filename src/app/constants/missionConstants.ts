@@ -17,7 +17,7 @@ export class MissionConstants {
 			title: 'LOL'
 		},
 		{
-			title: 'TRAINING',
+			title: 'Training',
 			str: 'TRN',
 		},
 	]
