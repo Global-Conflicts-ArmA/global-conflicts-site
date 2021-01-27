@@ -46,3 +46,73 @@
 	}
 
 }
+
+.mat-slider {
+	margin-left: 20px;
+}
+
+.mat-slider-vertical {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	margin-right: 20px;
+}
+
+.mat-slider-track-fill,
+.mat-slider-wrapper,
+.mat-slider-track-wrapper,
+.mat-slider-track-background {
+    height: 5px !important;
+}
+
+:host ::ng-deep {
+	.mat-slider-track-fill,
+	.mat-slider-wrapper,
+	.mat-slider-track-wrapper,
+	.mat-slider-track-background {
+		width: 5px !important;
+	}
+	.mat-slider-thumb-label-text {
+		opacity: 1 !important;
+	}
+	.mat-slider-thumb-label {
+    transform: rotate(-45deg) !important;
+    border-radius: 50% 50% 0 !important;
+  }
+  .mat-slider-thumb {
+    transform: scale(0) !important;
+  }
+	.mat-slider-disabled .mat-slider-track-fill {
+		background-color: rgba(255, 255, 255, 0.3) !important;
+	}
+	.blueSlider {
+		.mat-slider-thumb,
+		.mat-slider-thumb-label,
+		.mat-slider-track-fill {
+		  background-color: blue;
+		}
+	}
+	.redSlider {
+		.mat-slider-thumb,
+		.mat-slider-thumb-label,
+		.mat-slider-track-fill {
+		  background-color: red;
+		}
+	}
+	.greenSlider {
+		.mat-slider-thumb,
+		.mat-slider-thumb-label,
+		.mat-slider-track-fill {
+		  background-color: green;
+		}
+	}
+	.yellowSlider {
+		.mat-slider-thumb,
+		.mat-slider-thumb-label,
+		.mat-slider-track-fill {
+		  background-color: yellow;
+		}
+		.mat-slider-thumb-label-text {
+			color: black;
+		}
+	}
+}

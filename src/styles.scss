@@ -210,6 +210,17 @@ $mat-warn: (
     darker: $light-primary-text,
   )
 );
+$mat-red: (
+  main: #f00,
+  lighter: #f00,
+  darker: #f00,
+  200: #f00, // For slide toggle,
+  contrast : (
+    main: $light-primary-text,
+    lighter: $dark-primary-text,
+    darker: $light-primary-text,
+  )
+);
 $theme-warn: mat-palette($mat-warn, main, lighter, darker);;
 
 $theme: mat-dark-theme($theme-primary, $theme-accent, $theme-warn);
@@ -353,7 +364,7 @@ a:hover {
 }
 
 
-.row{
+.row {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;

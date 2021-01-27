@@ -1,12 +1,15 @@
 const express = require('express');
 const Mission = require('../models/mission.model');
+const User = require('../models/discordUser.model');
 const router = express.Router();
 const multer = require('multer')
 const fs = require('fs')
 const path = require('path');
+const sharp = require('sharp');
 const DiscordOauth2 = require("discord-oauth2");
 const {getDiscordUserFromCookies} = require("../misc/validate-cookies");
 const {discordJsClient, Discord} = require("../config/discord-bot");
+const {MissionTerrains} = require('../mission-enums');
 
 const trustedUploaderRoles = ['Admin', 'GM', 'Mission Maker'];
 
@@ -18,23 +21,21 @@ fileFilterFunction = async function (req, file, callback) {
 		return callback(null, false);
 	}
 
-
-	const isTrustedUploader = req.discordUser.roles.cache.find(r => trustedUploaderRoles.indexOf(r.name) !== -1)
-	req.uploadPath = isTrustedUploader ? process.env.TEST_SERVER_MPMissions : process.env.TEST_SERVER_READY;
-	req.missionDataErrors = validateUploadData(req);
+	req.uploadPath = process.env.TEST_SERVER_READY;
+	req.missionDataErrors = validateUploadData(req.body);
 	if (Object.keys(req.missionDataErrors).length > 0) {
 		callback(null, false);
 		return;
 	}
 	if (file.mimetype !== 'application/octet-stream') {
-		req.missionDataErrors["missionFile"] = 'File is not a .pbo.';
+		req.missionDataErrors["file"] = 'File is not a .pbo.';
 		callback(null, false);
 		return;
 	} else {
 		const originalNameArray = file.originalname.split('.');
 		const format = originalNameArray[originalNameArray.length - 1]
 		if (format !== "pbo") {
-			req.missionDataErrors["missionFile"] = 'File is not a pbo.';
+			req.missionDataErrors["file"] = 'File is not a pbo.';
 			callback(null, false);
 			return;
 		} else if (fs.existsSync(`${process.env.ROOT_FOLDER}${req.uploadPath}/${file.originalname}`)) {
@@ -47,147 +48,167 @@ fileFilterFunction = async function (req, file, callback) {
 	}
 	req.file = file;
 	callback(null, true);
-
 }
 
 
 const uploadMulter = multer({
+	limits: { fieldSize: 25 * 1024 * 1024 },
 	fileFilter: fileFilterFunction,
 	storage: multer.diskStorage({
 		destination: function (req, file, cb) {
 			cb(null, `${process.env.ROOT_FOLDER}${req.uploadPath}`)
 		},
 		filename: function (req, file, cb) {
-			cb(null, file.originalname)
+			cb(null, req.body.fileName)
 		}
 	})
 })
 
 
-function validateUploadData(req, res) {
+function validateUploadData(reqBody, res) {
 	const errors = {};
-	if (req.fileValidationError) {
-		errors.mission = req.fileValidationError
+	if (!reqBody.author) {
+		errors.author = "Missing author.";
 	}
-	if (!req.body.description) {
+	if (!reqBody.authorID) {
+		errors.authorID = "Missing authorID.";
+	}
+	if (!reqBody.name) {
+		errors.name = "Missing name.";
+	}
+	if (!reqBody.fileName) {
+		errors.fileName = "Missing fileName.";
+	}
+	if (!reqBody.terrain) {
+		errors.terrain = "Missing terrain.";
+	}
+	const validMissionTypes = ["COOP", "TVT", "COTVT", "LOL", "TRAINING"];
+	if (!reqBody.type) {
+		errors.type = "Missing mission type.";
+	} else if (!validMissionTypes.includes(reqBody.type)) {
+		errors.type = "Invalid mission type.";
+	}
+	if (!reqBody.size) {
+		errors.size = "Missing size.";
+	}
+	if (!reqBody.description) {
 		errors.description = "Missing description.";
 	}
-	if (!req.body.minPlayers) {
-		errors.minPlayers = "Missing minimum amount of players.";
+	if (!reqBody.tags) {
+		errors.tags = "Missing tags.";
 	}
-	if (!req.body.maxPlayers) {
-		errors.maxPlayers = "Missing maximum amount of players.";
+	if (!reqBody.timeOfDay) {
+		errors.timeOfDay = "Missing timeOfDay.";
 	}
-	if (!req.body.missionName) {
-		errors.missionName = "Missing mission Name.";
+	if (!reqBody.era) {
+		errors.era = "Missing era.";
 	}
-	if (!req.body.version) {
+	if (!reqBody.version) {
 		errors.version = "Missing Version.";
 	}
-
-	const validMissionType = ["COOP", "TVT", "COTVT", "LOL"]
-	if (!req.body.missionType) {
-		errors.missionType = "Missing mission type.";
-	} else if (validMissionType.indexOf(req.body.missionType) === -1) {
-		errors.missionType = "Invalid mission type.";
-	}
-
 	return errors;
-
-
 }
 
-function insertMissionOnDatabase(mission) {
-	mission.save(function (err) {
+async function insertMissionOnDatabase(mission, query) {
+	const options = {
+		upsert: true,
+		safe: true,
+		new: true,
+	};
+	let missionData = await Mission.findOneAndUpdate(query, mission, options, function(err, doc) {
 		if (err) {
 			console.log(err);
 		}
-	})
+	});
 }
 
-
-router.get("/scan", function (req, res) {
-	let pass = req.query.pass;
-	if (pass !== process.env.ADMIN_PASSWORD) {
-		return res.send(401);
-
-	}
-
-	const paths = [process.env.TEST_SERVER_READY, process.env.TEST_SERVER_MPMissions, process.env.MAIN_SERVER_MPMissions];
-
-	paths.forEach(path => {
-
-		fs.readdir(`${process.env.ROOT_FOLDER}${path}`, function (err, files) {
+async function insertUserOnDatabase(user, query, missionID) {
+	const options = {
+		upsert: true,
+		safe: true,
+		new: true,
+	};
+	let userData = await User.findOneAndUpdate(query, user, options, function(err, doc) {
+		if (err) {
+			console.log(err);
+		}
+	});
+	if (userData.missions.indexOf(missionID) === -1) {
+		userData.missions.push(missionID);
+		userData.save(function (err) {
 			if (err) {
-				return console.log('Unable to scan directory: ' + err);
-			}
-			try {
-				let iA = 0;
-				for (let i = 0; i < files.length; i++) {
-					iA = i;
-					let file = files[i];
-
-					const fileDotSplit = file.split('.')
-					const format = fileDotSplit[fileDotSplit.length - 1]
-					if (format !== "pbo") {
-						continue;
-					}
-					const terrain = fileDotSplit[fileDotSplit.length - 2]
-					let missionName = ""
-					let version = ""
-					let missionType = ""
-					let maxPlayers = ""
-					let fileStats = ""
-					try {
-						missionName = file.match(new RegExp('(?<=_)(.*)(?=_[Vv])'))[0];
-						version = file.match(new RegExp('([^vV]+)(\\.)'))[0].split('.')[0]
-						missionType = file.match('^[a-zA-Z]{2,}')[0].toUpperCase();
-						maxPlayers = file.match('(\\d+)')[0].toUpperCase();
-						fileStats = fs.statSync(`${path}/${file}`);
-					} catch (e) {
-						console.log(e);
-						continue;
-					}
-
-					console.log(file);
-					console.log(`${missionType} | ${maxPlayers} | ${missionName} | ${terrain}`);
-					console.log('_________________________________________________________');
-
-					Mission.updateOne({fileName: file}, {
-						$setOnInsert: {
-							name: missionName,
-							fileName: file,
-							author: "--",
-							authorID: "--",
-							type: missionType,
-							terrain: terrain,
-							description: "--",
-							maxPlayers: maxPlayers,
-							minPlayers: 0,
-							uploadDate: fileStats.mtime,
-							version: version,
-						},
-						$addToSet: {paths: path}
-					}, {upsert: true}, (err, docs) => {
-						if (err) {
-							console.log(`Error upserting ${err}`)
-						} else {
-							console.log(`Upserted`)
-						}
-					});
-
-
-				}
-			} catch (e) {
-				console.log(e);
+				console.log(err);
 			}
 		})
-	});
-	return res.send("ok");
-});
+	}
+}
 
-router.post("/", uploadMulter.single("missionFile"), (req, res) => {
+async function getImage(base64Image) {
+	let parts = base64Image.split(';');
+	let mimType = parts[0].split(':')[1];
+	let imageData = parts[1].split(',')[1];
+	var img = await Buffer.from(imageData, 'base64');
+	const resizedBuffer = await sharp(img)
+		.resize(256, 256)
+		.toBuffer()
+		.catch(e => {console.log('imageError', e)})
+	return resizedBuffer
+}
 
+async function postDiscord(reqBody, avatarURL, uploadPath) {
+	let strTerrain = '';
+	if (MissionTerrains[reqBody.terrain]) {
+		strTerrain = MissionTerrains[reqBody.terrain].name;
+	}
+
+	const newMissionEmbed = new Discord.MessageEmbed()
+		.setColor('#22cf26')
+		.setTitle(reqBody.fileName)
+		.setAuthor(`Author: ${reqBody.author}`, avatarURL)
+		.setDescription(`Directory: ${uploadPath}`)
+		.addFields(
+			{ name: 'Description:', value: reqBody.description, inline: false },
+			{ name: 'Player Count:', value: `**Min:** ${reqBody.size.split(",")[0]} **Max:** ${reqBody.size.split(",")[1]}`, inline: true },
+			{ name: 'Type:', value: reqBody.type, inline: true },
+			{ name: 'Terrain:', value: strTerrain, inline: true },
+			{ name: 'Time of Day:', value: reqBody.timeOfDay, inline: true },
+			{ name: 'Era:', value: reqBody.era, inline: true },
+			{ name: 'Tags:', value: reqBody.tags.split(",").join(", "), inline: false },
+		)
+		.setFooter("")
+		.setTimestamp()
+
+		if (reqBody.ratios) {
+			let ratioStr = '';
+			let splitStr = reqBody.ratios.split(",");
+			if (splitStr[0] > 0) {
+				ratioStr = ratioStr + `**Blufor:** ${splitStr[0]} `
+			}
+			if (splitStr[1] > 0) {
+				ratioStr = ratioStr + `**Opfor:** ${splitStr[1]} `
+			}
+			if (splitStr[2] > 0) {
+				ratioStr = ratioStr + `**Indfor:** ${splitStr[2]} `
+			}
+			if (splitStr[3] > 0) {
+				ratioStr = ratioStr + `**Civ:** ${splitStr[3]} `
+			}
+			newMissionEmbed.addField('Ratios:',ratioStr,false);
+		}
+
+		if (reqBody.image) {
+			const resizedBuffer = await getImage(reqBody.image);
+			let attachment = new Discord.MessageAttachment(resizedBuffer, "img.png");
+			newMissionEmbed.attachFiles([attachment])
+			newMissionEmbed.setImage('attachment://img.png');
+		}
+
+		discordJsClient.channels.cache
+			.get(process.env.DISCORD_BOT_CHANNEL)
+			.send('New mission uploaded', newMissionEmbed)
+}
+
+router.post("/", uploadMulter.single('fileData'), (req, res) => {
 
 	if (req.authError) {
 		return res.status(401).send({
@@ -195,54 +216,40 @@ router.post("/", uploadMulter.single("missionFile"), (req, res) => {
 		})
 	}
 
-
 	if (Object.keys(req.missionDataErrors).length > 0) {
 		return res.status(400).send({"missionErrors": req.missionDataErrors})
 	}
 
-	let fullMissionName = req.file.originalname;
+	postDiscord(req.body, req.discordUser.user.displayAvatarURL(), req.uploadPath);
 
-	const newMissionEmbed = new Discord.MessageEmbed()
-		.setColor('#22cf26')
-		.setTitle(fullMissionName)
-		.setAuthor(`Author: ${req.discordUser.user.username}`, req.discordUser.user.displayAvatarURL())
-		.setDescription(`Directory: ${req.uploadPath}`)
-		.addField('Description', req.body.description)
-		.addField('Min. Players', req.body.minPlayers)
-		.setFooter("👍 if tested and ready")
-		.setTimestamp()
-
-
-	discordJsClient.channels.cache
-		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send('New mission uploaded to the Test Server!', newMissionEmbed)
-		.then(embedMessage => {
-			embedMessage.react("👍");
-		})
-	// TODO save mission on mongodb
-
-	const terrain = (req.file.originalname.substring(
-		req.file.originalname.indexOf('.') + 1,
-		req.file.originalname.lastIndexOf('.')
-	));
-
-	const mission = new Mission({
-		name: req.body.missionName,
-		fileName: req.file.originalname,
-		author: req.discordUser.user.username,
-		authorID: req.discordUser.user.id,
-		type: req.body.missionType,
-		terrain: terrain,
+	const mission = {
+		name: req.body.name,
+		fileName: req.body.fileName,
+		author: req.body.author,
+		authorID: req.body.authorID,
+		terrain: req.body.terrain,
+		type: req.body.type,
+		size: req.body.size,
 		description: req.body.description,
-		maxPlayers: req.body.maxPlayers,
-		minPlayers: req.body.minPlayers,
+		tags: req.body.tags,
+		timeOfDay: req.body.timeOfDay,
+		era: req.body.era,
 		uploadDate: Date.now(),
 		version: req.body.version,
 		paths: [req.uploadPath],
+	};
+	if (req.body.image) {mission.image = req.body.image};
+	const query = { fileName: req.body.fileName };
+	insertMissionOnDatabase(mission, query);
 
-	});
-	insertMissionOnDatabase(mission)
-
+	const user = {
+		discordId: req.discordUser.user.id,
+		username: req.discordUser.user.username,
+		avatar: req.discordUser.user.displayAvatarURL(),
+		role: req.discordUser.roles.highest.name,
+	};
+	const userQuery = { discordId: req.discordUser.user.id };
+	insertUserOnDatabase(user, userQuery, req.body.fileName);
 
 	return res.send({"ok": true})
 });

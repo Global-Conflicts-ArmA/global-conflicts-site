@@ -1,11 +1,13 @@
 export class DiscordUser {
+	id: string;
 	token: string;
 	username: string;
 	role: string;
 	roleColor: string;
 	avatarLink: string;
 
-	constructor(token: string, username: string, role: string, roleColor: string, avatarLink: string) {
+	constructor(id: string, token: string, username: string, role: string, roleColor: string, avatarLink: string) {
+		this.id = id;
 		this.token = token;
 		this.username = username;
 		this.role = role;
