@@ -74,6 +74,7 @@
     "ngx-material-file-input": "^2.1.1",
     "nodemon": "^1.17.5",
     "rxjs": "^6.5.5",
+    "sharp": "^0.27.0",
     "swagger-ui-express": "^3.0.9",
     "winston": "^3.3.3",
     "yarn": "^1.22.10",

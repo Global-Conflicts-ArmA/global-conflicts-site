@@ -21,6 +21,18 @@ const discordUserSchema = new Schema(
 			type: Boolean,
 			required: false,
 		},
+		missions: {
+			type: Array,
+			required: false,
+		},
+		reports: {
+			type: Array,
+			required: false,
+		},
+		reviews: {
+			type: Array,
+			required: false,
+		},
 	},
 	{
 		versionKey: false,

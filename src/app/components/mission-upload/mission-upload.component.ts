@@ -36,7 +36,7 @@ export class MissionUploadComponent implements OnInit {
 	uploadPressed = false;
 	missionErrors: object = {};
 	authError: string | null;
-	uploadingState: string;
+	uploadingState: string = 'ready';
 	missionFileName = '.pbo';
 	missionDescription = '';
 	missionImageFile = null;
@@ -52,7 +52,6 @@ export class MissionUploadComponent implements OnInit {
 	missionNameGroup: FormGroup;
 	missionTypeGroup: FormGroup;
 	missionSizeGroup: FormGroup;
-	missionEraGroup: FormGroup;
 	missionDescGroup: FormGroup;
 	fileImageGroup: FormGroup;
 
@@ -74,7 +73,8 @@ export class MissionUploadComponent implements OnInit {
 		this.missionTypeGroup = this.formBuilder.group({
       missionType: ['', [
 				Validators.required
-			]]
+			]],
+			ratioLOL: ['']
     });
 		this.missionSizeGroup = this.formBuilder.group(
 			{
@@ -95,20 +95,18 @@ export class MissionUploadComponent implements OnInit {
 				Validators.required,
 				this.checkMissionDesc()
 			]],
-			misTags: [''],
-			misTime: [Validators.required],
-			missionEra: ['', [
+			misTags: ['', [Validators.required]],
+			misTime: ['', [Validators.required]],
+			misEra: ['', [
 				Validators.required
 			]]
     });
 		this.fileImageGroup = this.formBuilder.group({
       missionImage: ['', [
-				Validators.required,
-				this.checkImageFile(),
 				FileValidator.maxContentSize(this.maxSizeImage)
 			]],
 			imgToggle: ['']
-    });
+    }, { validators: [this.checkImageFile.bind(this)] });
 	}
 
 	onListChipRemoved(multiSelect: MatSelect, matChipIndex: number): void {
@@ -296,11 +294,22 @@ export class MissionUploadComponent implements OnInit {
   }
 
 	getIfTVT(type = this.missionTypeGroup.get('missionType')) {
+		if (this.missionTypeGroup.get('ratioLOL')?.value) {
+			return true
+		}
 		return type && type.value ? (type.value.ratio ?? false): false
 	}
 
+	ratioOverride() {
+		const status = this.missionTypeGroup.get('ratioLOL')?.value;
+		if (!status) {
+			this.missionSizeGroup.get('ratioBluforE')?.setErrors(null)
+		}
+		return status
+	}
+
 	checkMissionRatios(controlGroup: AbstractControl) {
-		const tvt = this.missionTypeGroup.get('missionType')?.value?.ratio
+		const tvt = this.getIfTVT();
 		if (tvt) {
 			const enabledBlu = controlGroup.get('ratioBluforE')?.value;
 			const enabledOp = controlGroup.get('ratioOpforE')?.value;
@@ -311,12 +320,9 @@ export class MissionUploadComponent implements OnInit {
 					tooFew: true
 				})
 			} else {
-				controlGroup.get('ratioBluforE')?.setErrors({
-					tooFew: false
-				})
+				controlGroup.get('ratioBluforE')?.setErrors(null)
 			}
 		}
-	  return null
 	}
 
 	getRatioErrorMessage() {
@@ -366,23 +372,58 @@ export class MissionUploadComponent implements OnInit {
 		return null;
   }
 
-	checkImageFile() {
-	  return function (control: FormControl) {
-	    const files = control.value;
-	    if (files && files.files[0]) {
+	getTagsErrorMessage() {
+		let control = this.missionDescGroup.get('misTags');
+		if (control) {
+			if (control.hasError('required')) {
+				return `You must select at least one tag`;
+			}
+			return null;
+		}
+		return null;
+  }
+
+	getReqErrorMessage(controlStr:string) {
+		let control = this.missionDescGroup.get(controlStr);
+		if (control) {
+			if (control.hasError('required')) {
+				return `You must choose an option`;
+			}
+			return null;
+		}
+		return null;
+  }
+
+	checkImageFile(controlGroup: AbstractControl) {
+		let hasError: boolean = false;
+		const toggle = controlGroup.get('imgToggle')?.value;
+		if (toggle) {
+			const files = controlGroup.get('missionImage')?.value;
+			if (files && files.files[0]) {
 				const file = files.files[0];
 				const fileNameArray = file.name.split('.');
 				const fileExt = fileNameArray[fileNameArray.length - 1].toLowerCase();
 				const acceptedFileExt = ['png','jpeg','jpg'];
 				if (!acceptedFileExt.includes(fileExt)) {
-	        return {
-	          requiredFileType: true
-	        };
-	      }
-	      return null;
-	    }
-	    return null;
-	  };
+					hasError = true;
+					controlGroup.get('missionImage')?.setErrors({
+						requiredFileType: true
+					})
+	      } else {
+					if (controlGroup.get('missionImage')?.hasError('maxContentSize')) {
+						hasError = true
+		      }
+				}
+	    } else {
+				hasError = true;
+				controlGroup.get('missionImage')?.setErrors({
+					required: true
+				})
+			}
+		}
+		if (!hasError) {
+			controlGroup.get('missionImage')?.setErrors(null)
+		}
 	}
 
 	setImagePreview(file: any) {
@@ -400,7 +441,8 @@ export class MissionUploadComponent implements OnInit {
 
 	getImageErrorMessage() {
 		let missionImage = this.fileImageGroup.get('missionImage');
-		if (missionImage) {
+		let toggleStatus = this.fileImageGroup.get('imgToggle')?.value;
+		if (missionImage && toggleStatus) {
 			if (missionImage.hasError('required')) {
 	      return 'Please select a file';
 	    }
@@ -413,7 +455,7 @@ export class MissionUploadComponent implements OnInit {
 	      return `The total size must not exceed ${this.bytesToSize(maxSize)}	(size: ${this.bytesToSize(actualSize)}).`;
 	    }
 		}
-    return 'unknown error';
+    return null;
   }
 
 	bytesToSize(bytes: number) {
@@ -433,6 +475,7 @@ export class MissionUploadComponent implements OnInit {
 		const toggleStatus = this.fileImageGroup.get('imgToggle')?.value;
 		if (!toggleStatus) {
 			this.fileImageGroup.get('missionImage')?.setValue(null);
+			this.fileImageGroup.get('missionImage')?.setErrors(null);
 			this.missionImageFile = null;
 			this.missionImageSrc = null
 		}
@@ -449,39 +492,62 @@ export class MissionUploadComponent implements OnInit {
 			this.misType = missionType.value.str ?? missionType.value.title;
 			this.buildMissionFileName();
 		}
+		this.missionSizeGroup.get('ratioBluforE')?.setErrors(null)
 	}
 
 	buildMissionFileName() {
-		let missionName = this.missionNameGroup.get('missionName')?.value ?? '';
+		const missionName = this.missionNameGroup.get('missionName')?.value;
 		const safeMissionName = missionName.replace(' ', '_').replace(/\W/g, '');
-		const safeMissionType = this.misType;
-		const safeMaxPlayers = this.maxPlayers ? this.padZeros(this.maxPlayers) : '';
-		const spaceMaxPlayersMissionName = safeMissionName && (safeMaxPlayers || this.misType) ? '_' : '';
-		const spaceMissionNameVersion = (safeMissionName || this.misType || safeMaxPlayers) && this.version ? '_V' : '';
+		const safeMissionType = this.missionTypeGroup.get('missionType')?.value?.str ? this.missionTypeGroup.get('missionType')?.value?.str : this.missionTypeGroup.get('missionType')?.value?.title;
+		const safeMaxPlayers = this.padZeros(this.missionSizeGroup.get('maxPlayers')?.value);
+		//const safeVersion = this.getMissionVersion();
+		const safeVersion = 1;
 		let mapName = '';
 		if (this.missionToUpload) {
 			mapName = (this.missionToUpload.name).substring(
 				this.missionToUpload.name.indexOf('.') + 1,
 				this.missionToUpload.name.lastIndexOf('.')
 			);
+			this.missionTerrain = mapName;
 			mapName = '.' + mapName;
 		}
-		this.missionFileName = `${safeMissionType}${safeMaxPlayers ?? ''}${spaceMaxPlayersMissionName}${safeMissionName}${spaceMissionNameVersion}${this.version >= 1 ? this.version : ''}${mapName}.pbo`;
+		this.missionFileName = `${safeMissionType}${safeMaxPlayers}_${safeMissionName}_V${safeVersion}${mapName}.pbo`;
 	}
 
-	upload() {
-		this.uploadPressed = true;
-		if (Object.keys(this.missionErrors).length > 0) {
-			return;
-		}
+	submitMission() {
 		const formData: any = new FormData();
-		formData.append('description', this.description);
-		formData.append('minPlayers', this.minPlayers);
-		formData.append('maxPlayers', this.maxPlayers);
-		formData.append('missionType', this.misType);
-		formData.append('version', this.version);
-		formData.append('missionName', this.missionName);
-		formData.append('missionFile', this.missionToUpload, this.missionFileName);
+		formData.append('name', this.missionNameGroup.get('missionName')?.value);
+		formData.append('author', this.discordUser?.username);
+		formData.append('authorID', this.discordUser?.id);
+		formData.append('fileName', this.missionFileName);
+		formData.append('terrain', this.missionTerrain);
+		const misType = this.missionTypeGroup.get('missionType')?.value;
+		formData.append('type', misType.title);
+		formData.append('size', [this.missionSizeGroup.get('minPlayers')?.value, this.missionSizeGroup.get('maxPlayers')?.value]);
+		if (misType.ratio) {
+			const parsedRatios: number[] = [
+				this.missionSizeGroup.get('ratioBluforE')?.value ? this.missionSizeGroup.get('ratioBlufor')?.value : -1,
+				this.missionSizeGroup.get('ratioOpforE')?.value ? this.missionSizeGroup.get('ratioOpfor')?.value : -1,
+				this.missionSizeGroup.get('ratioIndforE')?.value ? this.missionSizeGroup.get('ratioIndfor')?.value : -1,
+				this.missionSizeGroup.get('ratioCivE')?.value ? this.missionSizeGroup.get('ratioCiv')?.value : -1,
+			];
+			formData.append('ratios', parsedRatios);
+		}
+		formData.append('description', this.missionDescGroup.get('misDescription')?.value);
+		formData.append('tags', this.missionDescGroup.get('misTags')?.value);
+		formData.append('timeOfDay', this.missionDescGroup.get('misTime')?.value);
+		formData.append('era', this.missionDescGroup.get('misEra')?.value);
+		if (this.fileImageGroup.get('imgToggle')?.value) {
+			formData.append('image', this.missionImageSrc);
+		}
+		//const safeVersion = this.getMissionVersion();
+		const safeVersion = 1;
+		formData.append('version', safeVersion);
+		formData.append('updates', []);
+		formData.append('fileData', this.missionToUpload);
+		for (var key of formData.entries()) {
+    	console.log(key[0] + ', ' + key[1]);
+    }
 		this.uploadingState = 'uploading';
 		this.authError = null;
 		this.missionsService.upload(formData).subscribe(value => {
@@ -492,7 +558,6 @@ export class MissionUploadComponent implements OnInit {
 			this.authError = httpError.error.authError;
 			this.uploadingState = 'error';
 		});
-
 	}
 
 }

@@ -5,27 +5,7 @@
 		</div>
 
 		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
-			<div class="explain" *ngIf="discordUser">
-				• The name of your mission on the server will be a composition of the options you choose bellow. The file name of
-				the mission on your PC is irrelevant.
-				<div *ngIf="discordUser.isTrustedMissionMaker()">
-					• You are trusted mission maker! Your mission will be uploaded to the "MPMissions" folder of the Test Server.
-				</div>
-				<div *ngIf="!discordUser.isTrustedMissionMaker()">
-					• You are not trusted mission maker(yet)! Your mission will be uploaded to the "READY" folder of the Test
-					Server.
-				</div>
-			</div>
-			<div class="mission-file-name-result">
-				Mission file name: <b>{{missionFileName}}</b>
-			</div>
-			<div class="mission-desc-result">
-				Description: <b>{{missionDescription}}</b>
-			</div>
-			<div class="mission-desc-result">
-				Image: <img [src]="missionImageSrc" *ngIf="missionImageSrc" width="500" style="max-width:500px; height:auto; max-height:600px;">
-			</div>
-			<mat-vertical-stepper class="field-container" [linear]="false" #stepper>
+			<mat-vertical-stepper class="field-container" [linear]="true" #stepper>
 			  <mat-step [stepControl]="fileUploadGroup">
 			    <form [formGroup]="fileUploadGroup">
 			      <ng-template matStepLabel>Mission File</ng-template>
@@ -73,6 +53,11 @@
 										{{type.title}}
 									</mat-radio-button>
 								</mat-radio-group>
+								<mat-slide-toggle style="display: flex;" formControlName="ratioLOL"
+									*ngIf="missionTypeGroup.get('missionType')?.value?.title == 'LOL'"
+									#matInput class="mb-4 mt-4"L (change)="ratioOverride()" >
+									Team Ratios
+								</mat-slide-toggle>
 							</div>
 							<mat-error>{{getTypeErrorMessage()}}</mat-error>
 							<button mat-button matStepperNext>Next</button>
@@ -136,19 +121,22 @@
 							    </mat-select-trigger>
 							    <mat-option *ngFor="let tag of mC.MissionTags.sort()" [value]="tag">{{tag}}</mat-option>
 							  </mat-select>
+								<mat-error>{{getTagsErrorMessage()}}</mat-error>
 							</mat-form-field>
-							<mat-label class="mr-4 mb-4" style="display: flex;">Time of Day:</mat-label>
+							<mat-label class="mr-4 mb-4 mt-4" style="display: flex;">Time of Day:</mat-label>
 							<mat-radio-group formControlName="misTime" #misTime required>
 								<mat-radio-button *ngFor="let time of mC.MissionTimes" [value]="time">
 									{{time}}
 								</mat-radio-button>
 							</mat-radio-group>
+							<mat-error>{{getReqErrorMessage('misTime')}}</mat-error>
 							<mat-label class="mr-4 mb-4 mt-4" style="display: flex;">Era:</mat-label>
-							<mat-button-toggle-group formControlName="missionEra" #missionEra required>
+							<mat-button-toggle-group formControlName="misEra" #misEra required>
 								<mat-button-toggle *ngFor="let era of mC.MissionEras" [value]="era">
 									{{era}}
 								</mat-button-toggle>
 							</mat-button-toggle-group>
+							<mat-error>{{getReqErrorMessage('misEra')}}</mat-error>
 						</div>
 						<button mat-button matStepperNext>Next</button>
 			    </form>
@@ -171,8 +159,8 @@
 								<button mat-icon-button *ngIf="!missionImage.empty" (click)="missionImage.clear($event); missionImageFile = null; missionImageSrc = null">
 									<mat-icon matSuffix>clear</mat-icon> Clear Selection
 								</button>
-								<mat-error>{{getImageErrorMessage()}}</mat-error>
 				      </mat-form-field>
+							<mat-error>{{getImageErrorMessage()}}</mat-error>
 						</div>
 						<button mat-button matStepperNext>Next</button>
 			    </form>
@@ -180,8 +168,17 @@
 			  <mat-step>
 			    <ng-template matStepLabel>Submit</ng-template>
 			    <div>
-			      <!--<button mat-button (click)="">Submit Mission</button>-->
+			      <!--<button mat-button [disabled]="uploadingState!='ready' && uploadingState!='error'" (click)="submitMission()">Submit Mission</button>-->
+			      <button mat-button (click)="submitMission()">Submit Mission</button>
 			    </div>
+					<div class="upload-result">
+						<div class="result-error" *ngIf="uploadingState=='error'">Failed to upload mission</div>
+						<div class="result-uploading" *ngIf="uploadingState=='uploading'">Uploading mission...</div>
+						<div class="result-success" *ngIf="uploadingState=='success'"> Mission uploaded!</div>
+					</div>
+					<div class="upload-result">
+						<div class="result-error" *ngIf="authError">{{authError}}</div>
+					</div>
 			  </mat-step>
 			</mat-vertical-stepper>
 		</div>
