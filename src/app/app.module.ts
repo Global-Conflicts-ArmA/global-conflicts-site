@@ -39,6 +39,7 @@ import {MatChipsModule} from '@angular/material/chips';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 import {WikiComponent} from './components/wiki/wiki.component';
 import {AARComponent} from './components/aar/aar.component';
@@ -83,6 +84,7 @@ import {MissionConstants} from './constants/missionConstants';
 		MatSliderModule,
 		MatCheckboxModule,
 		MatButtonToggleModule,
+		MatSlideToggleModule,
 	],
 	bootstrap: [AppComponent],
 	providers: [

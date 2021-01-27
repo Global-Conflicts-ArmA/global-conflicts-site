@@ -66,7 +66,7 @@
 	        <form [formGroup]="missionTypeGroup">
 							<ng-template matStepLabel>Mission Type</ng-template>
 							<div class="mt-2">
-								<mat-radio-group formControlName="missionType" #missionType
+								<mat-radio-group formControlName="missionType" #missionType #matInput
 									(ngModelChange)="selectMissionType(); buildMissionFileName()" required
 								>
 									<mat-radio-button *ngFor="let type of mC.MissionTypes" [value]="type" >
@@ -93,8 +93,8 @@
 				        <input matInput formControlName="maxPlayers" autocomplete="off" placeholder="22" type="number" id="maxPlayers"
 									#maxSizeInput maxlength="3" (ngModelChange)="maxPlayers = maxSizeInput.value; buildMissionFileName()"
 								>
-								<mat-error>{{getSizeErrorMessage()}}</mat-error>
 				      </mat-form-field>
+							<mat-error>{{getSizeErrorMessage()}}</mat-error>
 						</div>
 						<mat-label *ngIf="getIfTVT()" class="inset-label row">Side Ratios:</mat-label>
 						<div *ngIf="getIfTVT()" style="display: flex;">
@@ -107,6 +107,7 @@
 							<mat-checkbox formControlName="ratioCivE" class="inset-label" style="align-self: center;" >CIVILIAN:</mat-checkbox>
 							<mat-slider formControlName="ratioCiv" class="yellowSlider column" [disabled]="!(missionSizeGroup.get('ratioCivE').value ? missionSizeGroup.get('ratioCivE').value: false)" [thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="0.1" [max]="5"></mat-slider>
 						</div>
+						<mat-error>{{getRatioErrorMessage()}}</mat-error>
 						<button mat-button matStepperNext>Next</button>
 			    </form>
 			  </mat-step>
@@ -148,15 +149,6 @@
 									{{era}}
 								</mat-button-toggle>
 							</mat-button-toggle-group>
-							<!--<mat-radio-group formControlName="missionEra" #missionEra required >
-								<ul>
-									<li *ngFor="let era of mC.MissionEras" class="mb-2">
-										<mat-radio-button [value]="era">
-											{{era}}
-										</mat-radio-button>
-									</li>
-								</ul>
-							</mat-radio-group>-->
 						</div>
 						<button mat-button matStepperNext>Next</button>
 			    </form>
@@ -165,7 +157,11 @@
 			    <form [formGroup]="fileImageGroup">
 			      <ng-template matStepLabel>Image</ng-template>
 						<div>
-							<mat-form-field>
+							<mat-slide-toggle #matInput class="mb-4" formControlName="imgToggle"
+								(change)="changeImageToggle()" >
+								Custom Mission Image
+							</mat-slide-toggle>
+							<mat-form-field *ngIf="fileImageGroup.get('imgToggle').value">
 				        <mat-label class="inset-label" for="file-input">Select Image</mat-label>
 				        <ngx-mat-file-input formControlName="missionImage" #missionImage valuePlaceholder="No file selected"
 				        	[accept]="['.png', '.jpg', '.jpeg']" (change)="missionImageFile = $event.target.files[0]; setImagePreview($event.target.files[0])" required
@@ -182,11 +178,9 @@
 			    </form>
 			  </mat-step>
 			  <mat-step>
-			    <ng-template matStepLabel>Done</ng-template>
-			    <p>You are now done.</p>
+			    <ng-template matStepLabel>Submit</ng-template>
 			    <div>
-			      <button mat-button matStepperPrevious>Back</button>
-			      <button mat-button (click)="stepper.reset()">Reset</button>
+			      <!--<button mat-button (click)="">Submit Mission</button>-->
 			    </div>
 			  </mat-step>
 			</mat-vertical-stepper>

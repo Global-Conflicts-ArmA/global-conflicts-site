@@ -6,7 +6,7 @@ import {MissionsService} from '../../services/missions.service';
 import {DiscordUser} from '../../models/discorduser';
 import {UserService} from '../../services/user.service';
 import {FileValidator} from 'ngx-material-file-input';
-import {MatSelect, MatSelectChange} from '@angular/material/select';
+import {MatSelect} from '@angular/material/select';
 
 @Component({
 	selector: 'app-mission-upload',
@@ -57,10 +57,6 @@ export class MissionUploadComponent implements OnInit {
 	fileImageGroup: FormGroup;
 
 	ngOnInit(): void {
-		console.log('MissionTypes:', this.mC.MissionTypes);
-		console.log('MissionTypes count:', this.mC.MissionTypes.length);
-		console.log('MissionTerrains:', MissionTerrains);
-		console.log('MissionEras:', this.mC.MissionEras);
 		this.discordUser = this.userService.getUserLocally();
 		this.fileUploadGroup = this.formBuilder.group({
       missionFile: ['', [
@@ -84,15 +80,15 @@ export class MissionUploadComponent implements OnInit {
 			{
 				minPlayers: new FormControl(''),
 				maxPlayers: new FormControl(''),
-				ratioBluforE: new FormControl({value: true}),
+				ratioBluforE: new FormControl(true),
 				ratioBlufor: new FormControl({value: 1, disabled: false}),
-				ratioOpforE: new FormControl({value: true}),
+				ratioOpforE: new FormControl(true),
 				ratioOpfor: new FormControl({value: 1, disabled: false}),
-				ratioIndforE: new FormControl({value: true}),
+				ratioIndforE: new FormControl(true),
 				ratioIndfor: new FormControl({value: 1, disabled: false}),
-				ratioCivE: new FormControl({value: true}),
+				ratioCivE: new FormControl(true),
 				ratioCiv: new FormControl({value: 1, disabled: false}),
-	    }, { validators: [this.checkMissionSize] }
+	    }, { validators: [this.checkMissionSize, this.checkMissionRatios.bind(this)] }
 		);
 		this.missionDescGroup = this.formBuilder.group({
       misDescription: ['', [
@@ -110,7 +106,8 @@ export class MissionUploadComponent implements OnInit {
 				Validators.required,
 				this.checkImageFile(),
 				FileValidator.maxContentSize(this.maxSizeImage)
-			]]
+			]],
+			imgToggle: ['']
     });
 	}
 
@@ -302,35 +299,34 @@ export class MissionUploadComponent implements OnInit {
 		return type && type.value ? (type.value.ratio ?? false): false
 	}
 
-	checkMissionRatio(type = this.missionTypeGroup.get('missionType')) {
-		return function (control: FormControl) {
-	    if (type && type.value && type.value.ratio) {
-				const ratio = control.value
-				if (!ratio || ratio.length == 0) {
-					return {
-						required: true
-					}
-				}
-				const regexp = /^[0-9](\.[0-9])*:[0-9](\.[0-9])*(:[0-9](\.[0-9])*)*/g;
-				if (!ratio.match(regexp)) {
-					return {
-			      wrongFormat: true
-			    }
-				}
-	      return null
-	    }
-	    return null
-	  };
+	checkMissionRatios(controlGroup: AbstractControl) {
+		const tvt = this.missionTypeGroup.get('missionType')?.value?.ratio
+		if (tvt) {
+			const enabledBlu = controlGroup.get('ratioBluforE')?.value;
+			const enabledOp = controlGroup.get('ratioOpforE')?.value;
+			const enabledInd = controlGroup.get('ratioIndforE')?.value;
+			const enabledCiv = controlGroup.get('ratioCivE')?.value;
+			if ([enabledBlu, enabledOp, enabledInd, enabledCiv].filter(Boolean).length < 2) {
+				controlGroup.get('ratioBluforE')?.setErrors({
+					tooFew: true
+				})
+			} else {
+				controlGroup.get('ratioBluforE')?.setErrors({
+					tooFew: false
+				})
+			}
+		}
+	  return null
 	}
 
 	getRatioErrorMessage() {
-		let desc = this.missionSizeGroup.get('misRatio');
+		let desc = this.missionSizeGroup.get('ratioBluforE');
 		if (desc) {
 			if (desc.hasError('required')) {
 				return `You must provide a ratio in the format of 1.5:1`;
 			}
-			if (desc.hasError('wrongFormat')) {
-				return `You must provide a TVT ratio with a proper format eg: 1.5:1`;
+			if (desc.hasError('tooFew')) {
+				return `You must select at least two teams`;
 			}
 			return null;
 		}
@@ -433,6 +429,15 @@ export class MissionUploadComponent implements OnInit {
     return stringCount;
 	}
 
+	changeImageToggle() {
+		const toggleStatus = this.fileImageGroup.get('imgToggle')?.value;
+		if (!toggleStatus) {
+			this.fileImageGroup.get('missionImage')?.setValue(null);
+			this.missionImageFile = null;
+			this.missionImageSrc = null
+		}
+	}
+
 	buildMissionDesc() {
 		const desc = this.missionDescGroup.get('misDescription');
 		this.missionDescription = desc ? desc.value ?? '' : '';
@@ -442,10 +447,6 @@ export class MissionUploadComponent implements OnInit {
 		let missionType = this.missionTypeGroup.get('missionType');
 		if (missionType && missionType.value) {
 			this.misType = missionType.value.str ?? missionType.value.title;
-			console.log('value:',missionType.value);
-			console.log('misType:',this.misType);
-			let isTVT = this.getIfTVT();
-			console.log('isTVT:', isTVT);
 			this.buildMissionFileName();
 		}
 	}
