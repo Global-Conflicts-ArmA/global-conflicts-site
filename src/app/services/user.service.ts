@@ -22,12 +22,14 @@ export class UserService {
 	}
 
 	public getUserLocally(): DiscordUser | null {
+		const id = this.cookieService.get('id');
 		const token = this.cookieService.get('token');
 		const username = this.cookieService.get('username');
 		const role = this.cookieService.get('role');
 		const roleColor = this.cookieService.get('roleColor');
+		const avatarLink = 'https://cdn.discordapp.com/avatars/' + this.cookieService.get('id') + '/' + this.cookieService.get('avatar') + '.png';
 		if (token) {
-			return new DiscordUser(token, username, role, roleColor);
+			return new DiscordUser(id, token, username, role, roleColor, avatarLink);
 		} else {
 			return null;
 		}

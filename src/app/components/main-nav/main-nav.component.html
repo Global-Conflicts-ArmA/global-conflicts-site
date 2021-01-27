@@ -1,0 +1,83 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+      #drawer class="sidenav" fixedInViewport="false"
+      attr.role="dialog"
+      mode="over">
+    <mat-toolbar class="accent-color nav-main-link">
+			<img
+				alt="Logo"
+				src="../../../assets/imgs/logo.png"
+				width="30px"
+				class="mr-2"
+			/>
+			Global Conflicts
+		</mat-toolbar>
+		<hr class="horizontal-line mr-3 ml-3" />
+    <mat-nav-list>
+			<a mat-menu-item class="nav-link accent-color" routerLinkActive="active" routerLink="" (click)="drawer.toggle()">Home</a>
+			<mat-menu #missionMenu="matMenu" class="mat-menu-trigger2">
+				<a mat-menu-item class="nav-link" routerLinkActive="active" routerLink="mission-list" (click)="drawer.toggle()" >List</a>
+				<a mat-menu-item class="nav-link" routerLinkActive="active" routerLink="mission-upload" (click)="drawer.toggle()">Upload</a>
+				<a mat-menu-item class="nav-link" routerLinkActive="active" routerLink="mission-stats" (click)="drawer.toggle()">Statistics</a>
+			</mat-menu>
+			<button mat-menu-item class="nav-link accent-color" (click)="missionMenuTrigger.openMenu()">Missions
+				<mat-icon class="ml-2 smaller-icon" color="accent">arrow_forward_ios</mat-icon>
+				<div #missionMenuTrigger="matMenuTrigger" [matMenuTriggerFor]="missionMenu"></div>
+			</button>
+			<!--<a mat-menu-item class="nav-link accent-color" routerLinkActive="active" routerLink="aar" (click)="drawer.toggle()">AAR</a>-->
+			<a mat-menu-item class="nav-link accent-color" routerLinkActive="active" routerLink="wiki" (click)="drawer.toggle()">Wiki</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        class="mat-icon-button sidebar-toggle mr-2"
+        (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async">
+        <mat-icon class="ml-auto mr-auto" color="accent" aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+			<img
+				*ngIf="!(isHandset$ | async)"
+				alt="Logo"
+				src="../../../assets/imgs/logo.png"
+				width="40px"
+				class="mr-2"
+			/>
+      <span class="ml-2 accent-color nav-main-link">Global Conflicts</span>
+      <span class="spacer"></span>
+      <ng-container *ngIf="!(isHandset$ | async)">
+				<a mat-menu-item class="nav-main-link accent-color" routerLinkActive="active" routerLink="" href="">Home</a>
+				<mat-menu #missionMenu="matMenu">
+					<button mat-menu-item class="nav-main-link" routerLinkActive="active" routerLink="mission-list">List</button>
+					<button mat-menu-item class="nav-main-link" routerLinkActive="active" routerLink="mission-upload">Upload</button>
+					<button mat-menu-item class="nav-main-link" routerLinkActive="active" routerLink="mission-stats">Statistics</button>
+				</mat-menu>
+				<a mat-menu-item class="nav-main-link accent-color" [matMenuTriggerFor]="missionMenu">
+					Missions
+					<mat-icon class="ml-1 mr-1 smaller-icon" color="accent">arrow_drop_down</mat-icon>
+				</a>
+				<!--<a mat-menu-item class="nav-main-link accent-color" routerLinkActive="active" routerLink="aar" href="">AAR</a>-->
+				<a mat-menu-item class="nav-main-link accent-color" routerLinkActive="active" routerLink="wiki" href="">Wiki</a>
+      </ng-container>
+			<a *ngIf="!discordUser" href="https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds">
+			<button type="button" class="ml-1 btn btn-outline btn-lg">
+				<mat-icon class="mr-2 discord-icon" svgIcon="discord"></mat-icon> Login
+			</button>
+			</a>
+			<button mat-menu-item class="nav-link" *ngIf="discordUser && !discordUser.isAMemberOfOurDiscord()" style="font-size: 12px">
+				You are not a part<br/> of our Discord server!
+			</button>
+			<mat-menu #avatarMenu="matMenu">
+				<span mat-menu-item class="nav-link-fake" *ngIf="discordUser && discordUser.isProcessed()" [style.color]="discordUser.roleColor">Role: {{discordUser.role}}</span>
+        <button mat-menu-item class="nav-link" routerLinkActive="active" routerLink="content">Content</button>
+        <button mat-menu-item class="nav-link" routerLinkActive="active" routerLink="settings">Settings</button>
+        <button mat-menu-item class="nav-link" (click)="logout()">Log Out</button>
+      </mat-menu>
+      <img class="rounded-circle mr-2 ml-2 nav-avatar img-fluid" *ngIf="discordUser" id="userAvatar" src="{{discordUser.avatarLink}}" alt="avatar" [matMenuTriggerFor]="avatarMenu">
+    </mat-toolbar>
+    <ng-content></ng-content>
+    <!-- Add Content Here -->
+  </mat-sidenav-content>
+</mat-sidenav-container>

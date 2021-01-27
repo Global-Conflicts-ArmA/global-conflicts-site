@@ -10,9 +10,7 @@ import {Mission} from '../models/mission';
 export class MissionsService {
 
 	constructor(private httpClient: HttpClient) {
-
 	}
-
 
 	public list(): Observable<Mission[]> {
 		return this.httpClient.get<Mission[]>('/api/missions');

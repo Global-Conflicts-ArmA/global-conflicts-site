@@ -1,61 +1,5 @@
 @use "../../../colors";
 
-.field-container {
-	border: solid 1px colors.$accent;
-	border-radius: 4px;
-	display: flex;
-	flex-direction: row;
-	transition: all 200ms;
-
-	&.invalid {
-		border: solid 1px red;
-	}
-
-
-	label {
-		color: white;
-		width: 125px;
-		background-color: colors.$accent;
-		padding: 8px 16px;
-		text-align: center;
-		justify-content: center;
-		align-items: center;
-		display: flex;
-		font-size: 14px;
-		font-weight: 400;
-		vertical-align: middle;
-		-ms-touch-action: manipulation;
-		-webkit-user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
-		z-index: -1;
-	}
-
-	input, .input-like {
-		width: 100%;
-		border-radius: 0 4px 4px 0;
-
-
-	}
-
-	&.file {
-		cursor: pointer;
-		min-height: 68px;
-
-		input {
-			opacity: 0;
-			top: 0;
-			left: 0;
-		}
-
-
-	}
-
-
-}
-
-
 .button-row {
 	display: flex;
 	min-height: 68px;
@@ -103,3 +47,72 @@
 
 }
 
+.mat-slider {
+	margin-left: 20px;
+}
+
+.mat-slider-vertical {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	margin-right: 20px;
+}
+
+.mat-slider-track-fill,
+.mat-slider-wrapper,
+.mat-slider-track-wrapper,
+.mat-slider-track-background {
+    height: 5px !important;
+}
+
+:host ::ng-deep {
+	.mat-slider-track-fill,
+	.mat-slider-wrapper,
+	.mat-slider-track-wrapper,
+	.mat-slider-track-background {
+		width: 5px !important;
+	}
+	.mat-slider-thumb-label-text {
+		opacity: 1 !important;
+	}
+	.mat-slider-thumb-label {
+    transform: rotate(-45deg) !important;
+    border-radius: 50% 50% 0 !important;
+  }
+  .mat-slider-thumb {
+    transform: scale(0) !important;
+  }
+	.mat-slider-disabled .mat-slider-track-fill {
+		background-color: rgba(255, 255, 255, 0.3) !important;
+	}
+	.blueSlider {
+		.mat-slider-thumb,
+		.mat-slider-thumb-label,
+		.mat-slider-track-fill {
+		  background-color: blue;
+		}
+	}
+	.redSlider {
+		.mat-slider-thumb,
+		.mat-slider-thumb-label,
+		.mat-slider-track-fill {
+		  background-color: red;
+		}
+	}
+	.greenSlider {
+		.mat-slider-thumb,
+		.mat-slider-thumb-label,
+		.mat-slider-track-fill {
+		  background-color: green;
+		}
+	}
+	.yellowSlider {
+		.mat-slider-thumb,
+		.mat-slider-thumb-label,
+		.mat-slider-track-fill {
+		  background-color: yellow;
+		}
+		.mat-slider-thumb-label-text {
+			color: black;
+		}
+	}
+}

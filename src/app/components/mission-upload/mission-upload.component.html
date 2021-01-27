@@ -5,112 +5,182 @@
 		</div>
 
 		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
-			<div class="explain" *ngIf="discordUser">
-				• The name of your mission on the server will be a composition of the options you choose bellow. The file name of
-				the mission on your PC is irrelevant.
-				<div *ngIf="discordUser.isTrustedMissionMaker()">
-					• You are trusted mission maker! Your mission will be uploaded to the "MPMissions" folder of the Test Server.
-				</div>
-				<div *ngIf="!discordUser.isTrustedMissionMaker()">
-					• You are not trusted mission maker(yet)! Your mission will be uploaded to the "READY" folder of the Test
-					Server.
-				</div>
-			</div>
-			<div class="mission-file-name-result">
-				Mission file name: <b>{{missionFileName}}</b>
-			</div>
-			<div>
-				<div class="field-container file" [class.invalid]="missionErrors['missionFile']" (click)="missionFileInput.click()">
-					<label class="inset-label" for="file-input">Select Mission .pbo</label>
-					<input #missionFileInput autocomplete="off" style="display: none" title="Select file" type="file"
-								 id="file-input"
-								 accept=".pbo"
-								 (change)="missionToUpload = $event.target.files[0]; validateMissionPBO(); buildMissionFileName()">
-					<div class="input-like"
-							 [class.placeholder]="missionToUpload==null">{{missionToUpload?.name || 'CO32_Mission_Name_V2.altis.pbo'}}</div>
-
-				</div>
-				<div class="error-display">{{missionErrors['missionFile']}}</div>
-			</div>
-			<div class="row">
-				<div>
-					<div class="field-container" [class.invalid]="missionErrors['missionName']">
-						<label class="inset-label" for="description">Mission name</label>
-						<input maxlength="100" placeholder="Operations Boomsstick"
-									 autocomplete="off" id="name" [(ngModel)]="missionName"
-									 (ngModelChange)="validateMisssionName(); buildMissionFileName()">
-					</div>
-					<div class="error-display">{{missionErrors['missionName']}}</div>
-				</div>
-				<div>
-					<div class="field-container" [class.invalid]="missionErrors['version']">
-						<label class="inset-label" for="minPlayers">Version</label>
-						<input autocomplete="off" placeholder="1" type="number" oninput="this.value = Math.abs(this.value)"
-									 id="version" [(ngModel)]="version"
-									 (ngModelChange)="validateVersion(); buildMissionFileName()">
-					</div>
-					<div class="error-display">{{missionErrors['version']}}</div>
-				</div>
-
-
-			</div>
-			<div class="row">
-				<div>
-					<div class="field-container" [class.invalid]="missionErrors['minPlayers']">
-						<label class="inset-label" for="minPlayers">Min. Player Count</label>
-						<input autocomplete="off" placeholder="22" type="number" id="minPlayers"
-									 oninput="this.value = Math.abs(this.value)" [(ngModel)]="minPlayers"
-									 (ngModelChange)="validateMinPlayers(); buildMissionFileName()">
-					</div>
-					<div class="error-display">{{missionErrors['minPlayers']}}</div>
-				</div>
-				<div>
-					<div class="field-container" [class.invalid]="missionErrors['maxPlayers']">
-						<label class="inset-label" for="maxPlayers">Max. Player Count</label>
-						<input autocomplete="off" placeholder="22" type="number" id="maxPlayers" [(ngModel)]="maxPlayers"
-									 (ngModelChange)="validateMaxPlayers(); buildMissionFileName()">
-					</div>
-					<div class="error-display">{{missionErrors['maxPlayers']}}</div>
-				</div>
-
-			</div>
-			<div>
-				<div class="field-container" [class.invalid]="missionErrors['missionType']">
-					<label class="inset-label">Mission Type</label>
-					<div class="button-row unselectable">
-						<div [class.selected]="missionType==MissionType.COOP" (click)="selectMissionType(MissionType.COOP)">COOP
+			<mat-vertical-stepper class="field-container" [linear]="true" #stepper>
+			  <mat-step [stepControl]="fileUploadGroup">
+			    <form [formGroup]="fileUploadGroup">
+			      <ng-template matStepLabel>Mission File</ng-template>
+						<div>
+							<mat-form-field>
+				        <mat-label class="inset-label" for="file-input">Select Mission .pbo</mat-label>
+				        <ngx-mat-file-input formControlName="missionFile" valuePlaceholder="No file selected"
+				        	required [accept]="'.pbo'" [errorStateMatcher]="ErrorStateMatcher" #missionFile
+									(change)="missionToUpload = $event.target.files[0]; buildMissionFileName()"
+								>
+				        </ngx-mat-file-input>
+								<mat-icon color="white" matSuffix>folder</mat-icon>
+								<button mat-icon-button *ngIf="!missionFile.empty" (click)="missionFile.clear($event); missionToUpload = null;">
+									<mat-icon matSuffix>clear</mat-icon> Clear Selection
+								</button>
+								<mat-error>{{getFileErrorMessage()}}</mat-error>
+				      </mat-form-field>
 						</div>
-						<div [class.selected]="missionType==MissionType.TVT" (click)="selectMissionType(MissionType.TVT)">TVT</div>
-						<div [class.selected]="missionType==MissionType.COTVT" (click)="selectMissionType(MissionType.COTVT)">COTVT
+						<button mat-button matStepperNext>Next</button>
+			    </form>
+			  </mat-step>
+				<mat-step [stepControl]="missionNameGroup">
+			    <form [formGroup]="missionNameGroup">
+			      <ng-template matStepLabel>Mission Name</ng-template>
+						<div>
+							<mat-form-field>
+				        <mat-label class="inset-label">Mission Name</mat-label>
+				        <input matInput formControlName="missionName" maxlength="31" placeholder="Operation Boomstick" required
+									autocomplete="off" id="name" (ngModelChange)="buildMissionFileName()"
+								>
+								<mat-error>{{getNameErrorMessage()}}</mat-error>
+				      </mat-form-field>
 						</div>
-						<div [class.selected]="missionType==MissionType.LOL" (click)="selectMissionType(MissionType.LOL)">LOL</div>
+						<button mat-button matStepperNext>Next</button>
+			    </form>
+			  </mat-step>
+				<mat-step [stepControl]="missionTypeGroup">
+	        <form [formGroup]="missionTypeGroup">
+							<ng-template matStepLabel>Mission Type</ng-template>
+							<div class="mt-2">
+								<mat-radio-group formControlName="missionType" #missionType #matInput
+									(ngModelChange)="selectMissionType(); buildMissionFileName()" required
+								>
+									<mat-radio-button *ngFor="let type of mC.MissionTypes" [value]="type" >
+										{{type.title}}
+									</mat-radio-button>
+								</mat-radio-group>
+								<mat-slide-toggle style="display: flex;" formControlName="ratioLOL"
+									*ngIf="missionTypeGroup.get('missionType')?.value?.title == 'LOL'"
+									#matInput class="mb-4 mt-4"L (change)="ratioOverride()" >
+									Team Ratios
+								</mat-slide-toggle>
+							</div>
+							<mat-error>{{getTypeErrorMessage()}}</mat-error>
+							<button mat-button matStepperNext>Next</button>
+	        </form>
+        </mat-step>
+				<mat-step [stepControl]="missionSizeGroup">
+			    <form [formGroup]="missionSizeGroup">
+			      <ng-template matStepLabel>Player Count</ng-template>
+						<div>
+							<mat-form-field>
+				        <mat-label class="inset-label">Minimum Players</mat-label>
+				        <input matInput formControlName="minPlayers" autocomplete="off" placeholder="10" type="number" id="minPlayers"
+									#minSizeInput maxlength="3" (ngModelChange)="minPlayers = minSizeInput.value; buildMissionFileName()"
+								>
+				      </mat-form-field>
+							<mat-form-field>
+				        <mat-label class="inset-label">Maximum Players</mat-label>
+				        <input matInput formControlName="maxPlayers" autocomplete="off" placeholder="22" type="number" id="maxPlayers"
+									#maxSizeInput maxlength="3" (ngModelChange)="maxPlayers = maxSizeInput.value; buildMissionFileName()"
+								>
+				      </mat-form-field>
+							<mat-error>{{getSizeErrorMessage()}}</mat-error>
+						</div>
+						<mat-label *ngIf="getIfTVT()" class="inset-label row">Side Ratios:</mat-label>
+						<div *ngIf="getIfTVT()" style="display: flex;">
+							<mat-checkbox formControlName="ratioBluforE" class="inset-label" style="align-self: center;" >BLUFOR:</mat-checkbox>
+							<mat-slider formControlName="ratioBlufor" class="blueSlider column" [disabled]="!(missionSizeGroup.get('ratioBluforE').value ? missionSizeGroup.get('ratioBluforE').value: false)" [thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="0.1" [max]="5"></mat-slider>
+							<mat-checkbox formControlName="ratioOpforE" class="inset-label" style="align-self: center;" >OPFOR:</mat-checkbox>
+							<mat-slider formControlName="ratioOpfor" class="redSlider column" [disabled]="!(missionSizeGroup.get('ratioOpforE').value ? missionSizeGroup.get('ratioOpforE').value: false)" [thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="0.1" [max]="5"></mat-slider>
+							<mat-checkbox formControlName="ratioIndforE" class="inset-label" style="align-self: center;" >INDFOR:</mat-checkbox>
+							<mat-slider formControlName="ratioIndfor" class="greenSlider column" [disabled]="!(missionSizeGroup.get('ratioIndforE').value ? missionSizeGroup.get('ratioIndforE').value: false)" [thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="0.1" [max]="5"></mat-slider>
+							<mat-checkbox formControlName="ratioCivE" class="inset-label" style="align-self: center;" >CIVILIAN:</mat-checkbox>
+							<mat-slider formControlName="ratioCiv" class="yellowSlider column" [disabled]="!(missionSizeGroup.get('ratioCivE').value ? missionSizeGroup.get('ratioCivE').value: false)" [thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="0.1" [max]="5"></mat-slider>
+						</div>
+						<mat-error>{{getRatioErrorMessage()}}</mat-error>
+						<button mat-button matStepperNext>Next</button>
+			    </form>
+			  </mat-step>
+				<mat-step [stepControl]="missionDescGroup">
+			    <form [formGroup]="missionDescGroup">
+			      <ng-template matStepLabel>Description</ng-template>
+						<div>
+							<mat-form-field>
+				        <mat-label class="inset-label">Description</mat-label>
+				        <textarea matInput formControlName="misDescription" autocomplete="off" placeholder="USMC raids ammo depot | Defenders chooses weather" type="string"
+									#misDescription maxlength="100" id="misDescription" (ngModelChange)="buildMissionDesc()"
+								></textarea>
+								<mat-error>{{getDescErrorMessage()}}</mat-error>
+				      </mat-form-field>
+							<mat-form-field>
+							  <mat-label>Tags</mat-label>
+							  <mat-select formControlName="misTags" multiple #missionTags>
+							    <mat-select-trigger>
+							      <mat-chip-list>
+							        <mat-chip *ngFor="let tag of missionDescGroup.get('misTags').value; let matChipIndex = index"
+							          [removable]="true" (removed)="onListChipRemoved(missionTags, matChipIndex)">
+							          {{ tag }}
+							          <mat-icon matChipRemove>cancel</mat-icon>
+							        </mat-chip>
+							      </mat-chip-list>
+							    </mat-select-trigger>
+							    <mat-option *ngFor="let tag of mC.MissionTags.sort()" [value]="tag">{{tag}}</mat-option>
+							  </mat-select>
+								<mat-error>{{getTagsErrorMessage()}}</mat-error>
+							</mat-form-field>
+							<mat-label class="mr-4 mb-4 mt-4" style="display: flex;">Time of Day:</mat-label>
+							<mat-radio-group formControlName="misTime" #misTime required>
+								<mat-radio-button *ngFor="let time of mC.MissionTimes" [value]="time">
+									{{time}}
+								</mat-radio-button>
+							</mat-radio-group>
+							<mat-error>{{getReqErrorMessage('misTime')}}</mat-error>
+							<mat-label class="mr-4 mb-4 mt-4" style="display: flex;">Era:</mat-label>
+							<mat-button-toggle-group formControlName="misEra" #misEra required>
+								<mat-button-toggle *ngFor="let era of mC.MissionEras" [value]="era">
+									{{era}}
+								</mat-button-toggle>
+							</mat-button-toggle-group>
+							<mat-error>{{getReqErrorMessage('misEra')}}</mat-error>
+						</div>
+						<button mat-button matStepperNext>Next</button>
+			    </form>
+			  </mat-step>
+				<mat-step [stepControl]="fileImageGroup">
+			    <form [formGroup]="fileImageGroup">
+			      <ng-template matStepLabel>Image</ng-template>
+						<div>
+							<mat-slide-toggle #matInput class="mb-4" formControlName="imgToggle"
+								(change)="changeImageToggle()" >
+								Custom Mission Image
+							</mat-slide-toggle>
+							<mat-form-field *ngIf="fileImageGroup.get('imgToggle').value">
+				        <mat-label class="inset-label" for="file-input">Select Image</mat-label>
+				        <ngx-mat-file-input formControlName="missionImage" #missionImage valuePlaceholder="No file selected"
+				        	[accept]="['.png', '.jpg', '.jpeg']" (change)="missionImageFile = $event.target.files[0]; setImagePreview($event.target.files[0])" required
+								>
+				        </ngx-mat-file-input>
+								<mat-icon color="white" matSuffix>add_photo_alternate</mat-icon>
+								<button mat-icon-button *ngIf="!missionImage.empty" (click)="missionImage.clear($event); missionImageFile = null; missionImageSrc = null">
+									<mat-icon matSuffix>clear</mat-icon> Clear Selection
+								</button>
+				      </mat-form-field>
+							<mat-error>{{getImageErrorMessage()}}</mat-error>
+						</div>
+						<button mat-button matStepperNext>Next</button>
+			    </form>
+			  </mat-step>
+			  <mat-step>
+			    <ng-template matStepLabel>Submit</ng-template>
+			    <div>
+			      <!--<button mat-button [disabled]="uploadingState!='ready' && uploadingState!='error'" (click)="submitMission()">Submit Mission</button>-->
+			      <button mat-button (click)="submitMission()">Submit Mission</button>
+			    </div>
+					<div class="upload-result">
+						<div class="result-error" *ngIf="uploadingState=='error'">Failed to upload mission</div>
+						<div class="result-uploading" *ngIf="uploadingState=='uploading'">Uploading mission...</div>
+						<div class="result-success" *ngIf="uploadingState=='success'"> Mission uploaded!</div>
 					</div>
-				</div>
-				<div class="error-display">{{missionErrors['missionType']}}</div>
-			</div>
-			<div>
-				<div class="field-container" [class.invalid]="missionErrors['description']">
-					<label class="inset-label" for="description">Short Description</label>
-					<input maxlength="100" placeholder="2.5:1 | USMC raids ammo depot | Defenders chooses weather"
-								 autocomplete="off" id="description" [(ngModel)]="description"
-								 (ngModelChange)="validateDescription()">
-				</div>
-				<div class="error-display">{{missionErrors['description']}}</div>
-			</div>
-			<button class="btn" (click)="upload()">
-				<div>UPLOAD</div>
-			</button>
-			<div class="upload-result">
-				<div class="result-error" *ngIf="uploadingState=='error'">Failed to upload mission</div>
-				<div class="result-uploading" *ngIf="uploadingState=='uploading'">Uploading mission...</div>
-				<div class="result-success" *ngIf="uploadingState=='success'"> Mission uploaded!</div>
-
-			</div>
-			<div class="upload-result">
-				<div class="result-error" *ngIf="authError">{{authError}}</div>
-			</div>
-
+					<div class="upload-result">
+						<div class="result-error" *ngIf="authError">{{authError}}</div>
+					</div>
+			  </mat-step>
+			</mat-vertical-stepper>
 		</div>
-
 	</div>
 </div>

@@ -15,7 +15,7 @@ const MissionSchema = new Schema({
 		type: String,
 		required: true
 	},
-	type: {
+	fileName: {
 		type: String,
 		required: true
 	},
@@ -23,34 +23,62 @@ const MissionSchema = new Schema({
 		type: String,
 		required: true
 	},
+	type: {
+		type: String,
+		required: true
+	},
+	size: {
+		type: Array,
+		required: true
+	},
+	ratios: {
+		type: Array,
+		required: false
+	},
 	description: {
 		type: String,
 		required: true
 	},
-	maxPlayers: {
-		type: Number,
+	tags: {
+		type: Array,
 		required: true
 	},
-	minPlayers: {
-		type: Number,
+	timeOfDay: {
+		type: String,
 		required: true
+	},
+	era: {
+		type: String,
+		required: true
+	},
+	image: {
+		type: String,
+		required: false
 	},
 	uploadDate: {
 		type: Date,
 		required: true
 	},
+	updates: [{
+		type: Array,
+		required: false
+	}],
 	version: {
-		type: String,
-		required: true
-	},
-	fileName: {
-		type: String,
+		type: Number,
 		required: true
 	},
 	paths: [{
 		type: String,
 		required: true
-	}]
+	}],
+	reports: [{
+		type: Array,
+		required: false
+	}],
+	reviews: [{
+		type: Array,
+		required: false
+	}],
 }, {
 	versionKey: false
 });
