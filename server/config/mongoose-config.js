@@ -12,19 +12,22 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
-mongoose.connect(mongoUri, {keepAlive: 1}, function (err) {
+mongoose.connect(mongoUri, { keepAlive: 1 }, function (err) {
 	if (err) {
-		console.error("Error! " + err)
+		console.error('Error! ' + err);
 	} else {
-		console.log("DB Connected!");
+		console.log('DB Connected!');
 	}
 });
-
 
 // print mongoose logs in dev env
 if (config.MONGOOSE_DEBUG) {
 	mongoose.set('debug', (collectionName, method, query, doc) => {
-		debug(`${collectionName}.${method}`, util.inspect(query, false, 20), doc);
+		debug(
+			`${collectionName}.${method}`,
+			util.inspect(query, false, 20),
+			doc
+		);
 	});
 }
 

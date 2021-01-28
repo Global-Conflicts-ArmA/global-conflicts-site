@@ -9,5 +9,3 @@ if (!module.parent) {
 		console.info(`server started on port ${config.port} (${config.env})`);
 	});
 }
-
-

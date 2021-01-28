@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const Schema = mongoose.Schema;
 
 const discordUserSchema = new Schema(
@@ -7,36 +6,40 @@ const discordUserSchema = new Schema(
 		discordId: {
 			type: String,
 			required: true,
-			unique: true,
+			unique: true
 		},
 		username: {
 			type: String,
-			required: true,
+			required: true
 		},
 		avatar: {
 			type: String,
-			required: true,
+			required: true
 		},
 		isAdmin: {
 			type: Boolean,
-			required: false,
+			required: false
 		},
 		missions: {
 			type: Array,
-			required: false,
+			required: false
 		},
 		reports: {
 			type: Array,
-			required: false,
+			required: false
 		},
 		reviews: {
 			type: Array,
-			required: false,
-		},
+			required: false
+		}
 	},
 	{
-		versionKey: false,
+		versionKey: false
 	}
 );
 
-module.exports = mongoose.model('discordUser', discordUserSchema, 'discordUser');
+module.exports = mongoose.model(
+	'discordUser',
+	discordUserSchema,
+	'discordUser'
+);

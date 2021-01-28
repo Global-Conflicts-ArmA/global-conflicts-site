@@ -1,4 +1,4 @@
-export interface Mission {
+export interface IMission {
 	name: string;
 	author: string;
 	authorID: string;
@@ -14,7 +14,7 @@ export interface Mission {
 	era: string;
 	image: string;
 	uploadDate: Date;
-	updates: Array<any>;
+	updates: any[];
 	version: number;
 	paths: string[];
 }

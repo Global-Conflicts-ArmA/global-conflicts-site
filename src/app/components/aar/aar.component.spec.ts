@@ -1,25 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AARComponent } from './aar.component';
 
-import { AarComponent } from './aar.component';
+describe('AARComponent', () => {
+	let component: AARComponent;
+	let fixture: ComponentFixture<AARComponent>;
 
-describe('AarComponent', () => {
-  let component: AarComponent;
-  let fixture: ComponentFixture<AarComponent>;
+	beforeEach(async () => {
+		await TestBed.configureTestingModule({
+			declarations: [AARComponent]
+		}).compileComponents();
+	});
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ AarComponent ]
-    })
-    .compileComponents();
-  });
+	beforeEach(() => {
+		fixture = TestBed.createComponent(AARComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(AarComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	it('should create', () => {
+		expect(component).toBeTruthy();
+	});
 });

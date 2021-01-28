@@ -1,19 +1,16 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {Mission} from '../models/mission';
-
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { IMission } from '../models/mission';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class MissionsService {
+	constructor(private httpClient: HttpClient) {}
 
-	constructor(private httpClient: HttpClient) {
-	}
-
-	public list(): Observable<Mission[]> {
-		return this.httpClient.get<Mission[]>('/api/missions');
+	public list(): Observable<IMission[]> {
+		return this.httpClient.get<IMission[]>('/api/missions');
 	}
 
 	public upload(formData: FormData): Observable<any> {

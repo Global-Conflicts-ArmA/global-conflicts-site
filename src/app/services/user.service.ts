@@ -1,21 +1,20 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-
-import {CookieService} from 'ngx-cookie-service';
-
-import {Router} from '@angular/router';
-import {DiscordUser} from '../models/discorduser';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+// import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
+import { DiscordUser } from '../models/discorduser';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class UserService {
-
-	constructor(private httpClient: HttpClient, private cookieService: CookieService, private router: Router) {
-	}
+	constructor(
+		private httpClient: HttpClient,
+		private cookieService: CookieService // private router: Router
+	) {}
 
 	public logout() {
-		this.httpClient.get('api/auth/logout').subscribe(value => {
+		this.httpClient.get('api/auth/logout').subscribe(() => {
 			this.cookieService.deleteAll();
 			window.location.replace('/');
 		});
@@ -27,15 +26,23 @@ export class UserService {
 		const username = this.cookieService.get('username');
 		const role = this.cookieService.get('role');
 		const roleColor = this.cookieService.get('roleColor');
-		const avatarLink = 'https://cdn.discordapp.com/avatars/' + this.cookieService.get('id') + '/' + this.cookieService.get('avatar') + '.png';
+		const avatarLink =
+			'https://cdn.discordapp.com/avatars/' +
+			this.cookieService.get('id') +
+			'/' +
+			this.cookieService.get('avatar') +
+			'.png';
 		if (token) {
-			return new DiscordUser(id, token, username, role, roleColor, avatarLink);
+			return new DiscordUser(
+				id,
+				token,
+				username,
+				role,
+				roleColor,
+				avatarLink
+			);
 		} else {
 			return null;
 		}
 	}
-
-
-
-
 }

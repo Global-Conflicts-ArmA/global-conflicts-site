@@ -1,5 +1,4 @@
 export class MissionConstants {
-
 	MissionTypes: object[] = [
 		{
 			title: 'COOP',
@@ -7,44 +6,44 @@ export class MissionConstants {
 		},
 		{
 			title: 'TVT',
-			ratio: true,
+			ratio: true
 		},
 		{
 			title: 'COTVT',
-			ratio: true,
+			ratio: true
 		},
 		{
 			title: 'LOL'
 		},
 		{
 			title: 'Training',
-			str: 'TRN',
-		},
-	]
+			str: 'TRN'
+		}
+	];
 
 	MissionTags: string[] = [
-		"Defence",
-		"Attack",
-		"Meeting Engagement",
-		"Tanks",
-		"Helicopter",
-		"Fixed Wing",
-		"Boats",
-		"Mechanized",
-		"Motorized",
-		"Infantry",
-		"WAC",
-		"Urban Ops",
-		"Seeder",
-		"Zeus",
-		"Hostage Rescue",
-		"HVT",
-		"Convoy",
-		"Escort",
-		"Mines",
-		"Sabotage",
-		"Raid",
-		"Combined Arms",
+		'Defence',
+		'Attack',
+		'Meeting Engagement',
+		'Tanks',
+		'Helicopter',
+		'Fixed Wing',
+		'Boats',
+		'Mechanized',
+		'Motorized',
+		'Infantry',
+		'WAC',
+		'Urban Ops',
+		'Seeder',
+		'Zeus',
+		'Hostage Rescue',
+		'HVT',
+		'Convoy',
+		'Escort',
+		'Mines',
+		'Sabotage',
+		'Raid',
+		'Combined Arms'
 	];
 
 	MissionEras: string[] = [
@@ -61,27 +60,20 @@ export class MissionConstants {
 		'Other'
 	];
 
-	MissionTimes: string[] = [
-		"Dawn",
-		"Day",
-		"Dusk",
-		"Night",
-		"Custom",
-	]
+	MissionTimes: string[] = ['Dawn', 'Day', 'Dusk', 'Night', 'Custom'];
 
 	MissionTerrains = {
 		CUP_Chernarus_A3: {
 			class: 'CUP_Chernarus_A3',
-			name: 'Chernarus 2020',
+			name: 'Chernarus 2020'
 		},
 		MCN_HazarKot: {
 			class: 'MCN_HazarKot',
-			name: 'Hazar Kot',
+			name: 'Hazar Kot'
 		},
 		chernarus: {
 			class: 'chernarus',
-			name: 'Chernarus Autumn',
-		},
-	}
-
+			name: 'Chernarus Autumn'
+		}
+	};
 }
