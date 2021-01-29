@@ -25,7 +25,7 @@ export class MissionUploadComponent implements OnInit {
 		private missionsService: MissionsService,
 		private userService: UserService,
 		private formBuilder: FormBuilder,
-		private mC: MissionConstants
+		public mC: MissionConstants
 	) {}
 
 	discordUser: DiscordUser | null;
