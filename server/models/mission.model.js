@@ -23,6 +23,10 @@ const MissionSchema = new Schema(
 			type: String,
 			required: true
 		},
+		uniqueName: {
+			type: String,
+			required: true
+		},
 		type: {
 			type: String,
 			required: true
@@ -93,6 +97,6 @@ const MissionSchema = new Schema(
 	}
 );
 
-MissionSchema.index({ fileName: 1 }, { unique: true });
+MissionSchema.index({ uniqueName: 1 }, { unique: true });
 
 module.exports = mongooseConfig.model('mission', MissionSchema, 'missions');

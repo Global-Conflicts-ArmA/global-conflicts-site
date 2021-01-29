@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ColumnMode } from '@swimlane/ngx-datatable';
-import { DiscordUser } from '../../models/discorduser';
-import { IMission } from '../../models/mission';
 import { MissionsService } from '../../services/missions.service';
+import { IMission } from '../../models/mission';
+import { DiscordUser } from '../../models/discorduser';
 import { UserService } from '../../services/user.service';
 
 @Component({

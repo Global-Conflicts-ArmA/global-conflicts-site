@@ -2,7 +2,7 @@ const DiscordOauth2 = require('discord-oauth2');
 const { discordJsClient, Discord } = require('../config/discord-bot');
 
 async function getDiscordUserFromCookies(req, actionErrorMessage) {
-	if (!req.cookies['token']) {
+	if (!req.cookies.token) {
 		req.authError = 'Not signed in.';
 		return req;
 	} else {
@@ -12,7 +12,7 @@ async function getDiscordUserFromCookies(req, actionErrorMessage) {
 			redirectUri: process.env.DISCORD_CALLBACK_URL
 		});
 		const discordUserResult = await oauth
-			.getUser(req.cookies['token'])
+			.getUser(req.cookies.token)
 			.catch((reason) => {
 				if (reason.code === 401) {
 					req.authError = 'User not authorized.';

@@ -10,11 +10,12 @@ const discordOauth2 = new DiscordOauth2({
 });
 
 router.get('/login', function (req, res) {
+	// tslint:disable-next-line:no-console
 	console.log('login');
 });
 
 router.get('/logout', function (req, res) {
-	const authHeader = req.headers['authorization'];
+	const authHeader = req.headers.authorization;
 	const token = authHeader && authHeader.split(' ')[1];
 
 	const credentials = Buffer.from(
@@ -27,6 +28,7 @@ router.get('/logout', function (req, res) {
 			res.send({ ok: true });
 		})
 		.catch((reason) => {
+			// tslint:disable-next-line:no-console
 			console.log(reason);
 		});
 });

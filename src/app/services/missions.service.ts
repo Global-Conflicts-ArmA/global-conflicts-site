@@ -1,5 +1,5 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IMission } from '../models/mission';
 
@@ -11,6 +11,10 @@ export class MissionsService {
 
 	public list(): Observable<IMission[]> {
 		return this.httpClient.get<IMission[]>('/api/missions');
+	}
+
+	public findOne(formData: FormData): Observable<any> {
+		return this.httpClient.post('/api/missions/findOne', formData);
 	}
 
 	public upload(formData: FormData): Observable<any> {
