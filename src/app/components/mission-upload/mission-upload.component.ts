@@ -1,18 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import {
-	AbstractControl,
 	FormBuilder,
-	FormControl,
 	FormGroup,
-	Validators
+	Validators,
+	FormControl,
+	AbstractControl
 } from '@angular/forms';
-import { MatSelect } from '@angular/material/select';
-import { FileValidator } from 'ngx-material-file-input';
-import { MissionConstants } from '../../constants/missionConstants';
 import { MissionTerrains } from '../../mission-enums';
-import { DiscordUser } from '../../models/discorduser';
+import { MissionConstants } from '../../constants/missionConstants';
 import { MissionsService } from '../../services/missions.service';
+import { DiscordUser } from '../../models/discorduser';
 import { UserService } from '../../services/user.service';
+import { FileValidator } from 'ngx-material-file-input';
+import { MatSelect } from '@angular/material/select';
 
 @Component({
 	selector: 'app-mission-upload',
@@ -25,7 +25,7 @@ export class MissionUploadComponent implements OnInit {
 		private missionsService: MissionsService,
 		private userService: UserService,
 		private formBuilder: FormBuilder,
-		private mC: MissionConstants
+		public mC: MissionConstants
 	) {}
 
 	discordUser: DiscordUser | null;

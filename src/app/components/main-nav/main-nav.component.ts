@@ -1,11 +1,11 @@
-import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { UserService } from '../../services/user.service';
+import { DiscordUser } from '../../models/discorduser';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { DiscordUser } from '../../models/discorduser';
-import { UserService } from '../../services/user.service';
 
 @Component({
 	selector: 'main-nav',
