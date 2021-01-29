@@ -1,5 +1,11 @@
+interface MissionType {
+	title: string;
+	str?: string;
+	ratio?: boolean;
+}
+
 export class MissionConstants {
-	MissionTypes: object[] = [
+	MissionTypes: MissionType[] = [
 		{
 			title: 'COOP',
 			str: 'CO'
