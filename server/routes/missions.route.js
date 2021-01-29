@@ -30,14 +30,14 @@ fileFilterFunction = async function (req, file, callback) {
 		return;
 	}
 	if (file.mimetype !== 'application/octet-stream') {
-		req.missionDataErrors['file'] = 'File is not a .pbo.';
+		req.missionDataErrors.file = 'File is not a .pbo.';
 		callback(null, false);
 		return;
 	} else {
 		const originalNameArray = file.originalname.split('.');
 		const format = originalNameArray[originalNameArray.length - 1];
 		if (format !== 'pbo') {
-			req.missionDataErrors['file'] = 'File is not a pbo.';
+			req.missionDataErrors.file = 'File is not a pbo.';
 			callback(null, false);
 			return;
 		} else if (
@@ -45,7 +45,7 @@ fileFilterFunction = async function (req, file, callback) {
 				`${process.env.ROOT_FOLDER}${req.uploadPath}/${file.originalname}`
 			)
 		) {
-			req.missionDataErrors['misc'] =
+			req.missionDataErrors.misc =
 				'A mission with this filename already exists.';
 			callback(null, false);
 			return;
@@ -258,6 +258,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		author: req.body.author,
 		authorID: req.body.authorID,
 		terrain: req.body.terrain,
+		uniqueName: req.body.uniqueName,
 		type: req.body.type,
 		size: req.body.size,
 		description: req.body.description,
@@ -271,7 +272,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 	if (req.body.image) {
 		mission.image = req.body.image;
 	}
-	const query = { fileName: req.body.fileName };
+	const query = { fileName: req.body.uniqueName };
 	insertMissionOnDatabase(mission, query);
 
 	const user = {
@@ -281,7 +282,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		role: req.discordUser.roles.highest.name
 	};
 	const userQuery = { discordId: req.discordUser.user.id };
-	insertUserOnDatabase(user, userQuery, req.body.fileName);
+	insertUserOnDatabase(user, userQuery, req.body.uniqueName);
 
 	return res.send({ ok: true });
 });
@@ -300,6 +301,26 @@ router.get('/', async (req, res) => {
 	console.log('GET request for all missions');
 	const missions = await Mission.find({}, { _id: 0 }).exec();
 	return res.json(missions);
+});
+
+router.post('/findOne', uploadMulter.none(), async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to search missions.'
+	);
+
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
+
+	const mission = await Mission.findOne({ uniqueName: req.body.uniqueName}, (err) => {
+        if (err) {
+            res.status(500).send(err)
+        }
+    });
+	return res.json(mission);
 });
 
 module.exports = router;

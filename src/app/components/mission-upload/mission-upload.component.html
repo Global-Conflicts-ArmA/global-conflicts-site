@@ -190,6 +190,8 @@
 					</div>
 					<div class="upload-result">
 						<div class="result-error" *ngIf="uploadingState=='error'">Failed to upload mission</div>
+						<div class="name-conflict" *ngIf="uploadingState=='name-conflict'">A mission with this name on
+							this terrain already exists!</div>
 						<div class="result-uploading" *ngIf="uploadingState=='uploading'">Uploading mission...</div>
 						<div class="result-success" *ngIf="uploadingState=='success'"> Mission uploaded!</div>
 					</div>
