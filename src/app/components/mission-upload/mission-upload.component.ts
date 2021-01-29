@@ -589,7 +589,11 @@ export class MissionUploadComponent implements OnInit {
 			name,
 			this.missionTerrain
 		);
-		const conflict = await this.checkIfMissionExists(uniqueName);
+		const conflict = await this.checkIfMissionExists(uniqueName).catch(
+			(error) => {
+				return (this.uploadingState = 'name-conflict');
+			}
+		);
 		if (conflict) {
 			return (this.uploadingState = 'name-conflict');
 		}
