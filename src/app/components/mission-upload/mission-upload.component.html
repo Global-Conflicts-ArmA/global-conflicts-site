@@ -5,7 +5,7 @@
 		</div>
 
 		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
-			<mat-vertical-stepper class="field-container" [linear]="true" #stepper>
+			<mat-vertical-stepper class="field-container" [linear]="false" #stepper>
 			  <mat-step [stepControl]="fileUploadGroup">
 			    <form [formGroup]="fileUploadGroup">
 			      <ng-template matStepLabel>Mission File</ng-template>
