@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 import { CommonModule } from '@angular/common';
@@ -43,6 +45,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { WikiComponent } from './components/wiki/wiki.component';
 import { AARComponent } from './components/aar/aar.component';
 import { MissionConstants } from './constants/missionConstants';
+import { MissionDetailsComponent } from './components/mission-details/mission-details.component';
 
 @NgModule({
 	declarations: [
@@ -53,7 +56,8 @@ import { MissionConstants } from './constants/missionConstants';
 		MissionUploadComponent,
 		NotFoundComponent,
 		WikiComponent,
-		AARComponent
+		AARComponent,
+		MissionDetailsComponent
 	],
 	imports: [
 		CommonModule,
@@ -83,7 +87,8 @@ import { MissionConstants } from './constants/missionConstants';
 		MatSliderModule,
 		MatCheckboxModule,
 		MatButtonToggleModule,
-		MatSlideToggleModule
+		MatSlideToggleModule,
+		MatTooltipModule
 	],
 	bootstrap: [AppComponent],
 	providers: [

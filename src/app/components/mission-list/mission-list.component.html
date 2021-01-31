@@ -30,24 +30,7 @@
 				(activate)="onActivate($event)"
 				[rows]="rows"
 			>
-				<ngx-datatable-column
-					[width]="50"
-					[resizeable]="false"
-					[sortable]="false"
-					[draggable]="false"
-					[canAutoResize]="false"
-					[cellClass]="'button-cell'"
-				>
-					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
-						<a
-							href="javascript:void(0)"
-							[class.datatable-icon-right]="!expanded"
-							[class.datatable-icon-down]="expanded"
-							title="Expand/Collapse Row"
-						>
-						</a>
-					</ng-template>
-				</ngx-datatable-column>
+
 				<ngx-datatable-row-detail [rowHeight]="150" #myDetailRow>
 					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
 						<div style="padding:10px;">
@@ -60,14 +43,15 @@
 				<ngx-datatable-column [width]="250" name="Name"></ngx-datatable-column>
 				<ngx-datatable-column [width]="20" name="Version"></ngx-datatable-column>
 				<ngx-datatable-column [width]="110" name="Terrain"></ngx-datatable-column>
-				<ngx-datatable-column [width]="60" name="Max Players"></ngx-datatable-column>
-				<ngx-datatable-column [width]="60" name="Min Players"></ngx-datatable-column>
-				<ngx-datatable-column [width]="70" name="Upload Date">
+				<ngx-datatable-column [width]="20" name="Max"></ngx-datatable-column>
+				<ngx-datatable-column [width]="20" name="Min"></ngx-datatable-column>
+				<ngx-datatable-column [width]="60" name="Upload Date">
 					<ng-template let-row="row" ngx-datatable-cell-template>
 						{{row.uploadDate | date: 'MM/dd/yyyy'}}
 					</ng-template>
 				</ngx-datatable-column>
 				<ngx-datatable-column [width]="100" name="Author"></ngx-datatable-column>
+
 			</ngx-datatable>
 		</div>
 	</div>

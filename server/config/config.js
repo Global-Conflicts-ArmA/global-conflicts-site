@@ -31,15 +31,17 @@ if (error) {
 }
 
 const config = {
-  env: envVars.NODE_ENV,
-  port: envVars.SERVER_PORT,
-  mongooseDebug: envVars.MONGOOSE_DEBUG,
-  jwtSecret: envVars.JWT_SECRET,
-  frontend: 'angular',
-  mongo: {
-    host: envVars.MONGO_HOST,
-    port: envVars.MONGO_PORT
-  }
+	env: envVars.NODE_ENV,
+	port: envVars.SERVER_PORT,
+	mongooseDebug: envVars.MONGOOSE_DEBUG,
+	jwtSecret: envVars.JWT_SECRET,
+	frontend: 'angular',
+	mongo: {
+		host: envVars.MONGO_HOST,
+		port: envVars.MONGO_PORT,
+		pass: envVars.MONGO_PASS,
+		user: envVars.MONGO_USER
+	}
 };
 
 module.exports = config;

@@ -20,4 +20,10 @@ export class MissionsService {
 	public upload(formData: FormData): Observable<any> {
 		return this.httpClient.post(`/api/missions`, formData);
 	}
+
+	public getMissionFileName(missionFileName: string): Observable<IMission> {
+		return this.httpClient.get<IMission>(
+			`/api/missions/${missionFileName}`
+		);
+	}
 }
