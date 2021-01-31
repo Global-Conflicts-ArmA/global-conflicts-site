@@ -287,6 +287,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 	return res.send({ ok: true });
 });
 
+// lists all missions
 router.get('/', async (req, res) => {
 	req = await getDiscordUserFromCookies(
 		req,
@@ -303,24 +304,24 @@ router.get('/', async (req, res) => {
 	return res.json(missions);
 });
 
-router.post('/findOne', uploadMulter.none(), async (req, res) => {
+//get mission by file name
+router.get('/:mission_file_name', async (req, res) => {
 	req = await getDiscordUserFromCookies(
 		req,
-		'User not allowed to search missions.'
+		'User not allowed to list missions.'
 	);
-
 	if (req.authError) {
 		return res.status(401).send({
 			authError: req.authError
 		});
 	}
 
-	const mission = await Mission.findOne({ uniqueName: req.body.uniqueName}, (err) => {
-        if (err) {
-            res.status(500).send(err)
-        }
-    });
+	const mission_file_name = req.params.mission_file_name;
+	console.log('GET request for mission by file name');
+	const mission = await Mission.findOne(
+		{ fileName: mission_file_name },
+		{ _id: 0 }
+	).exec();
 	return res.json(mission);
 });
-
 module.exports = router;

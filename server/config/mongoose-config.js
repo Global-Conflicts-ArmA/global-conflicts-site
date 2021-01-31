@@ -12,13 +12,22 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
-mongoose.connect(mongoUri, {keepAlive: 1}, function (err) {
-	if (err) {
-		console.error("Error! " + err)
-	} else {
-		console.log("DB Connected!");
+mongoose.connect(
+	mongoUri,
+	{
+		useNewUrlParser: true,
+		keepAlive: 1,
+		user: config.mongo.user,
+		pass: config.mongo.pass
+	},
+	function (err) {
+		if (err) {
+			console.error('Error! ' + err);
+		} else {
+			console.log('DB Connected!');
+		}
 	}
-});
+);
 
 
 // print mongoose logs in dev env

@@ -5,10 +5,10 @@
 		</div>
 
 		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
-			<mat-vertical-stepper class="field-container" [linear]="true" #stepper>
-				<mat-step [stepControl]="fileUploadGroup">
-					<form [formGroup]="fileUploadGroup">
-						<ng-template matStepLabel>Mission File</ng-template>
+			<mat-vertical-stepper class="field-container" [linear]="false" #stepper>
+			  <mat-step [stepControl]="fileUploadGroup">
+			    <form [formGroup]="fileUploadGroup">
+			      <ng-template matStepLabel>Mission File</ng-template>
 						<div>
 							<mat-form-field>
 								<mat-label class="inset-label" for="file-input">Select Mission .pbo</mat-label>
