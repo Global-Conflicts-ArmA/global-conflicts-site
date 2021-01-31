@@ -36,7 +36,9 @@ const config = {
 	frontend: 'angular',
 	mongo: {
 		host: envVars.MONGO_HOST,
-		port: envVars.MONGO_PORT
+		port: envVars.MONGO_PORT,
+		pass: envVars.MONGO_PASS,
+		user: envVars.MONGO_USER
 	}
 };
 

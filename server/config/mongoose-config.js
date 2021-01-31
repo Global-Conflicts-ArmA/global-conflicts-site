@@ -6,19 +6,31 @@ const config = require('./config');
 
 // connect to mongo db
 const mongoUri = config.mongo.host;
+console.log(mongoUri);
 // mongoose depracations fix: https://mongoosejs.com/docs/deprecations.html
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
-mongoose.connect(mongoUri, { keepAlive: 1 }, function (err) {
-	if (err) {
-		console.error('Error! ' + err);
-	} else {
-		console.log('DB Connected!');
+console.log(config.mongo.user);
+console.log(config.mongo.pass);
+mongoose.connect(
+	mongoUri,
+	{
+		useNewUrlParser: true,
+		keepAlive: 1,
+		user: config.mongo.user,
+		pass: config.mongo.pass
+	},
+	function (err) {
+		if (err) {
+			console.error('Error! ' + err);
+		} else {
+			console.log('DB Connected!');
+		}
 	}
-});
+);
 
 // print mongoose logs in dev env
 if (config.MONGOOSE_DEBUG) {
