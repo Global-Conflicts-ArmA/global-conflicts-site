@@ -6,15 +6,11 @@ const config = require('./config');
 
 // connect to mongo db
 const mongoUri = config.mongo.host;
-console.log(mongoUri);
 // mongoose depracations fix: https://mongoosejs.com/docs/deprecations.html
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
-
-console.log(config.mongo.user);
-console.log(config.mongo.pass);
 mongoose.connect(
 	mongoUri,
 	{
