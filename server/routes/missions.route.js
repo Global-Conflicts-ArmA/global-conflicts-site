@@ -30,14 +30,14 @@ fileFilterFunction = async function (req, file, callback) {
 		return;
 	}
 	if (file.mimetype !== 'application/octet-stream') {
-		req.missionDataErrors['file'] = 'File is not a .pbo.';
+		req.missionDataErrors.file = 'File is not a .pbo.';
 		callback(null, false);
 		return;
 	} else {
 		const originalNameArray = file.originalname.split('.');
 		const format = originalNameArray[originalNameArray.length - 1];
 		if (format !== 'pbo') {
-			req.missionDataErrors['file'] = 'File is not a pbo.';
+			req.missionDataErrors.file = 'File is not a pbo.';
 			callback(null, false);
 			return;
 		} else if (
@@ -45,7 +45,7 @@ fileFilterFunction = async function (req, file, callback) {
 				`${process.env.ROOT_FOLDER}${req.uploadPath}/${file.originalname}`
 			)
 		) {
-			req.missionDataErrors['misc'] =
+			req.missionDataErrors.misc =
 				'A mission with this filename already exists.';
 			callback(null, false);
 			return;
@@ -258,6 +258,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		author: req.body.author,
 		authorID: req.body.authorID,
 		terrain: req.body.terrain,
+		uniqueName: req.body.uniqueName,
 		type: req.body.type,
 		size: req.body.size,
 		description: req.body.description,
@@ -271,7 +272,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 	if (req.body.image) {
 		mission.image = req.body.image;
 	}
-	const query = { fileName: req.body.fileName };
+	const query = { fileName: req.body.uniqueName };
 	insertMissionOnDatabase(mission, query);
 
 	const user = {
@@ -281,7 +282,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		role: req.discordUser.roles.highest.name
 	};
 	const userQuery = { discordId: req.discordUser.user.id };
-	insertUserOnDatabase(user, userQuery, req.body.fileName);
+	insertUserOnDatabase(user, userQuery, req.body.uniqueName);
 
 	return res.send({ ok: true });
 });
@@ -316,7 +317,7 @@ router.get('/:mission_file_name', async (req, res) => {
 	}
 
 	const mission_file_name = req.params.mission_file_name;
-	console.log('GET request for all missions');
+	console.log('GET request for mission by file name');
 	const mission = await Mission.findOne(
 		{ fileName: mission_file_name },
 		{ _id: 0 }

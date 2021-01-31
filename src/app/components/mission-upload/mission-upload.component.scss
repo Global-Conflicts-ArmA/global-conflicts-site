@@ -23,7 +23,6 @@
 		:hover {
 			cursor: pointer;
 		}
-
 	}
 }
 
@@ -44,7 +43,6 @@
 	.result-error {
 		color: colors.$error;
 	}
-
 }
 
 .mat-slider {
@@ -61,7 +59,7 @@
 .mat-slider-wrapper,
 .mat-slider-track-wrapper,
 .mat-slider-track-background {
-    height: 5px !important;
+	height: 5px !important;
 }
 
 :host ::ng-deep {
@@ -75,12 +73,12 @@
 		opacity: 1 !important;
 	}
 	.mat-slider-thumb-label {
-    transform: rotate(-45deg) !important;
-    border-radius: 50% 50% 0 !important;
-  }
-  .mat-slider-thumb {
-    transform: scale(0) !important;
-  }
+		transform: rotate(-45deg) !important;
+		border-radius: 50% 50% 0 !important;
+	}
+	.mat-slider-thumb {
+		transform: scale(0) !important;
+	}
 	.mat-slider-disabled .mat-slider-track-fill {
 		background-color: rgba(255, 255, 255, 0.3) !important;
 	}
@@ -88,28 +86,28 @@
 		.mat-slider-thumb,
 		.mat-slider-thumb-label,
 		.mat-slider-track-fill {
-		  background-color: blue;
+			background-color: blue;
 		}
 	}
 	.redSlider {
 		.mat-slider-thumb,
 		.mat-slider-thumb-label,
 		.mat-slider-track-fill {
-		  background-color: red;
+			background-color: red;
 		}
 	}
 	.greenSlider {
 		.mat-slider-thumb,
 		.mat-slider-thumb-label,
 		.mat-slider-track-fill {
-		  background-color: green;
+			background-color: green;
 		}
 	}
 	.yellowSlider {
 		.mat-slider-thumb,
 		.mat-slider-thumb-label,
 		.mat-slider-track-fill {
-		  background-color: yellow;
+			background-color: yellow;
 		}
 		.mat-slider-thumb-label-text {
 			color: black;

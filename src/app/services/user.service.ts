@@ -1,6 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-// import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 import { DiscordUser } from '../models/discorduser';
 
@@ -10,7 +9,7 @@ import { DiscordUser } from '../models/discorduser';
 export class UserService {
 	constructor(
 		private httpClient: HttpClient,
-		private cookieService: CookieService // private router: Router
+		private cookieService: CookieService
 	) {}
 
 	public logout() {

@@ -1,4 +1,4 @@
-interface IMissionType {
+export interface IMissionType {
 	title: string;
 	str?: string;
 	ratio?: boolean;

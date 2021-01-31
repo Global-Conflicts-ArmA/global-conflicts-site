@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { WikiComponent } from './wiki.component';
 
 describe('WikiComponent', () => {

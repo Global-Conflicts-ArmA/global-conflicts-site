@@ -1,18 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import {
-	AbstractControl,
 	FormBuilder,
-	FormControl,
 	FormGroup,
-	Validators
+	Validators,
+	FormControl,
+	AbstractControl
 } from '@angular/forms';
-import { MatSelect } from '@angular/material/select';
-import { FileValidator } from 'ngx-material-file-input';
-import { MissionConstants } from '../../constants/missionConstants';
 import { MissionTerrains } from '../../mission-enums';
-import { DiscordUser } from '../../models/discorduser';
+import { MissionConstants } from '../../constants/missionConstants';
 import { MissionsService } from '../../services/missions.service';
+import { DiscordUser } from '../../models/discorduser';
 import { UserService } from '../../services/user.service';
+import { FileValidator } from 'ngx-material-file-input';
+import { MatSelect } from '@angular/material/select';
 
 @Component({
 	selector: 'app-mission-upload',
@@ -129,6 +129,14 @@ export class MissionUploadComponent implements OnInit {
 		}
 	}
 
+	makeUniqueMissionMapName(missionName: string, terrain: string) {
+		const safeMissionName = missionName
+			.replace(' ', '_')
+			.replace(/\W/g, '');
+		const uniqueName = safeMissionName + '_' + terrain;
+		return uniqueName;
+	}
+
 	checkFileName() {
 		return (control: FormControl) => {
 			const files = control.value;
@@ -214,7 +222,6 @@ export class MissionUploadComponent implements OnInit {
 				return null;
 			}
 			return null;
-			// TODO: check existing mission names for duplicates
 		};
 	}
 
@@ -557,16 +564,41 @@ export class MissionUploadComponent implements OnInit {
 		this.missionFileName = `${safeMissionType}${safeMaxPlayers}_${safeMissionName}_V${safeVersion}${mapName}.pbo`;
 	}
 
-	submitMission() {
-		const formData: any = new FormData();
-		formData.append(
-			'name',
-			this.missionNameGroup.get('missionName')?.value
+	async checkIfMissionExists(uniqueName: string) {
+		const formData = new FormData();
+		let conflict = false;
+		formData.append('uniqueName', uniqueName);
+		const mission = this.missionsService.findOne(formData).subscribe(
+			() => {},
+			(httpError) => {
+				conflict = true;
+			}
 		);
+		if (mission == null) {
+			conflict = false;
+		} else {
+			conflict = true;
+		}
+		return conflict;
+	}
+
+	async submitMission() {
+		const formData: any = new FormData();
+		const name = this.missionNameGroup.get('missionName')?.value;
+		const uniqueName = this.makeUniqueMissionMapName(
+			name,
+			this.missionTerrain
+		);
+		const conflict = await this.checkIfMissionExists(uniqueName);
+		if (conflict) {
+			return (this.uploadingState = 'name-conflict');
+		}
+		formData.append('name', name);
 		formData.append('author', this.discordUser?.username);
 		formData.append('authorID', this.discordUser?.id);
 		formData.append('fileName', this.missionFileName);
 		formData.append('terrain', this.missionTerrain);
+		formData.append('uniqueName', uniqueName);
 		const misType = this.missionTypeGroup.get('missionType')?.value;
 		formData.append('type', misType.title);
 		formData.append('size', [

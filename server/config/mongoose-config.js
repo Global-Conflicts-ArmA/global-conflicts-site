@@ -11,6 +11,7 @@ mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
+
 mongoose.connect(
 	mongoUri,
 	{
@@ -28,14 +29,11 @@ mongoose.connect(
 	}
 );
 
+
 // print mongoose logs in dev env
 if (config.MONGOOSE_DEBUG) {
 	mongoose.set('debug', (collectionName, method, query, doc) => {
-		debug(
-			`${collectionName}.${method}`,
-			util.inspect(query, false, 20),
-			doc
-		);
+		debug(`${collectionName}.${method}`, util.inspect(query, false, 20), doc);
 	});
 }
 
