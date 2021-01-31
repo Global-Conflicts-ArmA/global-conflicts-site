@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { DiscordUser } from '../../models/discorduser';
 import { IMission } from '../../models/mission';
@@ -23,7 +24,8 @@ export class MissionListComponent implements OnInit {
 
 	constructor(
 		private missionsService: MissionsService,
-		private userService: UserService
+		private userService: UserService,
+		private router: Router
 	) {}
 
 	ngOnInit(): void {
@@ -38,8 +40,8 @@ export class MissionListComponent implements OnInit {
 	}
 
 	onActivate(event) {
-		if (event.cellIndex === 8) {
-			this.table.rowDetail.toggleExpandRow(event.row);
+		if (event.type === 'click') {
+			this.router.navigate([`/mission-details/${event.row.fileName}`]);
 		}
 	}
 
