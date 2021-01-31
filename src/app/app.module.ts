@@ -22,6 +22,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { RxReactiveFormsModule } from '@rxweb/reactive-form-validators';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
@@ -43,6 +44,7 @@ import { CustExtBrowserXhr } from './services/cust-ext-browser-xhr';
 import { AARComponent } from './components/aar/aar.component';
 import { WikiComponent } from './components/wiki/wiki.component';
 import { MissionConstants } from './constants/missionConstants';
+import { MissionDetailsComponent } from './components/mission-details/mission-details.component';
 
 @NgModule({
 	declarations: [
@@ -53,7 +55,8 @@ import { MissionConstants } from './constants/missionConstants';
 		MissionUploadComponent,
 		NotFoundComponent,
 		WikiComponent,
-		AARComponent
+		AARComponent,
+		MissionDetailsComponent
 	],
 	imports: [
 		CommonModule,
@@ -83,7 +86,8 @@ import { MissionConstants } from './constants/missionConstants';
 		MatSliderModule,
 		MatCheckboxModule,
 		MatButtonToggleModule,
-		MatSlideToggleModule
+		MatSlideToggleModule,
+		MatTooltipModule
 	],
 	bootstrap: [AppComponent],
 	providers: [
