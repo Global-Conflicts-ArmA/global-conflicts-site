@@ -26,7 +26,7 @@ export class MissionUploadComponent implements OnInit {
 		private userService: UserService,
 		private formBuilder: FormBuilder,
 		public mC: MissionConstants
-	) {}
+	) { }
 
 	discordUser: DiscordUser | null;
 	misType = 'CO';
@@ -568,18 +568,13 @@ export class MissionUploadComponent implements OnInit {
 		const formData = new FormData();
 		let conflict = false;
 		formData.append('uniqueName', uniqueName);
-		const mission = this.missionsService.findOne(formData).subscribe(
-			() => {},
-			(httpError) => {
-				conflict = true;
-			}
-		);
-		if (mission == null) {
-			conflict = false;
-		} else {
-			conflict = true;
+		try {
+			var returnedMission = await this.missionsService.findOne(formData).toPromise();
+			// if it's not null, that means that a mission exists, thus return true, meaning it has a conflict.
+			return returnedMission != null;
+		} catch (error) {
+			return true;
 		}
-		return conflict;
 	}
 
 	async submitMission() {
