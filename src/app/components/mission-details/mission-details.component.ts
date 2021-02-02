@@ -4,6 +4,7 @@ import { MissionsService } from '../../services/missions.service';
 
 import { DiscordUser } from '../../models/discorduser';
 import { UserService } from '../../services/user.service';
+import { IMission } from '../../models/mission';
 
 @Component({
 	selector: 'app-mission-details',
@@ -17,6 +18,7 @@ export class MissionDetailsComponent implements OnInit {
 		private route: ActivatedRoute
 	) {}
 	discordUser: DiscordUser | null;
+	mission: IMission | null;
 
 	async ngOnInit(): Promise<void> {
 		this.discordUser = this.userService.getUserLocally();
@@ -25,7 +27,7 @@ export class MissionDetailsComponent implements OnInit {
 		this.missionsService
 			.getMissionFileName(missionFileName)
 			.subscribe((mission) => {
-				console.log(mission);
+				this.mission = mission;
 			});
 	}
 }
