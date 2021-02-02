@@ -5,6 +5,7 @@ import { MissionsService } from '../../services/missions.service';
 import { DiscordUser } from '../../models/discorduser';
 import { UserService } from '../../services/user.service';
 import { IMission } from '../../models/mission';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
 	selector: 'app-mission-details',
@@ -15,8 +16,9 @@ export class MissionDetailsComponent implements OnInit {
 	constructor(
 		private userService: UserService,
 		private missionsService: MissionsService,
-		private route: ActivatedRoute
-	) {}
+		private route: ActivatedRoute,
+		private sanitizer: DomSanitizer
+	) { }
 	discordUser: DiscordUser | null;
 	mission: IMission | null;
 
@@ -30,4 +32,9 @@ export class MissionDetailsComponent implements OnInit {
 				this.mission = mission;
 			});
 	}
+
+	public getImage(b64Image: string) {
+		return this.sanitizer.bypassSecurityTrustResourceUrl(b64Image);
+	}
+
 }

@@ -1,34 +1,20 @@
 <div class="content">
 	<div style="position: relative">
-		<div
-			class="not-allowed-text"
-			*ngIf="!(discordUser && discordUser.role)"
-		>
+		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">
 			You must join our Discord server and complete the welcoming process
 			to upload missions!
 		</div>
 
-		<div
-			class="column"
-			[class.not-allowed-overlay]="!(discordUser && discordUser.role)"
-		>
+		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
 			<div class="row">
 				<div class="col-6">{{ mission.name }}</div>
 				<div class="col-sm-3 col-btn">
-					<button
-						mat-flat-button
-						color="primary"
-						matTooltip="Download"
-					>
+					<button mat-flat-button color="primary" matTooltip="Download">
 						<mat-icon>get_app</mat-icon>
 					</button>
 				</div>
 				<div class="col-sm-3 col-btn">
-					<button
-						mat-flat-button
-						color="accent"
-						matTooltip="Update mission"
-					>
+					<button mat-flat-button color="accent" matTooltip="Update mission">
 						<mat-icon>upgrade</mat-icon>
 					</button>
 				</div>
@@ -66,6 +52,27 @@
 					<div class="details-value">{{ mission.terrain }}</div>
 				</div>
 			</div>
+
+			<div class="row">
+
+				<div class="col" *ngIf="mission.image!=null">
+					<img [src]="getImage(mission.image)" alt="Mission image">
+				</div>
+
+				<div class="col">
+					<p>{{mission.description}}</p>
+					<mat-chip-list>
+						<mat-chip *ngFor="let tag of mission.tags">
+							{{tag}}
+						</mat-chip>
+					</mat-chip-list>
+				</div>
+
+			</div>
+
 		</div>
+
+
+
 	</div>
 </div>
