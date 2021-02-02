@@ -69,8 +69,8 @@ export class MissionConstants {
 	MissionTimes: string[] = ['Dawn', 'Day', 'Dusk', 'Night', 'Custom'];
 
 	MissionTerrains = {
-		CUP_Chernarus_A3: {
-			class: 'CUP_Chernarus_A3',
+		cup_chernarus_A3: {
+			class: 'cup_chernarus_A3',
 			name: 'Chernarus 2020'
 		},
 		MCN_HazarKot: {
