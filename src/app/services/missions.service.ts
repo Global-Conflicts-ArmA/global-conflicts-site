@@ -13,8 +13,8 @@ export class MissionsService {
 		return this.httpClient.get<IMission[]>('/api/missions');
 	}
 
-	public findOne(formData: FormData): Observable<any> {
-		return this.httpClient.post('/api/missions/findOne', formData);
+	public findOne(id: string): Observable<any> {
+		return this.httpClient.get('/api/missions/' + id);
 	}
 
 	public upload(formData: FormData): Observable<any> {

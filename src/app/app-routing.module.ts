@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import { ShouldLoginComponent } from './should-login.component';
 import { HomeComponent } from './components/home/home.component';
 import { MissionDetailsComponent } from './components/mission-details/mission-details.component';
@@ -9,6 +8,7 @@ import { MissionUploadComponent } from './components/mission-upload/mission-uplo
 import { WikiComponent } from './components/wiki/wiki.component';
 import { AARComponent } from './components/aar/aar.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { UserSettingsComponent } from './components/user-settings/user-settings.component';
 
 const routes: Routes = [
 	{ path: '', component: HomeComponent },
@@ -18,6 +18,7 @@ const routes: Routes = [
 		component: MissionDetailsComponent
 	},
 	{ path: 'mission-list', component: MissionListComponent },
+	{ path: 'user-settings', component: UserSettingsComponent },
 	{ path: 'should-login', component: ShouldLoginComponent },
 	{ path: 'wiki', component: WikiComponent },
 	{ path: 'aar', component: AARComponent },

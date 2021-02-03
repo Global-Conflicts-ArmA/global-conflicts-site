@@ -565,21 +565,21 @@ export class MissionUploadComponent implements OnInit {
 	}
 
 	async checkIfMissionExists(uniqueName: string) {
-		const formData = new FormData();
 		let conflict = false;
-		formData.append('uniqueName', uniqueName);
-		const mission = this.missionsService.findOne(formData).subscribe(
-			() => {},
+		this.missionsService.findOne(uniqueName).subscribe(
+			(mission) => {
+				if (mission == null) {
+					conflict = false;
+				} else {
+					conflict = true;
+				}
+				return conflict;
+			},
 			(httpError) => {
 				conflict = true;
+				return conflict;
 			}
 		);
-		if (mission == null) {
-			conflict = false;
-		} else {
-			conflict = true;
-		}
-		return conflict;
 	}
 
 	async submitMission() {
@@ -605,9 +605,11 @@ export class MissionUploadComponent implements OnInit {
 		formData.append('uniqueName', uniqueName);
 		const misType = this.missionTypeGroup.get('missionType')?.value;
 		formData.append('type', misType.title);
+		const minSize = parseFloat(this.missionSizeGroup.get('minPlayers')?.value);
+		const maxSize = parseFloat(this.missionSizeGroup.get('maxPlayers')?.value);
 		formData.append('size', [
-			this.missionSizeGroup.get('minPlayers')?.value,
-			this.missionSizeGroup.get('maxPlayers')?.value
+			minSize,
+			maxSize
 		]);
 		if (misType.ratio || this.missionTypeGroup.get('ratioLOL')?.value) {
 			const parsedRatios: number[] = [

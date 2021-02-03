@@ -300,12 +300,17 @@ router.get('/', async (req, res) => {
 		});
 	}
 	console.log('GET request for all missions');
-	const missions = await Mission.find({}, { _id: 0 }).exec();
-	return res.json(missions);
+	Mission.find({}, { _id: 0 }).exec((err, missions) => {
+		if (err) {
+			res.status(500).send(err);
+		} else {
+			res.json(missions);
+		}
+	});
 });
 
 //get mission by file name
-router.get('/:mission_file_name', async (req, res) => {
+router.get('/:uniqueName', async (req, res) => {
 	req = await getDiscordUserFromCookies(
 		req,
 		'User not allowed to list missions.'
@@ -315,13 +320,12 @@ router.get('/:mission_file_name', async (req, res) => {
 			authError: req.authError
 		});
 	}
-
-	const mission_file_name = req.params.mission_file_name;
-	console.log('GET request for mission by file name');
-	const mission = await Mission.findOne(
-		{ fileName: mission_file_name },
-		{ _id: 0 }
-	).exec();
-	return res.json(mission);
+	Mission.findOne({ uniqueName: req.params.uniqueName }, (err, mission) => {
+		if (err) {
+			res.status(500).send(err);
+		} else {
+			res.json(mission);
+		}
+	});
 });
 module.exports = router;

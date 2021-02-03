@@ -32,6 +32,10 @@ const discordUserSchema = new Schema(
 		reviews: {
 			type: Array,
 			required: false
+		},
+		userSettings: {
+			type: Array,
+			required: false
 		}
 	},
 	{

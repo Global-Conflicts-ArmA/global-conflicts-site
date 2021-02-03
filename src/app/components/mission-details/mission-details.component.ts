@@ -21,11 +21,12 @@ export class MissionDetailsComponent implements OnInit {
 	async ngOnInit(): Promise<void> {
 		this.discordUser = this.userService.getUserLocally();
 		const missionFileName = this.route.snapshot.paramMap.get('id');
-
-		this.missionsService
-			.getMissionFileName(missionFileName)
-			.subscribe((mission) => {
-				console.log(mission);
-			});
+		if (missionFileName) {
+			this.missionsService
+				.getMissionFileName(missionFileName)
+				.subscribe((mission) => {
+					console.log(mission);
+				});
+		}
 	}
 }

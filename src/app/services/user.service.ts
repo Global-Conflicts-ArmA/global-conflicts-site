@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
+import { Observable } from 'rxjs';
 import { DiscordUser } from '../models/discorduser';
 
 @Injectable({
@@ -44,4 +45,27 @@ export class UserService {
 			return null;
 		}
 	}
+
+	public list(): Observable<DiscordUser[]> {
+		return this.httpClient.get<DiscordUser[]>('/api/users');
+	}
+
+	public getUserSettings(id: string): IUserSettings {
+		const settings = {
+			missionEditDM: true,
+			missionReportDM: true,
+			missionReviewDM: true,
+			missionRemoveDM: true,
+			missionAcceptDM: true
+		};
+		return settings;
+	}
+}
+
+export interface IUserSettings {
+	missionEditDM: boolean;
+	missionReportDM: boolean;
+	missionReviewDM: boolean;
+	missionRemoveDM: boolean;
+	missionAcceptDM: boolean;
 }

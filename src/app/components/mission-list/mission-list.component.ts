@@ -30,6 +30,7 @@ export class MissionListComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.missionsService.list().subscribe((value) => {
+			console.log('collected Mission List:', value);
 			this.tempRows = [...value];
 			this.rows = value;
 			this.rows = this.tempRows.filter((mission) => {

@@ -9,15 +9,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RxReactiveFormsModule } from '@rxweb/reactive-form-validators';
 import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LayoutModule } from '@angular/cdk/layout';
 
 import { OAuthModule } from 'angular-oauth2-oidc';
-import { HomeComponent } from './components/home/home.component';
-import { MainNavComponent } from './components/main-nav/main-nav.component';
-import { MissionListComponent } from './components/mission-list/mission-list.component';
-import { MissionUploadComponent } from './components/mission-upload/mission-upload.component';
-import { NotFoundComponent } from './components/not-found/not-found.component';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { HttpErrorInterceptor } from './interceptor/httpInterceptor';
 import { CookieService } from 'ngx-cookie-service';
@@ -42,10 +36,16 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
+import { HomeComponent } from './components/home/home.component';
+import { MainNavComponent } from './components/main-nav/main-nav.component';
+import { MissionListComponent } from './components/mission-list/mission-list.component';
+import { MissionUploadComponent } from './components/mission-upload/mission-upload.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 import { WikiComponent } from './components/wiki/wiki.component';
 import { AARComponent } from './components/aar/aar.component';
 import { MissionConstants } from './constants/missionConstants';
 import { MissionDetailsComponent } from './components/mission-details/mission-details.component';
+import { UserSettingsComponent } from './components/user-settings/user-settings.component';
 
 @NgModule({
 	declarations: [
@@ -57,7 +57,8 @@ import { MissionDetailsComponent } from './components/mission-details/mission-de
 		NotFoundComponent,
 		WikiComponent,
 		AARComponent,
-		MissionDetailsComponent
+		MissionDetailsComponent,
+		UserSettingsComponent
 	],
 	imports: [
 		CommonModule,

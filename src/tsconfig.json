@@ -17,5 +17,11 @@
 	},
 	"angularCompilerOptions": {
 		"fullTemplateTypeCheck": true
+	},
+	"rules": {
+		"no-console": false
+	},
+	"jsRules": {
+		"no-console": false
 	}
 }
