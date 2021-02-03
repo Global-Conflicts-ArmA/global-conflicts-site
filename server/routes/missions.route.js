@@ -324,4 +324,24 @@ router.get('/:mission_file_name', async (req, res) => {
 	).exec();
 	return res.json(mission);
 });
+//get mission by file uniqueName
+router.post('/findOne', uploadMulter.none(), async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to search missions.'
+	);
+
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
+
+	const mission = await Mission.findOne({ uniqueName: req.body.uniqueName}, (err) => {
+        if (err) {
+            res.status(500).send(err)
+        }
+    });
+	return res.json(mission);
+});
 module.exports = router;

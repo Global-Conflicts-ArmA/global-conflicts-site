@@ -9,7 +9,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RxReactiveFormsModule } from '@rxweb/reactive-form-validators';
 import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LayoutModule } from '@angular/cdk/layout';
 
 import { OAuthModule } from 'angular-oauth2-oidc';
@@ -41,6 +40,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatDialogModule } from '@angular/material/dialog';
 
 import { WikiComponent } from './components/wiki/wiki.component';
 import { AARComponent } from './components/aar/aar.component';
@@ -88,7 +88,8 @@ import { MissionDetailsComponent } from './components/mission-details/mission-de
 		MatCheckboxModule,
 		MatButtonToggleModule,
 		MatSlideToggleModule,
-		MatTooltipModule
+		MatTooltipModule,
+		MatDialogModule
 	],
 	bootstrap: [AppComponent],
 	providers: [
@@ -106,4 +107,4 @@ import { MissionDetailsComponent } from './components/mission-details/mission-de
 		}
 	]
 })
-export class AppModule {}
+export class AppModule { }

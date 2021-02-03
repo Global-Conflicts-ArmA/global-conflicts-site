@@ -1,0 +1,22 @@
+@use "../../../colors";
+.details-label {
+	font-size: 11px;
+	color: colors.$accent;
+}
+
+.details-break {
+	display: none;
+}
+
+@media (max-width: 575px) {
+	.col-btn {
+		margin: 5px 10px;
+
+		button {
+			width: 100%;
+		}
+	}
+	.details-break {
+		display: block;
+	}
+} ;
