@@ -46,10 +46,7 @@ import { WikiComponent } from './components/wiki/wiki.component';
 import { AARComponent } from './components/aar/aar.component';
 import { MissionConstants } from './constants/missionConstants';
 import { MissionDetailsComponent } from './components/mission-details/mission-details.component';
-<<<<<<< HEAD
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
-=======
->>>>>>> c3f8a6bc016c553a0dd923c0b1569a60e63af93c
 
 @NgModule({
 	declarations: [
@@ -61,12 +58,8 @@ import { UserSettingsComponent } from './components/user-settings/user-settings.
 		NotFoundComponent,
 		WikiComponent,
 		AARComponent,
-<<<<<<< HEAD
 		MissionDetailsComponent,
 		UserSettingsComponent
-=======
-		MissionDetailsComponent
->>>>>>> c3f8a6bc016c553a0dd923c0b1569a60e63af93c
 	],
 	imports: [
 		CommonModule,
@@ -97,12 +90,8 @@ import { UserSettingsComponent } from './components/user-settings/user-settings.
 		MatCheckboxModule,
 		MatButtonToggleModule,
 		MatSlideToggleModule,
-<<<<<<< HEAD
-		MatTooltipModule
-=======
 		MatTooltipModule,
 		MatDialogModule
->>>>>>> c3f8a6bc016c553a0dd923c0b1569a60e63af93c
 	],
 	bootstrap: [AppComponent],
 	providers: [
