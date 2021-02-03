@@ -1,14 +1,19 @@
-<div class="content">
+<div class="container">
 	<div style="position: relative">
 		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">
 			You must join our Discord server and complete the welcoming process to upload missions!
 		</div>
 
 		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
+
+			<div *ngIf="isUpdate">
+				You are updating
+			</div>
+
 			<mat-vertical-stepper class="field-container" [linear]="false" #stepper>
-			  <mat-step [stepControl]="fileUploadGroup">
-			    <form [formGroup]="fileUploadGroup">
-			      <ng-template matStepLabel>Mission File</ng-template>
+				<mat-step [stepControl]="fileUploadGroup">
+					<form [formGroup]="fileUploadGroup">
+						<ng-template matStepLabel>Mission File</ng-template>
 						<div>
 							<mat-form-field>
 								<mat-label class="inset-label" for="file-input">Select Mission .pbo</mat-label>

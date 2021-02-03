@@ -13,6 +13,7 @@ import { DiscordUser } from '../../models/discorduser';
 import { UserService } from '../../services/user.service';
 import { FileValidator } from 'ngx-material-file-input';
 import { MatSelect } from '@angular/material/select';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
 	selector: 'app-mission-upload',
@@ -25,9 +26,11 @@ export class MissionUploadComponent implements OnInit {
 		private missionsService: MissionsService,
 		private userService: UserService,
 		private formBuilder: FormBuilder,
-		public mC: MissionConstants
-	) {}
+		public mC: MissionConstants,
+		private route: ActivatedRoute
+	) { }
 
+	isUpdate = false;
 	discordUser: DiscordUser | null;
 	misType = 'CO';
 	missionToUpload: File;
@@ -117,6 +120,13 @@ export class MissionUploadComponent implements OnInit {
 			},
 			{ validators: [this.checkImageFile.bind(this)] }
 		);
+
+		this.route.queryParams
+			.subscribe(params => {
+				const value = params.get('update');
+				this.isUpdate = value.toLocaleLowerCase() === 'true';
+
+			});
 	}
 
 	onListChipRemoved(multiSelect: MatSelect, matChipIndex: number): void {

@@ -21,7 +21,9 @@ export class MissionsService {
 		return this.httpClient.post(`/api/missions`, formData);
 	}
 
-	public getMissionFileName(missionFileName: string): Observable<IMission> {
+	public getMissionFileName(
+		missionFileName: string | null
+	): Observable<IMission> {
 		return this.httpClient.get<IMission>(
 			`/api/missions/${missionFileName}`
 		);
