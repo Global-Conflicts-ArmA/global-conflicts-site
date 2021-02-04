@@ -20,7 +20,7 @@ export class MissionDetailsComponent implements OnInit {
 		private route: ActivatedRoute,
 		private sanitizer: DomSanitizer,
 		public dialog: MatDialog
-	) { }
+	) {}
 	discordUser: DiscordUser | null;
 	mission: IMission | null;
 
@@ -40,18 +40,15 @@ export class MissionDetailsComponent implements OnInit {
 	}
 
 	public updateMission() {
-		const dialogRef = this.dialog.open(DialogContentExampleDialog);
-
-		dialogRef.afterClosed().subscribe(result => {
-			console.log(`Dialog result: ${result}`);
-		});
-
+		//  	const dialogRef = this.dialog.open(DialogContentExampleDialog);
+		//  	dialogRef.afterClosed().subscribe(result => {
+		//  		console.log(`Dialog result: ${result}`);
+		//  	});
 	}
-
 }
 
-@Component({
-	selector: 'dialog-content-example-dialog',
-	templateUrl: 'mission-update-dialog.html',
-})
-export class DialogContentExampleDialog { }
+// @Component({
+// 	selector: 'dialog-content-example-dialog',
+// 	templateUrl: 'mission-update-dialog.html',
+// })
+// export class DialogContentExampleDialog { }

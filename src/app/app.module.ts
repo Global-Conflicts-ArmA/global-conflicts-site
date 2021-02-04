@@ -36,6 +36,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatTableModule } from '@angular/material/table';
 
 import { HomeComponent } from './components/home/home.component';
 import { MainNavComponent } from './components/main-nav/main-nav.component';
@@ -91,7 +92,8 @@ import { UserSettingsComponent } from './components/user-settings/user-settings.
 		MatButtonToggleModule,
 		MatSlideToggleModule,
 		MatTooltipModule,
-		MatDialogModule
+		MatDialogModule,
+		MatTableModule
 	],
 	bootstrap: [AppComponent],
 	providers: [
@@ -109,4 +111,4 @@ import { UserSettingsComponent } from './components/user-settings/user-settings.
 		}
 	]
 })
-export class AppModule { }
+export class AppModule {}

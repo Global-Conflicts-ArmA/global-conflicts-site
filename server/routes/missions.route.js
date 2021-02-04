@@ -10,7 +10,6 @@ const DiscordOauth2 = require('discord-oauth2');
 const { getDiscordUserFromCookies } = require('../misc/validate-cookies');
 const { discordJsClient, Discord } = require('../config/discord-bot');
 const { MissionTerrains } = require('../mission-enums');
-
 const trustedUploaderRoles = ['Admin', 'GM', 'Mission Maker'];
 
 fileFilterFunction = async function (req, file, callback) {
@@ -50,7 +49,6 @@ fileFilterFunction = async function (req, file, callback) {
 			callback(null, false);
 			return;
 		}
-		//TODO validate mission name
 	}
 	req.file = file;
 	callback(null, true);
@@ -61,7 +59,10 @@ const uploadMulter = multer({
 	fileFilter: fileFilterFunction,
 	storage: multer.diskStorage({
 		destination: function (req, file, cb) {
-			cb(null, `${process.env.ROOT_FOLDER}${req.uploadPath}`);
+			cb(
+				null,
+				`${process.env.ROOT_FOLDER}/${process.env.TEST_SERVER_READY}`
+			);
 		},
 		filename: function (req, file, cb) {
 			cb(null, req.body.fileName);
@@ -79,9 +80,6 @@ function validateUploadData(reqBody, res) {
 	}
 	if (!reqBody.name) {
 		errors.name = 'Missing name.';
-	}
-	if (!reqBody.fileName) {
-		errors.fileName = 'Missing fileName.';
 	}
 	if (!reqBody.terrain) {
 		errors.terrain = 'Missing terrain.';
@@ -110,25 +108,26 @@ function validateUploadData(reqBody, res) {
 	if (!reqBody.version) {
 		errors.version = 'Missing Version.';
 	}
+	if (!reqBody.updates) {
+		errors.updates = 'Missing Updates Array.';
+	}
+	if (!reqBody.fileName) {
+		errors.fileName = 'Missing Filename.';
+	}
 	return errors;
 }
 
-async function insertMissionOnDatabase(mission, query) {
+function insertMissionOnDatabase(mission, query) {
 	const options = {
 		upsert: true,
 		safe: true,
 		new: true
 	};
-	let missionData = await Mission.findOneAndUpdate(
-		query,
-		mission,
-		options,
-		function (err, doc) {
-			if (err) {
-				console.log(err);
-			}
+	Mission.findOneAndUpdate(query, mission, options, (err, doc) => {
+		if (err) {
+			console.log(err);
 		}
-	);
+	});
 }
 
 async function insertUserOnDatabase(user, query, missionID) {
@@ -137,22 +136,29 @@ async function insertUserOnDatabase(user, query, missionID) {
 		safe: true,
 		new: true
 	};
-	let userData = await User.findOneAndUpdate(query, user, options, function (
-		err,
-		doc
-	) {
+	User.findOneAndUpdate(query, user, options, (err, userData) => {
 		if (err) {
 			console.log(err);
+		} else {
+			if (!userData.missions) {
+				userData.missions = [missionID];
+				userData.save((error2) => {
+					if (error2) {
+						console.log(err);
+					}
+				});
+			} else {
+				if (userData.missions.indexOf(missionID) === -1) {
+					userData.missions.push(missionID);
+					userData.save((error2) => {
+						if (error2) {
+							console.log(err);
+						}
+					});
+				}
+			}
 		}
 	});
-	if (userData.missions.indexOf(missionID) === -1) {
-		userData.missions.push(missionID);
-		userData.save(function (err) {
-			if (err) {
-				console.log(err);
-			}
-		});
-	}
 }
 
 async function getImage(base64Image) {
@@ -169,7 +175,7 @@ async function getImage(base64Image) {
 	return resizedBuffer;
 }
 
-async function postDiscord(reqBody, avatarURL, uploadPath) {
+async function postDiscord(reqBody, avatarURL) {
 	let strTerrain = '';
 	if (MissionTerrains[reqBody.terrain]) {
 		strTerrain = MissionTerrains[reqBody.terrain].name;
@@ -179,13 +185,13 @@ async function postDiscord(reqBody, avatarURL, uploadPath) {
 		.setColor('#22cf26')
 		.setTitle(reqBody.fileName)
 		.setAuthor(`Author: ${reqBody.author}`, avatarURL)
-		.setDescription(`Directory: ${uploadPath}`)
+		.setDescription(`New Mission Uploaded`)
 		.addFields(
 			{ name: 'Description:', value: reqBody.description, inline: false },
 			{
 				name: 'Player Count:',
-				value: `**Min:** ${reqBody.size.split(',')[0]} **Max:** ${
-					reqBody.size.split(',')[1]
+				value: `**Min:** ${reqBody.size[0]} **Max:** ${
+					reqBody.size[1]
 				}`,
 				inline: true
 			},
@@ -195,27 +201,27 @@ async function postDiscord(reqBody, avatarURL, uploadPath) {
 			{ name: 'Era:', value: reqBody.era, inline: true },
 			{
 				name: 'Tags:',
-				value: reqBody.tags.split(',').join(', '),
+				value: reqBody.tags,
 				inline: false
 			}
 		)
 		.setFooter('')
 		.setTimestamp();
 
-	if (reqBody.ratios) {
+	
+	if (reqBody.ratios && (reqBody.ratios[0] > -1 || reqBody.ratios[1] > -1 || reqBody.ratios[2] > -1 || reqBody.ratios[3] > -1)) {
 		let ratioStr = '';
-		let splitStr = reqBody.ratios.split(',');
-		if (splitStr[0] > 0) {
-			ratioStr = ratioStr + `**Blufor:** ${splitStr[0]} `;
+		if (reqBody.ratios[0] > -1) {
+			ratioStr = ratioStr + `**Blufor:** ${reqBody.ratios[0]} `;
 		}
-		if (splitStr[1] > 0) {
-			ratioStr = ratioStr + `**Opfor:** ${splitStr[1]} `;
+		if (reqBody.ratios[1] > -1) {
+			ratioStr = ratioStr + `**Opfor:** ${reqBody.ratios[1]} `;
 		}
-		if (splitStr[2] > 0) {
-			ratioStr = ratioStr + `**Indfor:** ${splitStr[2]} `;
+		if (reqBody.ratios[2] > -1) {
+			ratioStr = ratioStr + `**Indfor:** ${reqBody.ratios[2]} `;
 		}
-		if (splitStr[3] > 0) {
-			ratioStr = ratioStr + `**Civ:** ${splitStr[3]} `;
+		if (reqBody.ratios[3] > -1) {
+			ratioStr = ratioStr + `**Civ:** ${reqBody.ratios[3]} `;
 		}
 		newMissionEmbed.addField('Ratios:', ratioStr, false);
 	}
@@ -235,7 +241,9 @@ async function postDiscord(reqBody, avatarURL, uploadPath) {
 		.send('New mission uploaded', newMissionEmbed);
 }
 
+// upload mission
 router.post('/', uploadMulter.single('fileData'), (req, res) => {
+	console.log('mission upload req', req.body);
 	if (req.authError) {
 		return res.status(401).send({
 			authError: req.authError
@@ -246,33 +254,40 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		return res.status(400).send({ missionErrors: req.missionDataErrors });
 	}
 
-	postDiscord(
-		req.body,
-		req.discordUser.user.displayAvatarURL(),
-		req.uploadPath
-	);
+	postDiscord(req.body, req.discordUser.user.displayAvatarURL());
+
+	const firstUpdate = {
+		version: req.body.updates.version,
+		authorID: req.body.updates.authorID,
+		date: req.body.updates.date,
+		fileName: req.body.updates.fileName,
+		path: `${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}`
+	};
 
 	const mission = {
+		uniqueName: req.body.uniqueName,
 		name: req.body.name,
-		fileName: req.body.fileName,
 		author: req.body.author,
 		authorID: req.body.authorID,
 		terrain: req.body.terrain,
-		uniqueName: req.body.uniqueName,
 		type: req.body.type,
 		size: req.body.size,
+		ratios: req.body.ratios,
 		description: req.body.description,
 		tags: req.body.tags,
 		timeOfDay: req.body.timeOfDay,
 		era: req.body.era,
 		uploadDate: Date.now(),
+		updates: [firstUpdate],
 		version: req.body.version,
-		paths: [req.uploadPath]
+		reports: req.body.reports,
+		reviews: req.body.reviews
 	};
+	console.log('size type:', typeof mission.size);
 	if (req.body.image) {
 		mission.image = req.body.image;
 	}
-	const query = { fileName: req.body.uniqueName };
+	const query = { uniqueName: req.body.uniqueName };
 	insertMissionOnDatabase(mission, query);
 
 	const user = {
@@ -309,7 +324,7 @@ router.get('/', async (req, res) => {
 	});
 });
 
-//get mission by file name
+//get mission by uniqueName
 router.get('/:uniqueName', async (req, res) => {
 	req = await getDiscordUserFromCookies(
 		req,

@@ -5,6 +5,7 @@ import { MissionsService } from '../../services/missions.service';
 import { IMission } from '../../models/mission';
 import { DiscordUser } from '../../models/discorduser';
 import { UserService } from '../../services/user.service';
+import { MatTableDataSource, MatRow } from '@angular/material/table';
 
 @Component({
 	selector: 'app-mission-list',
@@ -21,6 +22,8 @@ export class MissionListComponent implements OnInit {
 	selectedServerPath = 'mainServer/MPMissions';
 	discordUser: DiscordUser | null;
 	searchString = '';
+	displayedColumns: string[] = ['name', 'version'];
+	dataSource = new MatTableDataSource<IMission>([]);
 
 	constructor(
 		private missionsService: MissionsService,
@@ -33,46 +36,28 @@ export class MissionListComponent implements OnInit {
 			console.log('collected Mission List:', value);
 			this.tempRows = [...value];
 			this.rows = value;
-			this.rows = this.tempRows.filter((mission) => {
-				return mission.paths.indexOf(this.selectedServerPath) !== -1;
-			});
+			// this.rows = this.tempRows.filter((mission) => {
+			// 	return mission.paths.indexOf(this.selectedServerPath) !== -1;
+			// });
+			this.dataSource = new MatTableDataSource<IMission>(value);
 		});
 		this.discordUser = this.userService.getUserLocally();
 	}
 
-	onActivate(event) {
-		if (event.type === 'click') {
-			this.router.navigate([`/mission-details/${event.row.fileName}`]);
-		}
+	applyFilter(event: Event) {
+		const filterValue = (event.target as HTMLInputElement).value;
+		this.dataSource.filter = filterValue.trim().toLowerCase();
+	}
+
+	onActivate(row: IMission) {
+		console.log('got click event for:', row.name);
+		this.router.navigate([`/mission-details/${row.uniqueName}`]);
 	}
 
 	onSelectedServerPathChange(event) {
 		this.searchString = '';
-		this.rows = this.tempRows.filter((mission) => {
-			return mission.paths.indexOf(this.selectedServerPath) !== -1;
-		});
-	}
-
-	updateFilter(event) {
-		this.rows = this.tempRows.filter((mission) => {
-			return (
-				this.containsString(mission, this.searchString) ||
-				!this.searchString
-			);
-		});
-	}
-
-	containsString(mission: IMission, search: string) {
-		search = search.toLowerCase();
-		return (
-			(mission.name.toLowerCase().indexOf(search) !== -1 ||
-				mission.author.toLowerCase().indexOf(search) !== -1 ||
-				mission.type.toLowerCase().indexOf(search) !== -1 ||
-				mission.terrain.toLowerCase().indexOf(search) !== -1 ||
-				mission.description.toLowerCase().indexOf(search) !== -1 ||
-				mission.version.toString().toLowerCase().indexOf(search) !==
-					-1) &&
-			mission.paths.indexOf(this.selectedServerPath) !== -1
-		);
+		// this.rows = this.tempRows.filter((mission) => {
+		// 	return mission.paths.includes(this.selectedServerPath);
+		// });
 	}
 }

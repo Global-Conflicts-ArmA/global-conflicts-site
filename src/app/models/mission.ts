@@ -1,9 +1,18 @@
+export interface IUpdate {
+	version: number;
+	authorID: string;
+	date: Date;
+	changeLog?: string;
+	addressesReports?: string;
+	fileName: string;
+	path?: string;
+}
+
 export interface IMission {
+	uniqueName: string;
 	name: string;
 	author: string;
 	authorID: string;
-	file: File;
-	fileName: string;
 	terrain: string;
 	type: string;
 	size: number[];
@@ -12,9 +21,12 @@ export interface IMission {
 	tags: string[];
 	timeOfDay: string;
 	era: string;
-	image: string;
+	image?: string;
 	uploadDate: Date;
-	updates: any[];
+	lastUpdate: Date;
+	updates: IUpdate[];
 	version: number;
-	paths: string[];
+	paths?: string[];
+	reports?: any[];
+	reviews?: any[];
 }

@@ -3,6 +3,10 @@ const Schema = mongooseConfig.Schema;
 
 const MissionSchema = new Schema(
 	{
+		uniqueName: {
+			type: String,
+			required: true
+		},
 		name: {
 			type: String,
 			required: true
@@ -15,15 +19,7 @@ const MissionSchema = new Schema(
 			type: String,
 			required: true
 		},
-		fileName: {
-			type: String,
-			required: true
-		},
 		terrain: {
-			type: String,
-			required: true
-		},
-		uniqueName: {
 			type: String,
 			required: true
 		},
@@ -31,22 +27,13 @@ const MissionSchema = new Schema(
 			type: String,
 			required: true
 		},
-		size: {
-			type: Array,
-			required: true
-		},
-		ratios: {
-			type: Array,
-			required: false
-		},
+		size: [Number],
+		ratios: [Number],
 		description: {
 			type: String,
 			required: true
 		},
-		tags: {
-			type: Array,
-			required: true
-		},
+		tags: [String],
 		timeOfDay: {
 			type: String,
 			required: true
@@ -63,32 +50,84 @@ const MissionSchema = new Schema(
 			type: Date,
 			required: true
 		},
+		lastUpdate: {
+			type: Date,
+			required: true
+		},
 		updates: [
 			{
-				type: Array,
-				required: false
+				version: {
+					type: Number,
+					required: true
+				},
+				authorID: {
+					type: String,
+					required: true
+				},
+				date: {
+					type: String,
+					required: true
+				},
+				changeLog: {
+					type: String,
+					required: false
+				},
+				addressesReports: [{
+					type: String,
+					required: false
+				}],
+				fileName: {
+					type: String,
+					required: true
+				},
+				path: {
+					type: String,
+					required: true
+				}
 			}
 		],
 		version: {
 			type: Number,
 			required: true
 		},
-		paths: [
-			{
-				type: String,
-				required: true
-			}
-		],
 		reports: [
 			{
-				type: Array,
-				required: false
+				date: {
+					type: String,
+					required: true
+				},
+				authorID: {
+					type: String,
+					required: true
+				},
+				report: {
+					type: String,
+					required: true
+				},
+				version: {
+					type: Number,
+					required: true
+				}
 			}
 		],
 		reviews: [
 			{
-				type: Array,
-				required: false
+				date: {
+					type: String,
+					required: true
+				},
+				authorID: {
+					type: String,
+					required: true
+				},
+				review: {
+					type: String,
+					required: true
+				},
+				version: {
+					type: Number,
+					required: true
+				}
 			}
 		]
 	},

@@ -6,11 +6,15 @@
     "import-blacklist": [
       true,
       "rxjs/Rx"
-    ]
+    ],
+    "no-console": false
 	},
 	"extends": [
 		"tslint:recommended",
 		"tslint-angular",
     "tslint-config-prettier"
-  ]
+  ],
+	"jsRules": {
+		"no-console": false
+	}
 }
