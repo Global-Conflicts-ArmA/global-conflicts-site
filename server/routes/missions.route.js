@@ -185,14 +185,11 @@ async function postDiscord(reqBody, avatarURL) {
 		.setColor('#22cf26')
 		.setTitle(reqBody.fileName)
 		.setAuthor(`Author: ${reqBody.author}`, avatarURL)
-		.setDescription(`New Mission Uploaded`)
 		.addFields(
 			{ name: 'Description:', value: reqBody.description, inline: false },
 			{
 				name: 'Player Count:',
-				value: `**Min:** ${reqBody.size[0]} **Max:** ${
-					reqBody.size[1]
-				}`,
+				value: `**Min:** ${reqBody.size[0]} **Max:** ${reqBody.size[1]}`,
 				inline: true
 			},
 			{ name: 'Type:', value: reqBody.type, inline: true },
@@ -201,15 +198,21 @@ async function postDiscord(reqBody, avatarURL) {
 			{ name: 'Era:', value: reqBody.era, inline: true },
 			{
 				name: 'Tags:',
-				value: reqBody.tags,
+				value: reqBody.tags.toString(' , '),
 				inline: false
 			}
 		)
-		.setFooter('')
-		.setTimestamp();
+		.setTimestamp()
+		.setURL('')
+		.setFooter('\u3000'.repeat(10 /*any big number works too*/) + '|');
 
-	
-	if (reqBody.ratios && (reqBody.ratios[0] > -1 || reqBody.ratios[1] > -1 || reqBody.ratios[2] > -1 || reqBody.ratios[3] > -1)) {
+	if (
+		reqBody.ratios &&
+		(reqBody.ratios[0] > -1 ||
+			reqBody.ratios[1] > -1 ||
+			reqBody.ratios[2] > -1 ||
+			reqBody.ratios[3] > -1)
+	) {
 		let ratioStr = '';
 		if (reqBody.ratios[0] > -1) {
 			ratioStr = ratioStr + `**Blufor:** ${reqBody.ratios[0]} `;

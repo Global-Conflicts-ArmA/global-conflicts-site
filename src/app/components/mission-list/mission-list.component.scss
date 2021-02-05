@@ -10,3 +10,87 @@ select {
 	border: none;
 	outline: none;
 }
+
+.flexrow {
+	display: flex;
+	flex-direction: row;
+	margin: 1rem 1rem;
+	height: 85%;
+	overflow: hidden;
+}
+
+.controlsContainer {
+	margin: 0 1rem;
+	max-width: 100%;
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 0;
+}
+
+.controlsColumn {
+	display: flex;
+	flex-direction: column;
+	flex: 1 0 0;
+	background-color: #393939;
+	margin: 0 1rem;
+	max-width: 20rem !important;
+}
+
+.controlsColumn > * {
+	max-width: 20rem !important;
+}
+
+::ng-deep .mat-sort-header-container {
+	display: flex;
+	justify-content: center !important;
+	color: colors.$accent !important;
+	font-size: 20px;
+}
+
+table {
+	text-align: center !important;
+	width: 100%;
+	align-content: center !important;
+}
+
+::ng-deep input,
+.input-like {
+	background-color: colors.$primary;
+	border: none;
+	display: flex;
+	flex: 1 1 0;
+	align-items: center;
+	outline: none;
+	color: white;
+	min-height: 1rem;
+	padding: 1rem 1rem;
+	font-size: 15px;
+	max-height: 2rem;
+
+	&.placeholder {
+		color: #757575 !important;
+	}
+}
+
+.mat-form-field {
+	width: 100%;
+	font-size: 14px;
+}
+
+.tableColumn {
+	display: flex;
+	flex: 8 8 0;
+	flex-direction: column;
+	width: 100%;
+	overflow-y: auto;
+}
+
+.matTable {
+	width: 100%;
+	flex-grow: 1;
+	overflow-y: auto;
+}
+
+tr.mat-row:hover {
+	background-color: #92753d;
+}

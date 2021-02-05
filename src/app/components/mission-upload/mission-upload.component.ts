@@ -1,4 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {
+	Component,
+	Injectable,
+	OnInit,
+	Pipe,
+	PipeTransform
+} from '@angular/core';
 import {
 	FormBuilder,
 	FormGroup,
@@ -48,6 +54,7 @@ export class MissionUploadComponent implements OnInit {
 	missionImageFile = null;
 	missionImageSrc: any;
 	missionTerrain = '';
+	// TODO: upload whole terrain object for later use, test upload of such
 
 	readonly maxSize: number = 8388608;
 	readonly maxSizeImage: number = 2097152;
@@ -84,14 +91,20 @@ export class MissionUploadComponent implements OnInit {
 			{
 				minPlayers: new FormControl(''),
 				maxPlayers: new FormControl(''),
-				ratioBluforE: new FormControl(true),
-				ratioBlufor: new FormControl({ value: 0, disabled: false }),
-				ratioOpforE: new FormControl(true),
-				ratioOpfor: new FormControl({ value: 0, disabled: false }),
-				ratioIndforE: new FormControl(true),
-				ratioIndfor: new FormControl({ value: 0, disabled: false }),
-				ratioCivE: new FormControl(true),
-				ratioCiv: new FormControl({ value: 0, disabled: false })
+				ratioBluforE: new FormControl({
+					value: false,
+					disabled: false
+				}),
+				ratioBlufor: new FormControl({ value: 0, disabled: true }),
+				ratioOpforE: new FormControl({ value: false, disabled: false }),
+				ratioOpfor: new FormControl({ value: 0, disabled: true }),
+				ratioIndforE: new FormControl({
+					value: false,
+					disabled: false
+				}),
+				ratioIndfor: new FormControl({ value: 0, disabled: true }),
+				ratioCivE: new FormControl({ value: false, disabled: false }),
+				ratioCiv: new FormControl({ value: 0, disabled: true })
 			},
 			{
 				validators: [
@@ -580,7 +593,11 @@ export class MissionUploadComponent implements OnInit {
 		});
 	}
 
-	buildFormData(formData, data, parentKey?) {
+	buildFormData(
+		formData: { append: (arg0: any, arg1: any) => void },
+		data: IMission | null,
+		parentKey?: string | undefined
+	) {
 		if (
 			data &&
 			typeof data === 'object' &&
@@ -602,7 +619,7 @@ export class MissionUploadComponent implements OnInit {
 	}
 
 	sendMission(nameVar: string, uniqueNameVar: string) {
-		const misType = this.missionTypeGroup.get('missionType')?.value;
+		const misType = this.missionTypeGroup.get('missionType')?.value.title;
 		const minSize = parseFloat(
 			this.missionSizeGroup.get('minPlayers')?.value
 		);
@@ -639,13 +656,14 @@ export class MissionUploadComponent implements OnInit {
 			date: new Date(),
 			fileName: this.missionFileName ?? ''
 		};
+		const terrainObject = this.mC.MissionTerrains[this.missionTerrain];
 		const mission: IMission = {
 			uniqueName: uniqueNameVar,
 			name: nameVar,
 			author: this.discordUser?.username ?? '',
 			authorID: this.discordUser?.id ?? '',
-			terrain: this.missionTerrain ?? '',
-			type: misType.title,
+			terrain: terrainObject,
+			type: misType,
 			size: [minSize, maxSize],
 			ratios: parsedRatios,
 			description: this.missionDescGroup.get('misDescription')?.value

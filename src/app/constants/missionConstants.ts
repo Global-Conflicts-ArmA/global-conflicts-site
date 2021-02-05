@@ -28,28 +28,28 @@ export class MissionConstants {
 	];
 
 	MissionTags: string[] = [
-		'Defence',
 		'Attack',
-		'Meeting Engagement',
-		'Tanks',
-		'Helicopter',
-		'Fixed Wing',
 		'Boats',
-		'Mechanized',
-		'Motorized',
-		'Infantry',
-		'WAC',
-		'Urban Ops',
-		'Seeder',
-		'Zeus',
-		'Hostage Rescue',
-		'HVT',
+		'Combined Arms',
 		'Convoy',
+		'Defence',
 		'Escort',
+		'Fixed Wing',
+		'HVT',
+		'Helicopter',
+		'Hostage Rescue',
+		'Infantry',
+		'Mechanized',
+		'Meeting Engagement',
 		'Mines',
-		'Sabotage',
+		'Motorized',
 		'Raid',
-		'Combined Arms'
+		'Sabotage',
+		'Seeder',
+		'Tanks',
+		'Urban Ops',
+		'WAC',
+		'Zeus'
 	];
 
 	MissionEras: string[] = [

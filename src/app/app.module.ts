@@ -12,7 +12,6 @@ import { AppComponent } from './app.component';
 import { LayoutModule } from '@angular/cdk/layout';
 
 import { OAuthModule } from 'angular-oauth2-oidc';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { HttpErrorInterceptor } from './interceptor/httpInterceptor';
 import { CookieService } from 'ngx-cookie-service';
 import { CustExtBrowserXhr } from './services/cust-ext-browser-xhr';
@@ -37,6 +36,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
 import { HomeComponent } from './components/home/home.component';
 import { MainNavComponent } from './components/main-nav/main-nav.component';
@@ -71,7 +72,6 @@ import { UserSettingsComponent } from './components/user-settings/user-settings.
 		HttpClientModule,
 		OAuthModule.forRoot(),
 		LayoutModule,
-		NgxDatatableModule,
 		MatToolbarModule,
 		MatButtonModule,
 		MatSidenavModule,
@@ -93,7 +93,10 @@ import { UserSettingsComponent } from './components/user-settings/user-settings.
 		MatSlideToggleModule,
 		MatTooltipModule,
 		MatDialogModule,
-		MatTableModule
+		MatTableModule,
+		MatPaginatorModule,
+		MatSortModule,
+		BrowserAnimationsModule
 	],
 	bootstrap: [AppComponent],
 	providers: [

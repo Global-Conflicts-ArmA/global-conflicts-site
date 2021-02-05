@@ -10,6 +10,7 @@ import { UserService } from '../../services/user.service';
 export class UserSettingsComponent implements OnInit {
 	constructor(private userService: UserService) {}
 
+	// TODO: implement formControls for these
 	discordUser: DiscordUser | null;
 	missionEditDM = false;
 	missionReportDM = false;
