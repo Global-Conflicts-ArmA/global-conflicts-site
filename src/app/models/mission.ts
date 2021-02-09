@@ -15,7 +15,10 @@ export interface IMission {
 	authorID: string;
 	terrain: string;
 	type: string;
-	size: number[];
+	size: {
+		min: number,
+		max: number
+	};
 	ratios: number[];
 	description: string;
 	tags: string[];

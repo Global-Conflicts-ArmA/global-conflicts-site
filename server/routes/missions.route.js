@@ -9,7 +9,6 @@ const sharp = require('sharp');
 const DiscordOauth2 = require('discord-oauth2');
 const { getDiscordUserFromCookies } = require('../misc/validate-cookies');
 const { discordJsClient, Discord } = require('../config/discord-bot');
-const { MissionTerrains } = require('../mission-enums');
 const trustedUploaderRoles = ['Admin', 'GM', 'Mission Maker'];
 
 fileFilterFunction = async function (req, file, callback) {
@@ -176,11 +175,6 @@ async function getImage(base64Image) {
 }
 
 async function postDiscord(reqBody, avatarURL) {
-	let strTerrain = '';
-	if (MissionTerrains[reqBody.terrain]) {
-		strTerrain = MissionTerrains[reqBody.terrain].name;
-	}
-
 	const newMissionEmbed = new Discord.MessageEmbed()
 		.setColor('#22cf26')
 		.setTitle(reqBody.fileName)
@@ -189,16 +183,16 @@ async function postDiscord(reqBody, avatarURL) {
 			{ name: 'Description:', value: reqBody.description, inline: false },
 			{
 				name: 'Player Count:',
-				value: `**Min:** ${reqBody.size[0]} **Max:** ${reqBody.size[1]}`,
+				value: `**Min:** ${reqBody.size.min} **Max:** ${reqBody.size.max}`,
 				inline: true
 			},
 			{ name: 'Type:', value: reqBody.type, inline: true },
-			{ name: 'Terrain:', value: strTerrain, inline: true },
+			{ name: 'Terrain:', value: reqBody.terrain, inline: true },
 			{ name: 'Time of Day:', value: reqBody.timeOfDay, inline: true },
 			{ name: 'Era:', value: reqBody.era, inline: true },
 			{
 				name: 'Tags:',
-				value: reqBody.tags.toString(' , '),
+				value: reqBody.tags.join(', '),
 				inline: false
 			}
 		)
@@ -246,7 +240,6 @@ async function postDiscord(reqBody, avatarURL) {
 
 // upload mission
 router.post('/', uploadMulter.single('fileData'), (req, res) => {
-	console.log('mission upload req', req.body);
 	if (req.authError) {
 		return res.status(401).send({
 			authError: req.authError
@@ -260,10 +253,10 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 	postDiscord(req.body, req.discordUser.user.displayAvatarURL());
 
 	const firstUpdate = {
-		version: req.body.updates.version,
-		authorID: req.body.updates.authorID,
-		date: req.body.updates.date,
-		fileName: req.body.updates.fileName,
+		version: req.body.updates[0].version,
+		authorID: req.body.updates[0].authorID,
+		date: req.body.updates[0].date,
+		fileName: req.body.updates[0].fileName,
 		path: `${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}`
 	};
 
@@ -281,6 +274,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		timeOfDay: req.body.timeOfDay,
 		era: req.body.era,
 		uploadDate: Date.now(),
+		lastUpdate: Date.now(),
 		updates: [firstUpdate],
 		version: req.body.version,
 		reports: req.body.reports,
@@ -296,8 +290,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 	const user = {
 		discordId: req.discordUser.user.id,
 		username: req.discordUser.user.username,
-		avatar: req.discordUser.user.displayAvatarURL(),
-		role: req.discordUser.roles.highest.name
+		avatar: req.discordUser.user.displayAvatarURL()
 	};
 	const userQuery = { discordId: req.discordUser.user.id };
 	insertUserOnDatabase(user, userQuery, req.body.uniqueName);

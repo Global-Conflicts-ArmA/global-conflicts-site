@@ -27,7 +27,16 @@ const MissionSchema = new Schema(
 			type: String,
 			required: true
 		},
-		size: [Number],
+		size: {
+			min: {
+				type: Number,
+				required: true
+			},
+			max: {
+				type: Number,
+				required: true
+			}
+		},
 		ratios: [Number],
 		description: {
 			type: String,
@@ -65,17 +74,19 @@ const MissionSchema = new Schema(
 					required: true
 				},
 				date: {
-					type: String,
+					type: Date,
 					required: true
 				},
 				changeLog: {
 					type: String,
 					required: false
 				},
-				addressesReports: [{
-					type: String,
-					required: false
-				}],
+				addressesReports: [
+					{
+						type: String,
+						required: false
+					}
+				],
 				fileName: {
 					type: String,
 					required: true

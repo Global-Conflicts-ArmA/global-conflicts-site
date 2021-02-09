@@ -12,7 +12,6 @@ import {
 	FormControl,
 	AbstractControl
 } from '@angular/forms';
-import { MissionTerrains } from '../../mission-enums';
 import { MissionConstants } from '../../constants/missionConstants';
 import { MissionsService } from '../../services/missions.service';
 import { DiscordUser } from '../../models/discorduser';
@@ -54,7 +53,6 @@ export class MissionUploadComponent implements OnInit {
 	missionImageFile = null;
 	missionImageSrc: any;
 	missionTerrain = '';
-	// TODO: upload whole terrain object for later use, test upload of such
 
 	readonly maxSize: number = 8388608;
 	readonly maxSizeImage: number = 2097152;
@@ -171,7 +169,7 @@ export class MissionUploadComponent implements OnInit {
 						requiredTerrain: true
 					};
 				} else {
-					if (fileNameArray[1] in MissionTerrains) {
+					if (fileNameArray[1] in this.mC.MissionTerrains) {
 					} else {
 						return {
 							notAcceptedTerrain: true
@@ -656,15 +654,17 @@ export class MissionUploadComponent implements OnInit {
 			date: new Date(),
 			fileName: this.missionFileName ?? ''
 		};
-		const terrainObject = this.mC.MissionTerrains[this.missionTerrain];
 		const mission: IMission = {
 			uniqueName: uniqueNameVar,
 			name: nameVar,
 			author: this.discordUser?.username ?? '',
 			authorID: this.discordUser?.id ?? '',
-			terrain: terrainObject,
+			terrain: this.missionTerrain,
 			type: misType,
-			size: [minSize, maxSize],
+			size: {
+				min: minSize,
+				max: maxSize
+			},
 			ratios: parsedRatios,
 			description: this.missionDescGroup.get('misDescription')?.value
 				? this.missionDescGroup.get('misDescription')?.value

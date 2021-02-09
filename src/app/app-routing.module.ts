@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { ShouldLoginComponent } from './should-login.component';
 import { HomeComponent } from './components/home/home.component';
 import { MissionDetailsComponent } from './components/mission-details/mission-details.component';
 import { MissionListComponent } from './components/mission-list/mission-list.component';
@@ -19,7 +18,6 @@ const routes: Routes = [
 	},
 	{ path: 'mission-list', component: MissionListComponent },
 	{ path: 'user-settings', component: UserSettingsComponent },
-	{ path: 'should-login', component: ShouldLoginComponent },
 	{ path: 'wiki', component: WikiComponent },
 	{ path: 'aar', component: AARComponent },
 	{ path: '**', component: NotFoundComponent }

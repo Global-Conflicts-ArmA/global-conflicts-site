@@ -2,14 +2,14 @@ import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { MissionsService } from '../../services/missions.service';
-import { IMission } from '../../models/mission';
+import { IMission, IUpdate } from '../../models/mission';
 import { DiscordUser } from '../../models/discorduser';
 import { UserService } from '../../services/user.service';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSelect } from '@angular/material/select';
-import { MissionConstants } from '@app/constants/missionConstants';
+import { MissionConstants, ITerrain } from '@app/constants/missionConstants';
 import {
 	FormBuilder,
 	FormControl,
@@ -27,8 +27,7 @@ export class MissionListComponent implements OnInit {
 	@ViewChild(MatTable) table: MatTable<any>;
 	@ViewChild(MatSort) sort: MatSort;
 
-	rows: IMission[] = [];
-	tempRows: IMission[] = [];
+	rowData: IMission[] = [];
 	timeout: any;
 	columns = [{ prop: 'name' }, { name: 'Company' }, { name: 'Gender' }];
 	ColumnMode = ColumnMode;
@@ -38,8 +37,8 @@ export class MissionListComponent implements OnInit {
 	displayedColumns: string[] = [
 		'name',
 		'type',
-		'min',
-		'max',
+		'size.min',
+		'size.max',
 		'terrain',
 		'era',
 		'author',
@@ -47,9 +46,11 @@ export class MissionListComponent implements OnInit {
 	];
 	dataSource: MatTableDataSource<IMission>;
 	filterGroup: FormGroup;
+	userList: any[];
+	terrainList: string[];
 
 	public keepOriginalOrder = (a, b) => a.key;
-	
+
 	constructor(
 		private missionsService: MissionsService,
 		private userService: UserService,
@@ -57,27 +58,62 @@ export class MissionListComponent implements OnInit {
 		public mC: MissionConstants,
 		private formBuilder: FormBuilder
 	) {}
-
 	ngOnInit(): void {
 		this.filterGroup = this.formBuilder.group({
+			misAuthor: new FormControl({ value: 'ALL' }),
 			misType: new FormControl({ value: 'ALL' }),
 			misTerrain: new FormControl({ value: 'ALL' }),
 			misTime: new FormControl({ value: 'ALL' }),
 			misEra: new FormControl({ value: 'ALL' }),
-			misTags: new FormControl('')
+			misTags: new FormControl()
 		});
+		['misAuthor', 'misType', 'misTerrain', 'misTime', 'misEra'].forEach(
+			(element) => {
+				this.filterGroup.get(element)?.setValue('ALL');
+			}
+		);
 		this.missionsService.list().subscribe((value) => {
 			console.log('collected Mission List:', value);
-			this.tempRows = [...value];
-			this.rows = value;
-			// this.rows = this.tempRows.filter((mission) => {
-			// 	return mission.paths.indexOf(this.selectedServerPath) !== -1;
-			// });
 			this.dataSource = new MatTableDataSource<IMission>(value);
+			this.rowData = this.dataSource.data;
+			console.log('rowData: ', this.rowData);
+
 			this.dataSource.paginator = this.paginator;
+			this.dataSource.sortingDataAccessor = (item, property) => {
+				switch (property) {
+					case 'size.min':
+						return item.size.min;
+					case 'size.max':
+						return item.size.max;
+					default:
+						return item[property];
+				}
+			};
 			this.dataSource.sort = this.sort;
 		});
 		this.discordUser = this.userService.getUserLocally();
+		this.userService.list().subscribe((value) => {
+			this.userList = value;
+		});
+		this.terrainList = [];
+		Object.values(this.mC.MissionTerrains).forEach(
+			(terrain: ITerrain) => {
+				this.terrainList.push(terrain.name);
+			}
+		);
+		this.terrainList.sort();
+		console.log('terrains: ', this.terrainList);
+	}
+
+	getTerrainData(terrainName: string) {
+		return this.mC.MissionTerrains[terrainName];
+	}
+
+	getDiscordUserName(discordID: string) {
+		const user: DiscordUser = this.userList.find(
+			(element: DiscordUser) => element.id === discordID
+		);
+		return user?.username ?? '';
 	}
 
 	onListChipRemoved(multiSelect: MatSelect, matChipIndex: number): void {
@@ -89,19 +125,51 @@ export class MissionListComponent implements OnInit {
 			multiSelect.writeValue(selectedChips);
 		}
 	}
-	// TODO: display whether mission is on main server, test, or archived
-	// TODO: functionality of filter controls
-	applyFilter(event: Event) {
-		const filterValue = (event.target as HTMLInputElement).value;
-		this.dataSource.data.forEach((element) => {
-			for (const key in element) {
-				if (['image', 'uploadDate', 'authorID'].includes(key)) {
-					element[key] = '';
-				}
-			}
-		});
-		this.dataSource.filter = filterValue.trim().toLowerCase();
+	applyFilterTags() {
+		const tagsSelected: string[] = this.filterGroup.get('misTags')?.value;
+		console.log('tagsSelected: ', tagsSelected);
+		if (tagsSelected.length === 0) {
+			this.dataSource.data = this.rowData;
+		} else {
+			this.dataSource.data = this.rowData.filter((element: IMission) => {
+				return tagsSelected.every((tag: string) => {
+					return element.tags.includes(tag);
+				});
+			});
+		}
+	}
 
+	applyFilter(event: { target: { value: string }; value: string }) {
+		this.dataSource.filterPredicate = (
+			data: IMission,
+			filter: string
+		): boolean => {
+			return (
+				data.name.toLowerCase().includes(filter) ||
+				data.size.min.toString().toLowerCase().includes(filter) ||
+				data.size.max.toString().toLowerCase().includes(filter) ||
+				data.era.toLowerCase().includes(filter) ||
+				data.author.toLowerCase().includes(filter) ||
+				data.updates.some(
+					(update: IUpdate) =>
+						this.getDiscordUserName(update.authorID) === filter
+				) ||
+				data.version.toString().includes(filter) ||
+				this.getTerrainData(data.terrain)
+					.name.toLowerCase()
+					.includes(filter) ||
+				data.type.toLowerCase().includes(filter) ||
+				data.timeOfDay.toLowerCase().includes(filter)
+			);
+		};
+		let filterValue: string = event.target
+			? event.target.value
+			: event.value;
+		if (filterValue === 'ALL') {
+			filterValue = '';
+		}
+		console.log('filterValue: ', filterValue);
+		this.dataSource.filter = filterValue.trim().toLowerCase();
 		if (this.dataSource.paginator) {
 			this.dataSource.paginator.firstPage();
 		}
@@ -112,6 +180,7 @@ export class MissionListComponent implements OnInit {
 		this.router.navigate([`/mission-details/${row.uniqueName}`]);
 	}
 
+	// TODO: display whether mission is on main server, test, or archived
 	onSelectedServerPathChange(event) {
 		this.searchString = '';
 		// this.rows = this.tempRows.filter((mission) => {
