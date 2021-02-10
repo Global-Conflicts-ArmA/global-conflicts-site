@@ -18,7 +18,7 @@
 						</div>
 						<div class="col">
 							<div class="details-label">Author</div>
-							<div class="details-value">{{ mission?.author }}</div>
+							<div class="details-value">{{ mission?.authorName }}</div>
 						</div>
 						<div class="col">
 							<div class="details-label">Map</div>
@@ -94,6 +94,10 @@
 				<ng-container matColumnDef="version">
 					<th mat-header-cell *matHeaderCellDef mat-sort-header> Version </th>
 					<td mat-cell *matCellDef="let element">{{element.version}}</td>
+				</ng-container>
+				<ng-container matColumnDef="authorName">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Author </th>
+					<td mat-cell *matCellDef="let element">{{element.authorName}}</td>
 				</ng-container>
 				<tr mat-header-row *matHeaderRowDef="updateColumns; sticky: true"></tr>
 				<tr mat-row *matRowDef="let row; columns: updateColumns;"></tr>
