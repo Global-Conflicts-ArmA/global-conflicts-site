@@ -8,6 +8,7 @@ export interface ITerrain {
 	class: string;
 	name: string;
 	winter?: boolean;
+	defaultImage?: string;
 }
 
 export class MissionConstants {
@@ -193,7 +194,8 @@ export class MissionConstants {
 		},
 		Tanoa: {
 			class: 'Tanoa',
-			name: 'Tanoa'
+			name: 'Tanoa',
+			defaultImage: '../../../assets/imgs/logo.png'
 		},
 		fow_map_tarawa: {
 			class: 'fow_map_tarawa',

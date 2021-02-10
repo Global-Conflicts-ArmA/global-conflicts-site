@@ -11,10 +11,6 @@ const MissionSchema = new Schema(
 			type: String,
 			required: true
 		},
-		author: {
-			type: String,
-			required: true
-		},
 		authorID: {
 			type: String,
 			required: true

@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ColumnMode } from '@swimlane/ngx-datatable';
 import { MissionsService } from '../../services/missions.service';
 import { IMission, IUpdate } from '../../models/mission';
 import { DiscordUser } from '../../models/discorduser';
@@ -28,12 +27,7 @@ export class MissionListComponent implements OnInit {
 	@ViewChild(MatSort) sort: MatSort;
 
 	rowData: IMission[] = [];
-	timeout: any;
-	columns = [{ prop: 'name' }, { name: 'Company' }, { name: 'Gender' }];
-	ColumnMode = ColumnMode;
-	selectedServerPath = 'mainServer/MPMissions';
 	discordUser: DiscordUser | null;
-	searchString = '';
 	displayedColumns: string[] = [
 		'name',
 		'type',
@@ -41,23 +35,23 @@ export class MissionListComponent implements OnInit {
 		'size.max',
 		'terrain',
 		'era',
-		'author',
-		'version'
+		'authorName',
+		'version',
+		'lastUpdate'
 	];
 	dataSource: MatTableDataSource<IMission>;
 	filterGroup: FormGroup;
-	userList: any[];
+	userList: string[];
 	terrainList: string[];
 
-	public keepOriginalOrder = (a, b) => a.key;
-
 	constructor(
-		private missionsService: MissionsService,
-		private userService: UserService,
+		public missionsService: MissionsService,
+		public userService: UserService,
 		private router: Router,
 		public mC: MissionConstants,
 		private formBuilder: FormBuilder
 	) {}
+
 	ngOnInit(): void {
 		this.filterGroup = this.formBuilder.group({
 			misAuthor: new FormControl({ value: 'ALL' }),
@@ -73,11 +67,31 @@ export class MissionListComponent implements OnInit {
 			}
 		);
 		this.missionsService.list().subscribe((value) => {
-			console.log('collected Mission List:', value);
+			this.userList = [];
+			console.log('got value: ', value);
+			value.map(async (mission: IMission) => {
+				console.log('mission.authorID: ', mission.authorID);
+				mission.authorName = await this.userService.getDiscordUsername(
+					mission.authorID
+				);
+				if (!this.userList.includes(mission.authorName)) {
+					this.userList.push(mission.authorName);
+				}
+				console.log('mission.authorName: ', mission.authorName);
+				mission.updates.map(async (update: IUpdate) => {
+					update.authorName = await this.userService.getDiscordUsername(
+						update.authorID
+					);
+					if (!this.userList.includes(update.authorName)) {
+						this.userList.push(update.authorName);
+					}
+					console.log('update.authorName: ', update.authorName);
+				});
+			});
+			console.log('done map');
+			this.userList.sort();
 			this.dataSource = new MatTableDataSource<IMission>(value);
 			this.rowData = this.dataSource.data;
-			console.log('rowData: ', this.rowData);
-
 			this.dataSource.paginator = this.paginator;
 			this.dataSource.sortingDataAccessor = (item, property) => {
 				switch (property) {
@@ -92,30 +106,12 @@ export class MissionListComponent implements OnInit {
 			this.dataSource.sort = this.sort;
 		});
 		this.discordUser = this.userService.getUserLocally();
-		this.userService.list().subscribe((value) => {
-			this.userList = value;
-		});
 		this.terrainList = [];
-		Object.values(this.mC.MissionTerrains).forEach(
-			(terrain: ITerrain) => {
-				this.terrainList.push(terrain.name);
-			}
-		);
+		Object.values(this.mC.MissionTerrains).forEach((terrain: ITerrain) => {
+			this.terrainList.push(terrain.name);
+		});
 		this.terrainList.sort();
-		console.log('terrains: ', this.terrainList);
 	}
-
-	getTerrainData(terrainName: string) {
-		return this.mC.MissionTerrains[terrainName];
-	}
-
-	getDiscordUserName(discordID: string) {
-		const user: DiscordUser = this.userList.find(
-			(element: DiscordUser) => element.id === discordID
-		);
-		return user?.username ?? '';
-	}
-
 	onListChipRemoved(multiSelect: MatSelect, matChipIndex: number): void {
 		const misTags = this.filterGroup.get('misTags');
 		if (misTags) {
@@ -125,6 +121,7 @@ export class MissionListComponent implements OnInit {
 			multiSelect.writeValue(selectedChips);
 		}
 	}
+
 	applyFilterTags() {
 		const tagsSelected: string[] = this.filterGroup.get('misTags')?.value;
 		console.log('tagsSelected: ', tagsSelected);
@@ -139,7 +136,7 @@ export class MissionListComponent implements OnInit {
 		}
 	}
 
-	applyFilter(event: { target: { value: string }; value: string }) {
+	async applyFilter(event: { target: { value: string }; value: string }) {
 		this.dataSource.filterPredicate = (
 			data: IMission,
 			filter: string
@@ -149,17 +146,18 @@ export class MissionListComponent implements OnInit {
 				data.size.min.toString().toLowerCase().includes(filter) ||
 				data.size.max.toString().toLowerCase().includes(filter) ||
 				data.era.toLowerCase().includes(filter) ||
-				data.author.toLowerCase().includes(filter) ||
-				data.updates.some(
-					(update: IUpdate) =>
-						this.getDiscordUserName(update.authorID) === filter
-				) ||
+				data.authorName?.toLowerCase().includes(filter) ||
+				data.updates.some((update: IUpdate) => {
+					return update.authorName === filter;
+				}) ||
 				data.version.toString().includes(filter) ||
-				this.getTerrainData(data.terrain)
+				this.missionsService
+					.getTerrainData(data.terrain)
 					.name.toLowerCase()
 					.includes(filter) ||
 				data.type.toLowerCase().includes(filter) ||
-				data.timeOfDay.toLowerCase().includes(filter)
+				data.timeOfDay.toLowerCase().includes(filter) ||
+				data.description.toLowerCase().includes(filter)
 			);
 		};
 		let filterValue: string = event.target
@@ -182,7 +180,6 @@ export class MissionListComponent implements OnInit {
 
 	// TODO: display whether mission is on main server, test, or archived
 	onSelectedServerPathChange(event) {
-		this.searchString = '';
 		// this.rows = this.tempRows.filter((mission) => {
 		// 	return mission.paths.includes(this.selectedServerPath);
 		// });

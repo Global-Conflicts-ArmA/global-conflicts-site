@@ -19,6 +19,7 @@ import { IMission, IUpdate } from '../../models/mission';
 import { UserService } from '../../services/user.service';
 import { FileValidator } from 'ngx-material-file-input';
 import { MatSelect } from '@angular/material/select';
+import { SharedService } from '@app/services/shared';
 
 @Component({
 	selector: 'app-mission-upload',
@@ -31,7 +32,8 @@ export class MissionUploadComponent implements OnInit {
 		private missionsService: MissionsService,
 		private userService: UserService,
 		private formBuilder: FormBuilder,
-		public mC: MissionConstants
+		public mC: MissionConstants,
+		private sharedService: SharedService
 	) {}
 
 	isUpdate = false;
@@ -201,9 +203,9 @@ export class MissionUploadComponent implements OnInit {
 				const actualSize = missionFile.getError('maxContentSize')
 					?.actualSize;
 				const maxSize = missionFile.getError('maxContentSize')?.maxSize;
-				return `The total size must not exceed ${this.bytesToSize(
+				return `The total size must not exceed ${this.sharedService.bytesToSize(
 					maxSize
-				)}	(size: ${this.bytesToSize(actualSize)}).`;
+				)}	(size: ${this.sharedService.bytesToSize(actualSize)}).`;
 			}
 		}
 		return 'unknown error';
@@ -504,29 +506,12 @@ export class MissionUploadComponent implements OnInit {
 					?.actualSize;
 				const maxSize = missionImage.getError('maxContentSize')
 					?.maxSize;
-				return `The total size must not exceed ${this.bytesToSize(
+				return `The total size must not exceed ${this.sharedService.bytesToSize(
 					maxSize
-				)}	(size: ${this.bytesToSize(actualSize)}).`;
+				)}	(size: ${this.sharedService.bytesToSize(actualSize)}).`;
 			}
 		}
 		return null;
-	}
-
-	bytesToSize(bytes: number) {
-		const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-		if (bytes === 0) {
-			return '0 Byte';
-		}
-		const i = Math.floor(Math.log(bytes) / Math.log(1024));
-		return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i];
-	}
-
-	padZeros(count: number, size = 2) {
-		let stringCount = count.toString();
-		while (stringCount.length < size) {
-			stringCount = '0' + stringCount;
-		}
-		return stringCount;
 	}
 
 	changeImageToggle() {
@@ -562,7 +547,7 @@ export class MissionUploadComponent implements OnInit {
 			?.str
 			? this.missionTypeGroup.get('missionType')?.value?.str
 			: this.missionTypeGroup.get('missionType')?.value?.title;
-		const safeMaxPlayers = this.padZeros(
+		const safeMaxPlayers = this.sharedService.padZeros(
 			this.missionSizeGroup.get('maxPlayers')?.value
 		);
 		let mapName = '';
@@ -657,7 +642,6 @@ export class MissionUploadComponent implements OnInit {
 		const mission: IMission = {
 			uniqueName: uniqueNameVar,
 			name: nameVar,
-			author: this.discordUser?.username ?? '',
 			authorID: this.discordUser?.id ?? '',
 			terrain: this.missionTerrain,
 			type: misType,

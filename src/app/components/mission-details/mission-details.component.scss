@@ -1,7 +1,10 @@
 @use "../../../colors";
 .details-label {
-	font-size: 11px;
+	font-size: 22px;
 	color: colors.$accent;
+	font-family: Roboto;
+	font-weight: 400;
+	margin-bottom: 8px;
 }
 
 .details-break {

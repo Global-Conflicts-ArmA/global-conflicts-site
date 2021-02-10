@@ -71,9 +71,6 @@ const uploadMulter = multer({
 
 function validateUploadData(reqBody, res) {
 	const errors = {};
-	if (!reqBody.author) {
-		errors.author = 'Missing author.';
-	}
 	if (!reqBody.authorID) {
 		errors.authorID = 'Missing authorID.';
 	}
@@ -263,7 +260,6 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 	const mission = {
 		uniqueName: req.body.uniqueName,
 		name: req.body.name,
-		author: req.body.author,
 		authorID: req.body.authorID,
 		terrain: req.body.terrain,
 		type: req.body.type,

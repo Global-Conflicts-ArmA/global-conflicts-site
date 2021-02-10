@@ -12,7 +12,7 @@
 				<mat-label>Author:</mat-label>
 				<mat-select value="ALL" formControlName="misAuthor" (selectionChange)="applyFilter($event)">
 					<mat-option value="ALL">ALL</mat-option>
-					<mat-option *ngFor="let author of userList" [value]="author.username">{{author.username}}</mat-option>
+					<mat-option *ngFor="let author of userList" [value]="author">{{author}}</mat-option>
 				</mat-select>
 			</mat-form-field>
 			<mat-form-field appearance="fill">
@@ -73,28 +73,32 @@
 				<td mat-cell *matCellDef="let element">{{element.type}}</td>
 			</ng-container>
 			<ng-container matColumnDef="size.min">
-				<th mat-header-cell *matHeaderCellDef mat-sort-header> Min Players </th>
+				<th mat-header-cell *matHeaderCellDef mat-sort-header> Min </th>
 				<td mat-cell *matCellDef="let element">{{element.size.min}}</td>
 			</ng-container>
 			<ng-container matColumnDef="size.max">
-				<th mat-header-cell *matHeaderCellDef mat-sort-header> Max Players </th>
+				<th mat-header-cell *matHeaderCellDef mat-sort-header> Max </th>
 				<td mat-cell *matCellDef="let element">{{element.size.max}}</td>
 			</ng-container>
 			<ng-container matColumnDef="terrain">
 				<th mat-header-cell *matHeaderCellDef mat-sort-header> Terrain </th>
-				<td mat-cell *matCellDef="let element">{{getTerrainData(element.terrain).name}}</td>
+				<td mat-cell *matCellDef="let element">{{missionsService.getTerrainData(element.terrain).name}}</td>
 			</ng-container>
 			<ng-container matColumnDef="era">
 				<th mat-header-cell *matHeaderCellDef mat-sort-header> Era </th>
 				<td mat-cell *matCellDef="let element">{{element.era}}</td>
 			</ng-container>
-			<ng-container matColumnDef="author">
+			<ng-container matColumnDef="authorName">
 				<th mat-header-cell *matHeaderCellDef mat-sort-header> Author </th>
-				<td mat-cell *matCellDef="let element">{{element.author}}</td>
+				<td mat-cell *matCellDef="let element">{{element.authorName}}</td>
 			</ng-container>
 			<ng-container matColumnDef="version">
 				<th mat-header-cell *matHeaderCellDef mat-sort-header> Version </th>
 				<td mat-cell *matCellDef="let element">{{element.version}}</td>
+			</ng-container>
+			<ng-container matColumnDef="lastUpdate">
+				<th mat-header-cell *matHeaderCellDef mat-sort-header> Last Updated </th>
+				<td mat-cell *matCellDef="let element">{{missionsService.getDate(element.lastUpdate)}}</td>
 			</ng-container>
 			<tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
 			<tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onActivate(row)"></tr>

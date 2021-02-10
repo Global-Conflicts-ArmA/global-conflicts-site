@@ -13,6 +13,7 @@ import { LayoutModule } from '@angular/cdk/layout';
 
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { HttpErrorInterceptor } from './interceptor/httpInterceptor';
+import { CachingInterceptor } from './interceptor/caching-interceptor';
 import { CookieService } from 'ngx-cookie-service';
 import { CustExtBrowserXhr } from './services/cust-ext-browser-xhr';
 import { BrowserXhr } from '@angular/http';
@@ -49,6 +50,8 @@ import { AARComponent } from './components/aar/aar.component';
 import { MissionConstants } from './constants/missionConstants';
 import { MissionDetailsComponent } from './components/mission-details/mission-details.component';
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
+import { SharedService } from "./services/shared";
+import { RequestCache } from './services/request-cache.service';
 
 @NgModule({
 	declarations: [
@@ -105,13 +108,20 @@ import { UserSettingsComponent } from './components/user-settings/user-settings.
 		{
 			provide: HTTP_INTERCEPTORS,
 			useClass: HttpErrorInterceptor,
-			multi: true
+			multi: true,
+		},
+		RequestCache,
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: CachingInterceptor,
+			multi: true,
 		},
 		{ provide: BrowserXhr, useClass: CustExtBrowserXhr },
 		{
 			provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
 			useValue: { appearance: 'fill' }
-		}
+		},
+		SharedService
 	]
 })
 export class AppModule {}

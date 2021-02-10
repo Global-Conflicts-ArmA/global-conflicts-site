@@ -1,14 +1,79 @@
 <div class="container">
 	<div style="position: relative">
-		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">
+		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser?.role)">
 			You must join our Discord server and complete the welcoming process
 			to upload missions!
 		</div>
 
-		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
+		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser?.role)">
 			<div class="row">
-				<div class="col-6">{{ mission.name }}</div>
-				<div class="col-sm-3 col-btn">
+				<div class="col-4 col-md-4>">
+					<img class="img-fluid" [src]="missionsService.getImage(mission)" alt="Mission image">
+				</div>
+				<div class="col-7">
+					<div class="row mb-4">
+						<div class="col">
+							<div class="details-label">Name</div>
+							<div class="details-value">{{ mission?.name }}</div>
+						</div>
+						<div class="col">
+							<div class="details-label">Author</div>
+							<div class="details-value">{{ mission?.author }}</div>
+						</div>
+						<div class="col">
+							<div class="details-label">Map</div>
+							<div class="details-value">{{ mission?.terrain }}</div>
+						</div>
+					</div>
+					<div class="row mb-4">
+						<div class="col">
+							<div class="details-label">Type</div>
+							<div class="details-value">{{ mission?.type }}</div>
+						</div>
+						<div class="col">
+							<div class="details-label">Min.</div>
+							<div class="details-value">{{ mission?.size.min }}</div>
+						</div>
+						<div class="col">
+							<div class="details-label">Max.</div>
+							<div class="details-value">{{ mission?.size.max }}</div>
+						</div>
+					</div>
+					<div class="row mb-4">
+						<div class="col">
+							<div class="details-label">Time</div>
+							<div class="details-value">{{ mission?.timeOfDay }}</div>
+						</div>
+						<div class="col">
+							<div class="details-label">Era</div>
+							<div class="details-value">{{ mission?.era }}</div>
+						</div>
+						<div class="col">
+							<div class="details-label">Version</div>
+							<div class="details-value">{{ mission?.version }}</div>
+						</div>
+					</div>
+					<div class="row mb-4">
+						<div class="col-12">
+							<div class="details-label">Tags</div>
+							<mat-chip-list>
+								<mat-chip *ngFor="let tag of mission?.tags">
+									{{tag}}
+								</mat-chip>
+							</mat-chip-list>
+						</div>
+					</div>
+					<div class="row mb-4">
+						<div class="col-12">
+							<div class="mb-4">
+								<div class="details-label">Description</div>
+								<div class="details-value">{{ mission?.description }}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--<div class="col-sm-3 col-btn">
 					<button mat-flat-button color="primary" matTooltip="Download">
 						<mat-icon>get_app</mat-icon>
 					</button>
@@ -17,62 +82,23 @@
 					<button mat-flat-button color="accent" (click)="updateMission()" matTooltip="Update mission">
 						<mat-icon>upgrade</mat-icon>
 					</button>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col">Ver. {{ mission.version }}</div>
-				<div class="col">By: {{ mission.author }}</div>
-			</div>
-
-			<div class="row">
-				<div class="col">
-					<div class="details-label">Type</div>
-					<div class="details-value">{{ mission.type }}</div>
-				</div>
-				<div class="col">
-					<div class="details-label">Min.</div>
-					<div class="details-value">{{ mission.size.min }}</div>
-				</div>
-				<div class="col">
-					<div class="details-label">Max.</div>
-					<div class="details-value">{{ mission.size.max }}</div>
-				</div>
-				<div class="w-100 details-break"></div>
-				<div class="col">
-					<div class="details-label">Time</div>
-					<div class="details-value">{{ mission.timeOfDay }}</div>
-				</div>
-				<div class="col">
-					<div class="details-label">Era</div>
-					<div class="details-value">{{ mission.era }}</div>
-				</div>
-				<div class="col">
-					<div class="details-label">Map</div>
-					<div class="details-value">{{ mission.terrain.name }}</div>
-				</div>
-			</div>
-
-			<div class="row">
-
-				<div class="col-12 col-md-6" *ngIf="mission.image!=null">
-					<img [src]="getImage(mission.image)" alt="Mission image">
-				</div>
-
-				<div class="col-12 col-md-6">
-					<p>{{mission.description}}</p>
-					<mat-chip-list>
-						<mat-chip *ngFor="let tag of mission.tags">
-							{{tag}}
-						</mat-chip>
-					</mat-chip-list>
-				</div>
-
-			</div>
-
+				</div>-->
 		</div>
-
-
-
+		<!--Updates-->
+		<div class="column">
+			<table mat-table [dataSource]="this.mission?.updates" class="matTable" matSort style="width: 100%;">
+				<ng-container matColumnDef="date">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+					<td mat-cell *matCellDef="let element">{{element.date}}</td>
+				</ng-container>
+				<ng-container matColumnDef="version">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Version </th>
+					<td mat-cell *matCellDef="let element">{{element.version}}</td>
+				</ng-container>
+				<tr mat-header-row *matHeaderRowDef="updateColumns; sticky: true"></tr>
+				<tr mat-row *matRowDef="let row; columns: updateColumns;"></tr>
+			</table>
+			<mat-paginator [pageSizeOptions]="[3, 5, 10]"></mat-paginator>
+		</div>
 	</div>
 </div>

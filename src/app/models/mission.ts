@@ -1,6 +1,7 @@
 export interface IUpdate {
 	version: number;
 	authorID: string;
+	authorName?: string;
 	date: Date;
 	changeLog?: string;
 	addressesReports?: string;
@@ -11,7 +12,7 @@ export interface IUpdate {
 export interface IMission {
 	uniqueName: string;
 	name: string;
-	author: string;
+	authorName?: string;
 	authorID: string;
 	terrain: string;
 	type: string;

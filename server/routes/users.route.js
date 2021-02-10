@@ -2,6 +2,22 @@ const express = require('express');
 const mongoose = require('mongoose');
 const User = require('../models/discordUser.model');
 const router = express.Router();
+const { discordJsClient } = require('../config/discord-bot');
+const { Observable } = require('rxjs');
+
+async function getRemoteUser(id) {
+	const guild = discordJsClient.guilds.cache.get(
+		process.env.DISCORD_SERVER_ID
+	);
+	return guild.members
+		.fetch(id)
+		.then((member) => {
+			return member;
+		})
+		.catch((reason) => {
+			return reason;
+		});
+}
 
 router.get('/', (req, res) => {
 	console.log('GET request for all users');
@@ -14,9 +30,17 @@ router.get('/', (req, res) => {
 	});
 });
 
+router.get('/fetch/:id', async (req, res) => {
+	console.log('fetch userData from discord');
+	getRemoteUser(req.params.id).then((result) => {
+		res.json(result);
+	}).catch((err) => {
+		console.log('Error retrieving user');
+	});
+});
+
 router.get('/:id', (req, res) => {
 	console.log('GET request for single user');
-	console.log('id check:', req.params.id);
 	User.findOne({ discordId: req.params.id }).exec((err, user) => {
 		if (err) {
 			console.log('Error retrieving user');
@@ -28,9 +52,7 @@ router.get('/:id', (req, res) => {
 
 router.post('/', (req, res) => {
 	console.log('POST request for user');
-	console.log('User', User);
 	var newUser = new User();
-	console.log('newUser', newUser);
 	newUser.id = req.body.id;
 	newUser.username = req.body.username;
 	newUser.avatar = req.body.avatar ? req.body.avatar : null;
