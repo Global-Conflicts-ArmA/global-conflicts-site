@@ -254,7 +254,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		authorID: req.body.updates[0].authorID,
 		date: req.body.updates[0].date,
 		fileName: req.body.updates[0].fileName,
-		path: `${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}`
+		changeLog: req.body.updates[0].changeLog
 	};
 
 	const mission = {
@@ -327,12 +327,68 @@ router.get('/:uniqueName', async (req, res) => {
 			authError: req.authError
 		});
 	}
-	Mission.findOne({ uniqueName: req.params.uniqueName }, (err, mission) => {
+	Mission.findOne({ uniqueName: req.params.uniqueName }, async (err, doc) => {
 		if (err) {
 			res.status(500).send(err);
 		} else {
-			res.json(mission);
+			return doc;
 		}
-	});
+	})
+		.lean()
+		.then((mission) => {
+			mission.updates.forEach((update) => {
+				console.log('update: ', update);
+				update.main = fs.existsSync(
+					`${process.env.ROOT_FOLDER}${process.env.MAIN_SERVER_MPMissions}/${update.fileName}`
+				);
+				console.log(
+					'mission: ',
+					mission.name,
+					'version: ',
+					update.version,
+					'on main: ',
+					update.main
+				);
+				update.test = fs.existsSync(
+					`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_MPMissions}/${update.fileName}`
+				);
+				console.log(
+					'mission: ',
+					mission.name,
+					'version: ',
+					update.version,
+					'on test: ',
+					update.test
+				);
+				update.ready = fs.existsSync(
+					`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}/${update.fileName}`
+				);
+				console.log(
+					'mission: ',
+					mission.name,
+					'version: ',
+					update.version,
+					'on ready: ',
+					update.ready
+				);
+				update.archive = fs.existsSync(
+					`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${update.fileName}`
+				);
+				console.log(
+					'mission: ',
+					mission.name,
+					'version: ',
+					update.version,
+					'on archive: ',
+					update.archive
+				);
+				console.log('modified update: ', update);
+			});
+			console.log('updates: ', mission.updates);
+			res.json(mission);
+		})
+		.catch((err) => {
+			console.log('err: ', err);
+		});
 });
 module.exports = router;

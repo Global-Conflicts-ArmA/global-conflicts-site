@@ -5,6 +5,8 @@ const router = express.Router();
 const { discordJsClient } = require('../config/discord-bot');
 const { Observable } = require('rxjs');
 
+var userNames = [];
+
 async function getRemoteUser(id) {
 	const guild = discordJsClient.guilds.cache.get(
 		process.env.DISCORD_SERVER_ID
@@ -31,12 +33,20 @@ router.get('/', (req, res) => {
 });
 
 router.get('/fetch/:id', async (req, res) => {
-	console.log('fetch userData from discord');
-	getRemoteUser(req.params.id).then((result) => {
-		res.json(result);
-	}).catch((err) => {
-		console.log('Error retrieving user');
-	});
+	const userFind = userNames.find((user) => user.discordID === req.params.id);
+	if (userFind) {
+		console.log('fetch userData from server');
+		return userFind;
+	} else {
+		console.log('fetch userData from discord');
+		getRemoteUser(req.params.id)
+			.then((result) => {
+				res.json(result);
+			})
+			.catch((err) => {
+				console.log('Error retrieving user');
+			});
+	}
 });
 
 router.get('/:id', (req, res) => {

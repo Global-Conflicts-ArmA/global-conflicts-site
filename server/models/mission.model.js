@@ -1,3 +1,4 @@
+const { bool } = require('joi');
 const { mongooseConfig } = require('../config/mongoose-config');
 const Schema = mongooseConfig.Schema;
 
@@ -84,10 +85,6 @@ const MissionSchema = new Schema(
 					}
 				],
 				fileName: {
-					type: String,
-					required: true
-				},
-				path: {
 					type: String,
 					required: true
 				}

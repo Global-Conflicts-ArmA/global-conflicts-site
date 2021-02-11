@@ -24,23 +24,30 @@ export class MissionDetailsComponent implements OnInit {
 	discordUser: DiscordUser | null;
 	mission: IMission | null;
 	updates: IUpdate[];
-	updateColumns = ['date', 'version', 'authorName'];
+	updateColumns = ['date', 'version', 'authorName', 'status', 'buttons'];
+	reportColumns = ['date', 'version', 'authorName', 'buttons'];
+	reviewColumns = ['date', 'version', 'authorName', 'buttons'];
 
 	ngOnInit(): void {
 		this.discordUser = this.userService.getUserLocally();
 		const uniqueName = this.route.snapshot.paramMap.get('id');
 
-		this.missionsService.getFileName(uniqueName).subscribe(async (mission) => {
-			mission.authorName = await this.userService.getDiscordUsername(
-				mission.authorID
-			);
-			mission.updates.map(async (update: IUpdate) => {
-				update.authorName = await this.userService.getDiscordUsername(
-					update.authorID
+		this.missionsService
+			.getFileName(uniqueName)
+			.subscribe(async (mission) => {
+				mission.authorName = await this.userService.getDiscordUsername(
+					mission.authorID
 				);
+				mission.updates.map(async (update: IUpdate) => {
+					update.authorName = await this.userService.getDiscordUsername(
+						update.authorID
+					);
+				});
+				mission.reports = mission.reports ?? [];
+				mission.reviews = mission.reviews ?? [];
+				this.mission = mission;
+				console.log('mission: ', mission);
 			});
-			this.mission = mission;
-		});
 	}
 
 	public updateMission() {

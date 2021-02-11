@@ -3,7 +3,7 @@ export interface IUpdate {
 	authorID: string;
 	authorName?: string;
 	date: Date;
-	changeLog?: string;
+	changeLog: string;
 	addressesReports?: string;
 	fileName: string;
 	path?: string;

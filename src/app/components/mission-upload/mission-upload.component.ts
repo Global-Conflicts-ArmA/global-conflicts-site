@@ -637,7 +637,8 @@ export class MissionUploadComponent implements OnInit {
 			version: 1,
 			authorID: this.discordUser?.id ?? '',
 			date: new Date(),
-			fileName: this.missionFileName ?? ''
+			fileName: this.missionFileName ?? '',
+			changeLog: 'First Version'
 		};
 		const mission: IMission = {
 			uniqueName: uniqueNameVar,
