@@ -307,13 +307,38 @@ router.get('/', async (req, res) => {
 		});
 	}
 	console.log('GET request for all missions');
-	Mission.find({}, { _id: 0 }).exec((err, missions) => {
+	Mission.find({}, { _id: 0 }, async (err, doc) => {
 		if (err) {
 			res.status(500).send(err);
 		} else {
-			res.json(missions);
+			return doc;
 		}
-	});
+	})
+		.lean()
+		.then((missions) => {
+			missions.forEach((mission) => {
+				mission.updates.forEach((update) => {
+					update.main = fs.existsSync(
+						`${process.env.ROOT_FOLDER}${process.env.MAIN_SERVER_MPMissions}/${update.fileName}`
+					);
+					update.test = fs.existsSync(
+						`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_MPMissions}/${update.fileName}`
+					);
+					update.ready = fs.existsSync(
+						`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}/${update.fileName}`
+					);
+					update.archive = fs.existsSync(
+						`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${update.fileName}`
+					);
+				});
+			});
+
+			res.json(missions);
+		})
+		.catch((err) => {
+			console.log('err: ', err);
+			res.status(500).send(err);
+		});
 });
 
 //get mission by uniqueName
@@ -354,6 +379,7 @@ router.get('/:uniqueName', async (req, res) => {
 		})
 		.catch((err) => {
 			console.log('err: ', err);
+			res.status(500).send(err);
 		});
 });
 module.exports = router;
