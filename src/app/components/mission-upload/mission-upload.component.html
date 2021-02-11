@@ -91,22 +91,22 @@
 								style="align-self: center;">BLUFOR:</mat-checkbox>
 							<mat-slider formControlName="ratioBlufor" class="blueSlider column"
 								[disabled]="!(missionSizeGroup.get('ratioBluforE')?.value ? missionSizeGroup.get('ratioBluforE')?.value: false)"
-								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="0.1" [max]="5"></mat-slider>
+								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="1" [max]="5"></mat-slider>
 							<mat-checkbox formControlName="ratioOpforE" class="inset-label" style="align-self: center;">
 								OPFOR:</mat-checkbox>
 							<mat-slider formControlName="ratioOpfor" class="redSlider column"
 								[disabled]="!(missionSizeGroup.get('ratioOpforE')?.value ? missionSizeGroup.get('ratioOpforE')?.value: false)"
-								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="0.1" [max]="5"></mat-slider>
+								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="1" [max]="5"></mat-slider>
 							<mat-checkbox formControlName="ratioIndforE" class="inset-label"
 								style="align-self: center;">INDFOR:</mat-checkbox>
 							<mat-slider formControlName="ratioIndfor" class="greenSlider column"
 								[disabled]="!(missionSizeGroup.get('ratioIndforE')?.value ? missionSizeGroup.get('ratioIndforE')?.value: false)"
-								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="0.1" [max]="5"></mat-slider>
+								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="1" [max]="5"></mat-slider>
 							<mat-checkbox formControlName="ratioCivE" class="inset-label" style="align-self: center;">
 								CIVILIAN:</mat-checkbox>
 							<mat-slider formControlName="ratioCiv" class="yellowSlider column"
 								[disabled]="!(missionSizeGroup.get('ratioCivE')?.value ? missionSizeGroup.get('ratioCivE')?.value: false)"
-								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="0.1" [max]="5"></mat-slider>
+								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="1" [max]="5"></mat-slider>
 						</div>
 						<mat-error>{{getRatioErrorMessage()}}</mat-error>
 						<button mat-button matStepperNext>Next</button>
