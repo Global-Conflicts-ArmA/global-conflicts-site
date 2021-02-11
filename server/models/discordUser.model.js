@@ -9,10 +9,6 @@ const discordUserSchema = new Schema(
 			required: true,
 			unique: true
 		},
-		username: {
-			type: String,
-			required: true
-		},
 		avatar: {
 			type: String,
 			required: true
@@ -30,6 +26,10 @@ const discordUserSchema = new Schema(
 			required: false
 		},
 		reviews: {
+			type: Array,
+			required: false
+		},
+		userSettings: {
 			type: Array,
 			required: false
 		}

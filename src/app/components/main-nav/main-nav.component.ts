@@ -8,9 +8,10 @@ import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
 @Component({
-	selector: 'main-nav',
+	selector: 'app-main-nav',
 	templateUrl: './main-nav.component.html',
 	styleUrls: ['./main-nav.component.scss'],
+	// tslint:disable-next-line:use-component-view-encapsulation
 	encapsulation: ViewEncapsulation.None
 })
 export class MainNavComponent implements OnInit {

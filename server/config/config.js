@@ -21,7 +21,9 @@ const envVarsSchema = Joi.object({
   MONGO_HOST: Joi.string().required()
     .description('Mongo DB host url'),
   MONGO_PORT: Joi.number()
-    .default(27017)
+    .default(27017),
+  MONGO_LOCAL: Joi.string(),
+  MONGO_LOCALMODE: Joi.boolean().default(false)
 }).unknown()
   .required();
 
@@ -40,7 +42,9 @@ const config = {
 		host: envVars.MONGO_HOST,
 		port: envVars.MONGO_PORT,
 		pass: envVars.MONGO_PASS,
-		user: envVars.MONGO_USER
+    user: envVars.MONGO_USER,
+    local: envVars.MONGO_LOCAL,
+    localMode: envVars.MONGO_LOCALMODE
 	}
 };
 

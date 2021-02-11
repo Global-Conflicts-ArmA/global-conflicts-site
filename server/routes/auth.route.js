@@ -35,7 +35,7 @@ router.get('/logout', function (req, res) {
 
 async function getUser(token) {
 	const user = await discordOauth2.getUser(token);
-	const guild = await discordJsClient.guilds.cache.get(
+	const guild = discordJsClient.guilds.cache.get(
 		process.env.DISCORD_SERVER_ID
 	);
 	return guild.members
@@ -57,7 +57,6 @@ async function getUser(token) {
 				};
 			}
 		})
-
 		.catch((reason) => {
 			return { token: token };
 		});

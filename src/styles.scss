@@ -296,7 +296,7 @@ $altTheme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
 	input,
 	.input-like {
 		width: 100%;
-		border-radius: 0 4px 4px 0;
+		border-radius: 0 2px 2px 0;
 	}
 
 	&.file {
@@ -313,11 +313,6 @@ $altTheme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
 
 .mat-drawer-container {
 	font: 400 18px/20px Roboto;
-}
-
-.mat-toolbar-row,
-.mat-toolbar-single-row {
-	height: 64px !important;
 }
 
 .mat-menu-trigger2 {
@@ -447,9 +442,8 @@ input,
 	align-items: center;
 	outline: none;
 	color: white;
-	min-height: 58px;
-	padding: 5px 15px;
-	font-size: 25px;
+	min-height: 1rem;
+	font-size: 22px;
 
 	&.placeholder {
 		color: #757575 !important;
@@ -497,6 +491,7 @@ ul {
 html,
 body {
 	height: 100%;
+	overflow: hidden;
 }
 body {
 	margin: 0;

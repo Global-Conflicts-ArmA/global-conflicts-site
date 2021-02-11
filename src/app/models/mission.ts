@@ -1,20 +1,40 @@
-export interface IMission {
-	name: string;
-	author: string;
+export interface IUpdate {
+	version: number;
 	authorID: string;
-	file: File;
+	authorName?: string;
+	date: Date;
+	changeLog: string;
+	addressesReports?: string;
 	fileName: string;
+	path?: string;
+	archive?: boolean;
+	main?: boolean;
+	ready?: boolean;
+	test?: boolean;
+}
+
+export interface IMission {
+	uniqueName: string;
+	name: string;
+	authorName?: string;
+	authorID: string;
 	terrain: string;
 	type: string;
-	size: number[];
+	size: {
+		min: number,
+		max: number
+	};
 	ratios: number[];
 	description: string;
 	tags: string[];
 	timeOfDay: string;
 	era: string;
-	image: string;
+	image?: string;
 	uploadDate: Date;
-	updates: any[];
+	lastUpdate: Date;
+	updates: IUpdate[];
 	version: number;
-	paths: string[];
+	paths?: string[];
+	reports?: any[];
+	reviews?: any[];
 }

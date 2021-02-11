@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
+import { Observable, of, Subscription } from 'rxjs';
 import { DiscordUser } from '../models/discorduser';
+import { RemoteDiscordUser } from '../models/remoteDiscordUser';
 
 @Injectable({
 	providedIn: 'root'
@@ -44,4 +46,65 @@ export class UserService {
 			return null;
 		}
 	}
+
+	public list(): Observable<DiscordUser[]> {
+		return this.httpClient.get<DiscordUser[]>('/api/users');
+	}
+
+	public async getDiscordUsername(id: string): Promise<string> {
+		return this.httpClient
+			.get<DiscordUser[]>('/api/users')
+			.toPromise()
+			.then((result) => {
+				// if (result && result.find((element: DiscordUser) => element.id === id)?.username) {
+				// 	const user = result.find(
+				// 		(element: DiscordUser) => element.id === id
+				// 	);
+				// 	return user ? user.username : 'error'
+				// } else {
+					return this.httpClient
+						.get<RemoteDiscordUser>('/api/users/fetch/' + id)
+						.toPromise()
+						.then((remoteUser: RemoteDiscordUser) => {
+							if (remoteUser) {
+								console.log('remoteUser: ', remoteUser);
+								return remoteUser.nickname
+									? remoteUser.nickname
+									: remoteUser.displayName
+									? remoteUser.displayName
+									: 'error';
+							} else {
+								return 'error';
+							}
+						})
+						.catch((err) => {
+							console.log('error: ', err);
+							return 'error';
+						});
+				// }
+			})
+			.catch((err) => {
+				console.log('error: ', err);
+				return 'error';
+			});
+	}
+
+	public getUserSettings(id: string): IUserSettings {
+		const settings = {
+			missionEditDM: true,
+			missionReportDM: true,
+			missionReviewDM: true,
+			missionRemoveDM: true,
+			missionAcceptDM: true
+		};
+		return settings;
+	}
+}
+
+export interface IUserSettings {
+	missionEditDM: boolean;
+	missionReportDM: boolean;
+	missionReviewDM: boolean;
+	missionRemoveDM: boolean;
+	missionAcceptDM: boolean;
 }

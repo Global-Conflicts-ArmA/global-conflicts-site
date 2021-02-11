@@ -5,8 +5,8 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { DiscordUser } from '../../models/discorduser';
 import { UserService } from '../../services/user.service';
-import { IMission } from '../../models/mission';
-import { DomSanitizer } from '@angular/platform-browser';
+import { IMission, IUpdate } from '../../models/mission';
+import { SharedService } from '@app/services/shared';
 
 @Component({
 	selector: 'app-mission-details',
@@ -16,42 +16,50 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class MissionDetailsComponent implements OnInit {
 	constructor(
 		private userService: UserService,
-		private missionsService: MissionsService,
+		public missionsService: MissionsService,
+		private sharedService: SharedService,
 		private route: ActivatedRoute,
-		private sanitizer: DomSanitizer,
 		public dialog: MatDialog
-	) { }
+	) {}
 	discordUser: DiscordUser | null;
 	mission: IMission | null;
+	updates: IUpdate[];
+	updateColumns = ['date', 'version', 'authorName', 'status', 'buttons'];
+	reportColumns = ['date', 'version', 'authorName', 'buttons'];
+	reviewColumns = ['date', 'version', 'authorName', 'buttons'];
 
-	async ngOnInit(): Promise<void> {
+	ngOnInit(): void {
 		this.discordUser = this.userService.getUserLocally();
-		const missionFileName = this.route.snapshot.paramMap.get('id');
+		const uniqueName = this.route.snapshot.paramMap.get('id');
 
 		this.missionsService
-			.getMissionFileName(missionFileName)
-			.subscribe((mission) => {
+			.getFileName(uniqueName)
+			.subscribe(async (mission) => {
+				mission.authorName = await this.userService.getDiscordUsername(
+					mission.authorID
+				);
+				mission.updates.map(async (update: IUpdate) => {
+					update.authorName = await this.userService.getDiscordUsername(
+						update.authorID
+					);
+				});
+				mission.reports = mission.reports ?? [];
+				mission.reviews = mission.reviews ?? [];
 				this.mission = mission;
+				console.log('mission: ', mission);
 			});
 	}
 
-	public getImage(b64Image: string) {
-		return this.sanitizer.bypassSecurityTrustResourceUrl(b64Image);
-	}
-
 	public updateMission() {
-		const dialogRef = this.dialog.open(DialogContentExampleDialog);
-
-		dialogRef.afterClosed().subscribe(result => {
-			console.log(`Dialog result: ${result}`);
-		});
-
+		//  	const dialogRef = this.dialog.open(DialogContentExampleDialog);
+		//  	dialogRef.afterClosed().subscribe(result => {
+		//  		console.log(`Dialog result: ${result}`);
+		//  	});
 	}
-
 }
 
-@Component({
-	selector: 'dialog-content-example-dialog',
-	templateUrl: 'mission-update-dialog.html',
-})
-export class DialogContentExampleDialog { }
+// @Component({
+// 	selector: 'dialog-content-example-dialog',
+// 	templateUrl: 'mission-update-dialog.html',
+// })
+// export class DialogContentExampleDialog { }

@@ -12,13 +12,8 @@ import { AppComponent } from './app.component';
 import { LayoutModule } from '@angular/cdk/layout';
 
 import { OAuthModule } from 'angular-oauth2-oidc';
-import { HomeComponent } from './components/home/home.component';
-import { MainNavComponent } from './components/main-nav/main-nav.component';
-import { MissionListComponent } from './components/mission-list/mission-list.component';
-import { MissionUploadComponent } from './components/mission-upload/mission-upload.component';
-import { NotFoundComponent } from './components/not-found/not-found.component';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { HttpErrorInterceptor } from './interceptor/httpInterceptor';
+import { CachingInterceptor } from './interceptor/caching-interceptor';
 import { CookieService } from 'ngx-cookie-service';
 import { CustExtBrowserXhr } from './services/cust-ext-browser-xhr';
 import { BrowserXhr } from '@angular/http';
@@ -41,11 +36,22 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
+import { HomeComponent } from './components/home/home.component';
+import { MainNavComponent } from './components/main-nav/main-nav.component';
+import { MissionListComponent } from './components/mission-list/mission-list.component';
+import { MissionUploadComponent } from './components/mission-upload/mission-upload.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 import { WikiComponent } from './components/wiki/wiki.component';
 import { AARComponent } from './components/aar/aar.component';
 import { MissionConstants } from './constants/missionConstants';
 import { MissionDetailsComponent } from './components/mission-details/mission-details.component';
+import { UserSettingsComponent } from './components/user-settings/user-settings.component';
+import { SharedService } from "./services/shared";
+import { RequestCache } from './services/request-cache.service';
 
 @NgModule({
 	declarations: [
@@ -57,7 +63,8 @@ import { MissionDetailsComponent } from './components/mission-details/mission-de
 		NotFoundComponent,
 		WikiComponent,
 		AARComponent,
-		MissionDetailsComponent
+		MissionDetailsComponent,
+		UserSettingsComponent
 	],
 	imports: [
 		CommonModule,
@@ -68,7 +75,6 @@ import { MissionDetailsComponent } from './components/mission-details/mission-de
 		HttpClientModule,
 		OAuthModule.forRoot(),
 		LayoutModule,
-		NgxDatatableModule,
 		MatToolbarModule,
 		MatButtonModule,
 		MatSidenavModule,
@@ -89,7 +95,11 @@ import { MissionDetailsComponent } from './components/mission-details/mission-de
 		MatButtonToggleModule,
 		MatSlideToggleModule,
 		MatTooltipModule,
-		MatDialogModule
+		MatDialogModule,
+		MatTableModule,
+		MatPaginatorModule,
+		MatSortModule,
+		BrowserAnimationsModule
 	],
 	bootstrap: [AppComponent],
 	providers: [
@@ -98,13 +108,20 @@ import { MissionDetailsComponent } from './components/mission-details/mission-de
 		{
 			provide: HTTP_INTERCEPTORS,
 			useClass: HttpErrorInterceptor,
-			multi: true
+			multi: true,
+		},
+		RequestCache,
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: CachingInterceptor,
+			multi: true,
 		},
 		{ provide: BrowserXhr, useClass: CustExtBrowserXhr },
 		{
 			provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
 			useValue: { appearance: 'fill' }
-		}
+		},
+		SharedService
 	]
 })
-export class AppModule { }
+export class AppModule {}
