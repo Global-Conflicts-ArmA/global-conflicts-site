@@ -317,22 +317,23 @@ router.get('/', async (req, res) => {
 		.lean()
 		.then((missions) => {
 			missions.forEach((mission) => {
-				mission.updates.forEach((update) => {
-					update.main = fs.existsSync(
-						`${process.env.ROOT_FOLDER}${process.env.MAIN_SERVER_MPMissions}/${update.fileName}`
-					);
-					update.test = fs.existsSync(
-						`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_MPMissions}/${update.fileName}`
-					);
-					update.ready = fs.existsSync(
-						`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}/${update.fileName}`
-					);
-					update.archive = fs.existsSync(
-						`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${update.fileName}`
-					);
-				});
+				if (mission && mission.updates) {
+					mission.updates.forEach((update) => {
+						update.main = fs.existsSync(
+							`${process.env.ROOT_FOLDER}${process.env.MAIN_SERVER_MPMissions}/${update.fileName}`
+						);
+						update.test = fs.existsSync(
+							`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_MPMissions}/${update.fileName}`
+						);
+						update.ready = fs.existsSync(
+							`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}/${update.fileName}`
+						);
+						update.archive = fs.existsSync(
+							`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${update.fileName}`
+						);
+					});
+				}
 			});
-
 			res.json(missions);
 		})
 		.catch((err) => {
@@ -361,20 +362,22 @@ router.get('/:uniqueName', async (req, res) => {
 	})
 		.lean()
 		.then((mission) => {
-			mission.updates.forEach((update) => {
-				update.main = fs.existsSync(
-					`${process.env.ROOT_FOLDER}${process.env.MAIN_SERVER_MPMissions}/${update.fileName}`
-				);
-				update.test = fs.existsSync(
-					`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_MPMissions}/${update.fileName}`
-				);
-				update.ready = fs.existsSync(
-					`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}/${update.fileName}`
-				);
-				update.archive = fs.existsSync(
-					`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${update.fileName}`
-				);
-			});
+			if (mission && mission.updates) {
+				mission.updates.forEach((update) => {
+					update.main = fs.existsSync(
+						`${process.env.ROOT_FOLDER}${process.env.MAIN_SERVER_MPMissions}/${update.fileName}`
+					);
+					update.test = fs.existsSync(
+						`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_MPMissions}/${update.fileName}`
+					);
+					update.ready = fs.existsSync(
+						`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}/${update.fileName}`
+					);
+					update.archive = fs.existsSync(
+						`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${update.fileName}`
+					);
+				});
+			}
 			res.json(mission);
 		})
 		.catch((err) => {
