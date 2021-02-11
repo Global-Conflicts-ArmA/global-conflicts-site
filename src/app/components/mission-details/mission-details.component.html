@@ -4,18 +4,21 @@
 			You must join our Discord server and complete the welcoming process
 			to upload missions!
 		</div>
-
 		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser?.role)">
-			<div class="row">
+			<div class="mission-title-container">
+				<div class="mission-spacer"></div>
+				<div class="mission-title">{{ mission?.name }}</div>
+				<button mat-flat-button class="mission-button" color="accent"
+					matTooltip="Edit mission">
+					<mat-icon>build</mat-icon>
+				</button>
+			</div>
+			<div class="row mb-4">
 				<div class="col-5 col-md-5>">
 					<img class="img-details" [src]="missionsService.getImage(mission)" alt="Mission image">
 				</div>
 				<div class="col-7">
-					<div class="row mb-4">
-						<div class="col">
-							<div class="details-label">Name</div>
-							<div class="details-value">{{ mission?.name }}</div>
-						</div>
+					<div class="row mb-4 mt-4">
 						<div class="col">
 							<div class="details-label">Author</div>
 							<div class="details-value">{{ mission?.authorName }}</div>
@@ -24,22 +27,20 @@
 							<div class="details-label">Map</div>
 							<div class="details-value">{{ mission?.terrain }}</div>
 						</div>
-					</div>
-					<div class="row mb-4">
 						<div class="col">
 							<div class="details-label">Type</div>
 							<div class="details-value">{{ mission?.type }}</div>
 						</div>
 						<div class="col">
-							<div class="details-label">Min.</div>
-							<div class="details-value">{{ mission?.size.min }}</div>
-						</div>
-						<div class="col">
-							<div class="details-label">Max.</div>
-							<div class="details-value">{{ mission?.size.max }}</div>
+							<div class="details-label">Version</div>
+							<div class="details-value">{{ mission?.version }}</div>
 						</div>
 					</div>
 					<div class="row mb-4">
+						<div class="col">
+							<div class="details-label">Players</div>
+							<div class="details-value">Min: {{mission?.size.min}} Max: {{mission?.size.max}}</div>
+						</div>
 						<div class="col">
 							<div class="details-label">Time</div>
 							<div class="details-value">{{ mission?.timeOfDay }}</div>
@@ -49,8 +50,11 @@
 							<div class="details-value">{{ mission?.era }}</div>
 						</div>
 						<div class="col">
-							<div class="details-label">Version</div>
-							<div class="details-value">{{ mission?.version }}</div>
+							<div class="details-label">Ratios</div>
+							<!-- TODO: switch for ratios <div [ngSwitch]="mission?.era">
+								<div *ngSwitchCase="expression">output</div>
+								<div *ngSwitchDefault>N/A</div>
+							</div>-->
 						</div>
 					</div>
 					<div class="row mb-4">
@@ -63,7 +67,7 @@
 							</mat-chip-list>
 						</div>
 					</div>
-					<div class="row mb-4">
+					<div class="row">
 						<div class="col-12">
 							<div class="details-label">Description</div>
 							<div class="details-value">{{ mission?.description }}</div>
@@ -71,16 +75,6 @@
 					</div>
 				</div>
 			</div>
-			<!--<div class="col-sm-3 col-btn">
-					<button mat-flat-button color="primary" matTooltip="Download">
-						<mat-icon>get_app</mat-icon>
-					</button>
-				</div>
-				<div class="col-sm-3 col-btn">
-					<button mat-flat-button color="accent" (click)="updateMission()" matTooltip="Update mission">
-						<mat-icon>upgrade</mat-icon>
-					</button>
-				</div>-->
 		</div>
 		<!--Updates-->
 		<div class="row mb-4">
@@ -178,6 +172,7 @@
 				<tr mat-row *matRowDef="let row; columns: updateColumns;"></tr>
 			</table>
 		</div>
+		<!--Reports-->
 		<div class="row mb-4">
 			<div class="table-header">
 				<div class="spacer"></div>
@@ -223,6 +218,7 @@
 				</tr>
 			</table>
 		</div>
+		<!--Reviews-->
 		<div class="row mb-4">
 			<div class="table-header">
 				<div class="spacer"></div>

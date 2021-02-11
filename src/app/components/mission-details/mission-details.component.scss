@@ -19,6 +19,27 @@
 	color: red;
 }
 
+.mission-title-container {
+	display: flex;
+	flex-direction: row;
+	padding: 0.5rem 0 !important;
+	.mission-spacer {
+		flex: 0.25;
+	}
+	.mission-title {
+		flex: 4;
+		text-align: center !important;
+		align-content: center !important;
+		font: 400 20px/24px Roboto;
+		color: colors.$accent !important;
+		font-size: 32px;
+	}
+	.mission-button {
+		flex: 0.25;
+	}
+}
+
+
 ::ng-deep .mat-sort-header-container {
 	display: flex;
 	justify-content: center !important;

@@ -337,54 +337,19 @@ router.get('/:uniqueName', async (req, res) => {
 		.lean()
 		.then((mission) => {
 			mission.updates.forEach((update) => {
-				console.log('update: ', update);
 				update.main = fs.existsSync(
 					`${process.env.ROOT_FOLDER}${process.env.MAIN_SERVER_MPMissions}/${update.fileName}`
-				);
-				console.log(
-					'mission: ',
-					mission.name,
-					'version: ',
-					update.version,
-					'on main: ',
-					update.main
 				);
 				update.test = fs.existsSync(
 					`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_MPMissions}/${update.fileName}`
 				);
-				console.log(
-					'mission: ',
-					mission.name,
-					'version: ',
-					update.version,
-					'on test: ',
-					update.test
-				);
 				update.ready = fs.existsSync(
 					`${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}/${update.fileName}`
-				);
-				console.log(
-					'mission: ',
-					mission.name,
-					'version: ',
-					update.version,
-					'on ready: ',
-					update.ready
 				);
 				update.archive = fs.existsSync(
 					`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${update.fileName}`
 				);
-				console.log(
-					'mission: ',
-					mission.name,
-					'version: ',
-					update.version,
-					'on archive: ',
-					update.archive
-				);
-				console.log('modified update: ', update);
 			});
-			console.log('updates: ', mission.updates);
 			res.json(mission);
 		})
 		.catch((err) => {
