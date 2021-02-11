@@ -37,7 +37,8 @@ export class MissionListComponent implements OnInit {
 		'era',
 		'authorName',
 		'version',
-		'lastUpdate'
+		'lastUpdate',
+		'uploadDate'
 	];
 	dataSource: MatTableDataSource<IMission>;
 	filterGroup: FormGroup;
@@ -54,14 +55,16 @@ export class MissionListComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.filterGroup = this.formBuilder.group({
-			misAuthor: new FormControl({ value: 'ALL' }),
-			misType: new FormControl({ value: 'ALL' }),
-			misTerrain: new FormControl({ value: 'ALL' }),
-			misTime: new FormControl({ value: 'ALL' }),
-			misEra: new FormControl({ value: 'ALL' }),
-			misTags: new FormControl()
+			misSearch: new FormControl(''),
+			misState: new FormControl(''),
+			misAuthor: new FormControl(''),
+			misType: new FormControl(''),
+			misTerrain: new FormControl(''),
+			misTime: new FormControl(''),
+			misEra: new FormControl(''),
+			misTags: new FormControl('')
 		});
-		['misAuthor', 'misType', 'misTerrain', 'misTime', 'misEra'].forEach(
+		['misState', 'misAuthor', 'misType', 'misTerrain', 'misTime', 'misEra'].forEach(
 			(element) => {
 				this.filterGroup.get(element)?.setValue('ALL');
 			}
@@ -112,6 +115,7 @@ export class MissionListComponent implements OnInit {
 		});
 		this.terrainList.sort();
 	}
+
 	onListChipRemoved(multiSelect: MatSelect, matChipIndex: number): void {
 		const misTags = this.filterGroup.get('misTags');
 		if (misTags) {
@@ -119,6 +123,7 @@ export class MissionListComponent implements OnInit {
 			selectedChips.splice(matChipIndex, 1);
 			misTags.patchValue(selectedChips);
 			multiSelect.writeValue(selectedChips);
+			this.applyFilter();
 		}
 	}
 
@@ -136,38 +141,132 @@ export class MissionListComponent implements OnInit {
 		}
 	}
 
-	async applyFilter(event: { target: { value: string }; value: string }) {
-		this.dataSource.filterPredicate = (
-			data: IMission,
-			filter: string
-		): boolean => {
-			return (
-				data.name.toLowerCase().includes(filter) ||
-				data.size.min.toString().toLowerCase().includes(filter) ||
-				data.size.max.toString().toLowerCase().includes(filter) ||
-				data.era.toLowerCase().includes(filter) ||
-				data.authorName?.toLowerCase().includes(filter) ||
-				data.updates.some((update: IUpdate) => {
-					return update.authorName === filter;
-				}) ||
-				data.version.toString().includes(filter) ||
-				this.missionsService
-					.getTerrainData(data.terrain)
-					.name.toLowerCase()
-					.includes(filter) ||
-				data.type.toLowerCase().includes(filter) ||
-				data.timeOfDay.toLowerCase().includes(filter) ||
-				data.description.toLowerCase().includes(filter)
-			);
-		};
-		let filterValue: string = event.target
-			? event.target.value
-			: event.value;
-		if (filterValue === 'ALL') {
-			filterValue = '';
+	async applyFilter() {
+		let filteredData = this.rowData;
+		// State
+		const state: string = this.filterGroup.get('misState')?.value;
+		console.log('state selected: ', state);
+		if (state && state !== 'ALL') {
+			console.log('state selected: ', state);
+			switch (state) {
+				case 'MAIN':
+					filteredData = filteredData.filter((element: IMission) => {
+						return element.updates.some((u) => {
+							return u.main ?? false;
+						});
+					});
+					break;
+				case 'TEST':
+					filteredData = filteredData.filter((element: IMission) => {
+						return element.updates.some((u) => {
+							return u.test ?? false;
+						});
+					});
+					break;
+				case 'READY':
+					filteredData = filteredData.filter((element: IMission) => {
+						return element.updates.some((u) => {
+							return u.ready ?? false;
+						});
+					});
+					break;
+				case 'ARCHIVE':
+					filteredData = filteredData.filter((element: IMission) => {
+						return element.updates.some((u) => {
+							return u.archive ?? false;
+						});
+					});
+					break;
+				default:
+					break;
+			}
 		}
-		console.log('filterValue: ', filterValue);
-		this.dataSource.filter = filterValue.trim().toLowerCase();
+		// Author
+		const author: string = this.filterGroup.get('misAuthor')?.value;
+		if (author && author !== 'ALL') {
+			console.log('author selected: ', author);
+			filteredData = filteredData.filter((element: IMission) => {
+				return element.authorName === author;
+			});
+		}
+		// Type
+		const type: string = this.filterGroup.get('misType')?.value;
+		if (type && type !== 'ALL') {
+			console.log('type selected: ', type);
+			filteredData = filteredData.filter((element: IMission) => {
+				return element.type === type;
+			});
+		}
+		// Terrain
+		const terrain: string = this.filterGroup.get('misTerrain')?.value;
+		if (terrain && terrain !== 'ALL') {
+			console.log('terrain selected: ', terrain);
+			filteredData = filteredData.filter((element: IMission) => {
+				return (
+					this.missionsService.getTerrainData(element.terrain)
+						?.name === terrain
+				);
+			});
+		}
+		// Time
+		const time: string = this.filterGroup.get('misTime')?.value;
+		if (time && time !== 'ALL') {
+			console.log('time selected: ', time);
+			filteredData = filteredData.filter((element: IMission) => {
+				return element.timeOfDay === time;
+			});
+		}
+		// Era
+		const era: string = this.filterGroup.get('misEra')?.value;
+		if (era && era !== 'ALL') {
+			console.log('era selected: ', era);
+			filteredData = filteredData.filter((element: IMission) => {
+				return element.era === era;
+			});
+		}
+		// Tags
+		const tagsSelected: string[] = this.filterGroup.get('misTags')?.value;
+		if (tagsSelected && tagsSelected.length !== 0) {
+			console.log('tagsSelected: ', tagsSelected);
+			filteredData = filteredData.filter((element: IMission) => {
+				return tagsSelected.every((tag: string) => {
+					return element.tags.includes(tag);
+				});
+			});
+		}
+		// Search
+		const searchFilter: string = this.filterGroup.get('misSearch')?.value?.toLowerCase();
+		if (searchFilter && searchFilter !== '') {
+			console.log('searchFilter: ', searchFilter);
+			filteredData = filteredData.filter((element: IMission) => {
+				return (
+					element.name.toLowerCase().includes(searchFilter) ||
+					element.size.min
+						.toString()
+						.toLowerCase()
+						.includes(searchFilter) ||
+					element.size.max
+						.toString()
+						.toLowerCase()
+						.includes(searchFilter) ||
+					element.era.toLowerCase().includes(searchFilter) ||
+					element.authorName?.toLowerCase().includes(searchFilter) ||
+					element.updates.some((update: IUpdate) => {
+						return update.authorName === searchFilter;
+					}) ||
+					element.version.toString().includes(searchFilter) ||
+					this.missionsService
+						.getTerrainData(element.terrain)
+						.name.toLowerCase()
+						.includes(searchFilter) ||
+					element.type.toLowerCase().includes(searchFilter) ||
+					element.timeOfDay.toLowerCase().includes(searchFilter) ||
+					element.description.toLowerCase().includes(searchFilter)
+				);
+			});
+		}
+		// Assign changes
+		this.dataSource.data = filteredData;
 		if (this.dataSource.paginator) {
 			this.dataSource.paginator.firstPage();
 		}

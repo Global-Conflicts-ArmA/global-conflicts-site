@@ -7,6 +7,10 @@ export interface IUpdate {
 	addressesReports?: string;
 	fileName: string;
 	path?: string;
+	archive?: boolean;
+	main?: boolean;
+	ready?: boolean;
+	test?: boolean;
 }
 
 export interface IMission {

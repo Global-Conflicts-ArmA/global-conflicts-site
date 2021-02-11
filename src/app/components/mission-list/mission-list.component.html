@@ -6,46 +6,53 @@
 		<div class="controlsContainer" [formGroup]="filterGroup">
 			<mat-form-field class="searchFilter mt-4">
 				<mat-label>Search Filter</mat-label>
-				<input matInput (keyup)="applyFilter($event)" placeholder="Search Term" #input>
+				<input matInput formControlName="misSearch" (keyup)="applyFilter()" placeholder="Search Term" #input>
 			</mat-form-field>
+			<mat-button-toggle-group class="smaller-toggle-group mb-4" formControlName="misState" (change)="applyFilter()">
+				<mat-button-toggle value="ALL">All</mat-button-toggle>
+				<mat-button-toggle value="MAIN">Main</mat-button-toggle>
+				<mat-button-toggle value="TEST">Test</mat-button-toggle>
+				<mat-button-toggle value="READY">Ready</mat-button-toggle>
+				<mat-button-toggle value="ARCHIVE">Archive</mat-button-toggle>
+			</mat-button-toggle-group>
 			<mat-form-field appearance="fill">
 				<mat-label>Author:</mat-label>
-				<mat-select value="ALL" formControlName="misAuthor" (selectionChange)="applyFilter($event)">
+				<mat-select value="ALL" formControlName="misAuthor" (selectionChange)="applyFilter()">
 					<mat-option value="ALL">ALL</mat-option>
 					<mat-option *ngFor="let author of userList" [value]="author">{{author}}</mat-option>
 				</mat-select>
 			</mat-form-field>
 			<mat-form-field appearance="fill">
 				<mat-label>Type:</mat-label>
-				<mat-select value="ALL" formControlName="misType" (selectionChange)="applyFilter($event)">
+				<mat-select value="ALL" formControlName="misType" (selectionChange)="applyFilter()">
 					<mat-option value="ALL">ALL</mat-option>
 					<mat-option *ngFor="let type of mC.MissionTypes" [value]="type.title">{{type.title}}</mat-option>
 				</mat-select>
 			</mat-form-field>
 			<mat-form-field appearance="fill">
 				<mat-label>Terrain:</mat-label>
-				<mat-select value="ALL" formControlName="misTerrain" (selectionChange)="applyFilter($event)">
+				<mat-select value="ALL" formControlName="misTerrain" (selectionChange)="applyFilter()">
 					<mat-option value="ALL">ALL</mat-option>
 					<mat-option *ngFor="let item of terrainList" [value]="item">{{item}}</mat-option>
 				</mat-select>
 			</mat-form-field>
 			<mat-form-field appearance="fill">
 				<mat-label>Time:</mat-label>
-				<mat-select value="ALL" formControlName="misTime" (selectionChange)="applyFilter($event)">
+				<mat-select value="ALL" formControlName="misTime" (selectionChange)="applyFilter()">
 					<mat-option value="ALL">ALL</mat-option>
 					<mat-option *ngFor="let time of mC.MissionTimes" [value]="time">{{time}}</mat-option>
 				</mat-select>
 			</mat-form-field>
 			<mat-form-field appearance="fill">
 				<mat-label>Era:</mat-label>
-				<mat-select value="ALL" formControlName="misEra" (selectionChange)="applyFilter($event)">
+				<mat-select value="ALL" formControlName="misEra" (selectionChange)="applyFilter()">
 					<mat-option value="ALL">ALL</mat-option>
 					<mat-option *ngFor="let era of mC.MissionEras" [value]="era">{{era}}</mat-option>
 				</mat-select>
 			</mat-form-field>
 			<mat-form-field>
 				<mat-label>Tags</mat-label>
-				<mat-select formControlName="misTags" multiple #missionTags (selectionChange)="applyFilterTags()">
+				<mat-select formControlName="misTags" multiple #missionTags (selectionChange)="applyFilter()">
 					<mat-select-trigger>
 						<mat-chip-list>
 							<mat-chip *ngFor="let tag of filterGroup.get('misTags')?.value; let matChipIndex = index"
@@ -98,6 +105,10 @@
 			<ng-container matColumnDef="lastUpdate">
 				<th mat-header-cell *matHeaderCellDef mat-sort-header> Last Updated </th>
 				<td mat-cell *matCellDef="let element">{{missionsService.getDate(element.lastUpdate)}}</td>
+			</ng-container>
+			<ng-container matColumnDef="uploadDate">
+				<th mat-header-cell *matHeaderCellDef mat-sort-header> First Uploaded </th>
+				<td mat-cell *matCellDef="let element">{{missionsService.getDate(element.uploadDate)}}</td>
 			</ng-container>
 			<tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
 			<tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onActivate(row)"></tr>
