@@ -12,10 +12,10 @@
 
 			<mat-vertical-stepper class="field-container" [linear]="false" #stepper>
 				<mat-step [stepControl]="fileUploadGroup">
-					<form [formGroup]="fileUploadGroup">
+					<form  [formGroup]="fileUploadGroup">
 						<ng-template matStepLabel>Mission File</ng-template>
 						<div>
-							<mat-form-field>
+							<mat-form-field color="accent">
 								<mat-label class="inset-label" for="file-input">Select Mission .pbo</mat-label>
 								<ngx-mat-file-input formControlName="missionFile" valuePlaceholder="No file selected"
 									required [accept]="'.pbo'" #missionFile
@@ -36,10 +36,10 @@
 					<form [formGroup]="missionNameGroup">
 						<ng-template matStepLabel>Mission Name</ng-template>
 						<div>
-							<mat-form-field>
+							<mat-form-field color="accent">
 								<mat-label class="inset-label">Mission Name</mat-label>
-								<input matInput formControlName="missionName" maxlength="31"
-									placeholder="Operation Boomstick" required autocomplete="off" id="name"
+								<input matInput formControlName="missionName" name="somethingAutofillDoesntKnow" autocomplete="doNotAutoComplete"  maxlength="31"
+									placeholder="Operation Boomstick" required  id="name"
 									(ngModelChange)="buildMissionFileName()">
 								<mat-error>{{getNameErrorMessage()}}</mat-error>
 							</mat-form-field>
@@ -71,13 +71,13 @@
 					<form [formGroup]="missionSizeGroup">
 						<ng-template matStepLabel>Player Count</ng-template>
 						<div>
-							<mat-form-field>
+							<mat-form-field color="accent">
 								<mat-label class="inset-label">Minimum Players</mat-label>
 								<input matInput formControlName="minPlayers" autocomplete="off" placeholder="10"
 									type="number" id="minPlayers" #minSizeInput maxlength="3"
 									(ngModelChange)="minPlayers = minSizeInput.value; buildMissionFileName()">
 							</mat-form-field>
-							<mat-form-field>
+							<mat-form-field color="accent">
 								<mat-label class="inset-label">Maximum Players</mat-label>
 								<input matInput formControlName="maxPlayers" autocomplete="off" placeholder="22"
 									type="number" id="maxPlayers" #maxSizeInput maxlength="3"
@@ -116,7 +116,7 @@
 					<form [formGroup]="missionDescGroup">
 						<ng-template matStepLabel>Description</ng-template>
 						<div>
-							<mat-form-field>
+							<mat-form-field color="accent">
 								<mat-label class="inset-label">Description</mat-label>
 								<textarea matInput formControlName="misDescription" autocomplete="off"
 									placeholder="USMC raids ammo depot | Defenders chooses weather" type="string"
@@ -124,7 +124,7 @@
 									(ngModelChange)="buildMissionDesc()"></textarea>
 								<mat-error>{{getDescErrorMessage()}}</mat-error>
 							</mat-form-field>
-							<mat-form-field>
+							<mat-form-field color="accent">
 								<mat-label>Tags</mat-label>
 								<mat-select formControlName="misTags" multiple #missionTags>
 									<mat-select-trigger>
@@ -144,11 +144,11 @@
 								<mat-error>{{getTagsErrorMessage()}}</mat-error>
 							</mat-form-field>
 							<mat-label class="mr-4 mb-4 mt-4" style="display: flex;">Time of Day:</mat-label>
-							<mat-radio-group formControlName="misTime" #misTime required>
-								<mat-radio-button *ngFor="let time of mC.MissionTimes" [value]="time">
+							<mat-button-toggle-group formControlName="misTime" #misTime required>
+								<mat-button-toggle *ngFor="let time of mC.MissionTimes" [value]="time">
 									{{time}}
-								</mat-radio-button>
-							</mat-radio-group>
+								</mat-button-toggle>
+							</mat-button-toggle-group>
 							<mat-error>{{getReqErrorMessage('misTime')}}</mat-error>
 							<mat-label class="mr-4 mb-4 mt-4" style="display: flex;">Era:</mat-label>
 							<mat-button-toggle-group formControlName="misEra" #misEra required>
