@@ -7,6 +7,7 @@ import { DiscordUser } from '../../models/discorduser';
 import { UserService } from '../../services/user.service';
 import { IMission, IUpdate } from '../../models/mission';
 import { SharedService } from '@app/services/shared';
+import { DialogViewUpdateComponent } from './dialog-view-update.component';
 
 @Component({
 	selector: 'app-mission-details',
@@ -50,8 +51,11 @@ export class MissionDetailsComponent implements OnInit {
 			});
 	}
 
-	public showText(text: string) {
-		console.log(text);
+	public showText(textStr: string) {
+		console.log(textStr);
+		const dialogRef = this.dialog.open(DialogViewUpdateComponent, {
+			data: { name: this.mission?.name, text: textStr }
+		});
 	}
 
 	public updateMission() {
@@ -61,9 +65,3 @@ export class MissionDetailsComponent implements OnInit {
 		//  	});
 	}
 }
-
-// @Component({
-// 	selector: 'dialog-content-example-dialog',
-// 	templateUrl: 'mission-update-dialog.html',
-// })
-// export class DialogContentExampleDialog { }

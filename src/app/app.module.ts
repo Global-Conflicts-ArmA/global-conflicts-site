@@ -52,6 +52,7 @@ import { MissionDetailsComponent } from './components/mission-details/mission-de
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
 import { SharedService } from "./services/shared";
 import { RequestCache } from './services/request-cache.service';
+import { DialogViewUpdateComponent } from './components/mission-details/dialog-view-update.component';
 
 @NgModule({
 	declarations: [
@@ -64,7 +65,8 @@ import { RequestCache } from './services/request-cache.service';
 		WikiComponent,
 		AARComponent,
 		MissionDetailsComponent,
-		UserSettingsComponent
+		UserSettingsComponent,
+		DialogViewUpdateComponent
 	],
 	imports: [
 		CommonModule,
