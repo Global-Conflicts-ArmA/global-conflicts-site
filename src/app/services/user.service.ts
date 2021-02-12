@@ -53,35 +53,19 @@ export class UserService {
 
 	public async getDiscordUsername(id: string): Promise<string> {
 		return this.httpClient
-			.get<DiscordUser[]>('/api/users')
+			.get<RemoteDiscordUser>('/api/users/fetch/' + id)
 			.toPromise()
-			.then((result) => {
-				// if (result && result.find((element: DiscordUser) => element.id === id)?.username) {
-				// 	const user = result.find(
-				// 		(element: DiscordUser) => element.id === id
-				// 	);
-				// 	return user ? user.username : 'error'
-				// } else {
-					return this.httpClient
-						.get<RemoteDiscordUser>('/api/users/fetch/' + id)
-						.toPromise()
-						.then((remoteUser: RemoteDiscordUser) => {
-							if (remoteUser) {
-								console.log('remoteUser: ', remoteUser);
-								return remoteUser.nickname
-									? remoteUser.nickname
-									: remoteUser.displayName
-									? remoteUser.displayName
-									: 'error';
-							} else {
-								return 'error';
-							}
-						})
-						.catch((err) => {
-							console.log('error: ', err);
-							return 'error';
-						});
-				// }
+			.then((remoteUser: RemoteDiscordUser) => {
+				if (remoteUser) {
+					console.log('remoteUser: ', remoteUser);
+					return remoteUser.nickname
+						? remoteUser.nickname
+						: remoteUser.displayName
+						? remoteUser.displayName
+						: 'error';
+				} else {
+					return 'error';
+				}
 			})
 			.catch((err) => {
 				console.log('error: ', err);
@@ -89,15 +73,31 @@ export class UserService {
 			});
 	}
 
-	public getUserSettings(id: string): IUserSettings {
-		const settings = {
-			missionEditDM: true,
-			missionReportDM: true,
-			missionReviewDM: true,
-			missionRemoveDM: true,
-			missionAcceptDM: true
-		};
-		return settings;
+	public async getUserSettings(id: string): Promise<IUserSettings> {
+		return this.httpClient
+			.get<DiscordUser>('/api/users/' + id)
+			.toPromise()
+			.then((user: DiscordUser) => {
+				const settings = {
+					missionEditDM: true,
+					missionReportDM: true,
+					missionReviewDM: true,
+					missionRemoveDM: true,
+					missionAcceptDM: true
+				};
+				return settings;
+			})
+			.catch((err) => {
+				console.log('error: ', err);
+				const settings = {
+					missionEditDM: true,
+					missionReportDM: true,
+					missionReviewDM: true,
+					missionRemoveDM: true,
+					missionAcceptDM: true
+				};
+				return settings;
+			});
 	}
 }
 

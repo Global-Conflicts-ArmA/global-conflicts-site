@@ -50,6 +50,10 @@ export class MissionDetailsComponent implements OnInit {
 			});
 	}
 
+	public showText(text: string) {
+		console.log(text);
+	}
+
 	public updateMission() {
 		//  	const dialogRef = this.dialog.open(DialogContentExampleDialog);
 		//  	dialogRef.afterClosed().subscribe(result => {

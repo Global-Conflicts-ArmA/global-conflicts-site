@@ -12,7 +12,7 @@ export class DiscordUser {
 		username: string,
 		role: string,
 		roleColor: string,
-		avatarLink: string
+		avatarLink: string,
 	) {
 		this.id = id;
 		this.token = token;

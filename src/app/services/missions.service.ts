@@ -5,6 +5,7 @@ import { IMission } from '../models/mission';
 import { MissionConstants, ITerrain } from '../constants/missionConstants';
 import { DomSanitizer } from '@angular/platform-browser';
 import { DiscordUser } from '@app/models/discorduser';
+import * as fileSaver from 'file-saver';
 
 @Injectable({
 	providedIn: 'root'
@@ -37,7 +38,9 @@ export class MissionsService {
 			return this.sanitizer.bypassSecurityTrustResourceUrl(mission.image);
 		} else {
 			const terrain = this.getTerrainData(mission?.terrain);
-			return terrain?.defaultImage ? terrain?.defaultImage : '../../../assets/imgs/noImage.png';
+			return terrain?.defaultImage
+				? terrain?.defaultImage
+				: '../../../assets/imgs/noImage.png';
 		}
 	}
 
@@ -48,5 +51,17 @@ export class MissionsService {
 
 	public getFileName(uniqueName: string | null): Observable<IMission> {
 		return this.httpClient.get<IMission>(`/api/missions/${uniqueName}`);
+	}
+
+	public downloadFile(filename: string) {
+		console.log(filename);
+		this.httpClient
+			.get(filename, { responseType: 'blob' })
+			.subscribe((res) => {
+				const blob: any = new Blob([res]);
+				const url = window.URL.createObjectURL(blob);
+				console.log(url);
+				fileSaver.saveAs(blob, filename);
+			});
 	}
 }

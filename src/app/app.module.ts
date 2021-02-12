@@ -110,12 +110,6 @@ import { RequestCache } from './services/request-cache.service';
 			useClass: HttpErrorInterceptor,
 			multi: true,
 		},
-		RequestCache,
-		{
-			provide: HTTP_INTERCEPTORS,
-			useClass: CachingInterceptor,
-			multi: true,
-		},
 		{ provide: BrowserXhr, useClass: CustExtBrowserXhr },
 		{
 			provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,

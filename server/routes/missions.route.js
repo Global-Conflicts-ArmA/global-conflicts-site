@@ -9,6 +9,7 @@ const sharp = require('sharp');
 const DiscordOauth2 = require('discord-oauth2');
 const { getDiscordUserFromCookies } = require('../misc/validate-cookies');
 const { discordJsClient, Discord } = require('../config/discord-bot');
+const { get } = require('http');
 const trustedUploaderRoles = ['Admin', 'GM', 'Mission Maker'];
 
 fileFilterFunction = async function (req, file, callback) {
@@ -21,7 +22,6 @@ fileFilterFunction = async function (req, file, callback) {
 		return callback(null, false);
 	}
 
-	req.uploadPath = process.env.TEST_SERVER_READY;
 	req.missionDataErrors = validateUploadData(req.body);
 	if (Object.keys(req.missionDataErrors).length > 0) {
 		callback(null, false);
@@ -40,7 +40,7 @@ fileFilterFunction = async function (req, file, callback) {
 			return;
 		} else if (
 			fs.existsSync(
-				`${process.env.ROOT_FOLDER}${req.uploadPath}/${file.originalname}`
+				`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${file.originalname}`
 			)
 		) {
 			req.missionDataErrors.misc =
@@ -60,7 +60,7 @@ const uploadMulter = multer({
 		destination: function (req, file, cb) {
 			cb(
 				null,
-				`${process.env.ROOT_FOLDER}/${process.env.TEST_SERVER_READY}`
+				`${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}`
 			);
 		},
 		filename: function (req, file, cb) {
@@ -385,4 +385,17 @@ router.get('/:uniqueName', async (req, res) => {
 			res.status(500).send(err);
 		});
 });
+
+router.get('/download/:filename', async (req, res) => {
+	fs.readFile(`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${req.params.filename}`, (err,data) => {
+		if (err) {
+		  res.writeHead(404);
+		  res.end(JSON.stringify(err));
+		  return;
+		}
+		res.writeHead(200);
+		res.end(data);
+	  });
+});
+
 module.exports = router;

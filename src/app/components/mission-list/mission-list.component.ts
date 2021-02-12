@@ -1,4 +1,9 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import {
+	Component,
+	OnInit,
+	ViewChild,
+	DoCheck
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { MissionsService } from '../../services/missions.service';
 import { IMission, IUpdate } from '../../models/mission';
@@ -53,42 +58,35 @@ export class MissionListComponent implements OnInit {
 		private formBuilder: FormBuilder
 	) {}
 
-	ngOnInit(): void {
-		this.filterGroup = this.formBuilder.group({
-			misSearch: new FormControl(''),
-			misState: new FormControl(''),
-			misAuthor: new FormControl(''),
-			misType: new FormControl(''),
-			misTerrain: new FormControl(''),
-			misTime: new FormControl(''),
-			misEra: new FormControl(''),
-			misTags: new FormControl('')
-		});
-		['misState', 'misAuthor', 'misType', 'misTerrain', 'misTime', 'misEra'].forEach(
-			(element) => {
-				this.filterGroup.get(element)?.setValue('ALL');
-			}
-		);
+	refresh() {
 		this.missionsService.list().subscribe((value) => {
 			this.userList = [];
 			console.log('got value: ', value);
-			value.map(async (mission: IMission) => {
+			value.map((mission: IMission) => {
 				console.log('mission.authorID: ', mission.authorID);
-				mission.authorName = await this.userService.getDiscordUsername(
+				this.userService.getDiscordUsername(
 					mission.authorID
-				);
-				if (!this.userList.includes(mission.authorName)) {
-					this.userList.push(mission.authorName);
-				}
-				console.log('mission.authorName: ', mission.authorName);
-				mission.updates.map(async (update: IUpdate) => {
-					update.authorName = await this.userService.getDiscordUsername(
-						update.authorID
-					);
-					if (!this.userList.includes(update.authorName)) {
-						this.userList.push(update.authorName);
+				).then((result) => {
+					mission.authorName = result;
+					if (!this.userList.includes(mission.authorName)) {
+						this.userList.push(mission.authorName);
 					}
-					console.log('update.authorName: ', update.authorName);
+					console.log('mission.authorName: ', mission.authorName);
+					mission.updates.map((update: IUpdate) => {
+						this.userService.getDiscordUsername(
+							update.authorID
+						).then((_result) => {
+							update.authorName = _result;
+							if (!this.userList.includes(update.authorName)) {
+								this.userList.push(update.authorName);
+							}
+							console.log('update.authorName: ', update.authorName);
+						}).catch((err) => {
+							console.log('err: ', err);
+						});
+					});
+				}).catch((err) => {
+					console.log('err: ', err);
 				});
 			});
 			console.log('done map');
@@ -108,6 +106,30 @@ export class MissionListComponent implements OnInit {
 			};
 			this.dataSource.sort = this.sort;
 		});
+	}
+
+	ngOnInit(): void {
+		this.filterGroup = this.formBuilder.group({
+			misSearch: new FormControl(''),
+			misState: new FormControl(''),
+			misAuthor: new FormControl(''),
+			misType: new FormControl(''),
+			misTerrain: new FormControl(''),
+			misTime: new FormControl(''),
+			misEra: new FormControl(''),
+			misTags: new FormControl('')
+		});
+		[
+			'misState',
+			'misAuthor',
+			'misType',
+			'misTerrain',
+			'misTime',
+			'misEra'
+		].forEach((element) => {
+			this.filterGroup.get(element)?.setValue('ALL');
+		});
+		this.refresh();
 		this.discordUser = this.userService.getUserLocally();
 		this.terrainList = [];
 		Object.values(this.mC.MissionTerrains).forEach((terrain: ITerrain) => {
@@ -235,7 +257,9 @@ export class MissionListComponent implements OnInit {
 			});
 		}
 		// Search
-		const searchFilter: string = this.filterGroup.get('misSearch')?.value?.toLowerCase();
+		const searchFilter: string = this.filterGroup
+			.get('misSearch')
+			?.value?.toLowerCase();
 		if (searchFilter && searchFilter !== '') {
 			console.log('searchFilter: ', searchFilter);
 			filteredData = filteredData.filter((element: IMission) => {
@@ -275,12 +299,5 @@ export class MissionListComponent implements OnInit {
 	onActivate(row: IMission) {
 		console.log('got click event for:', row.name);
 		this.router.navigate([`/mission-details/${row.uniqueName}`]);
-	}
-
-	// TODO: display whether mission is on main server, test, or archived
-	onSelectedServerPathChange(event) {
-		// this.rows = this.tempRows.filter((mission) => {
-		// 	return mission.paths.includes(this.selectedServerPath);
-		// });
 	}
 }

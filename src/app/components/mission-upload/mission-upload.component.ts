@@ -95,16 +95,16 @@ export class MissionUploadComponent implements OnInit {
 					value: false,
 					disabled: false
 				}),
-				ratioBlufor: new FormControl({ value: 0, disabled: true }),
+				ratioBlufor: new FormControl({ value: 1, disabled: true }),
 				ratioOpforE: new FormControl({ value: false, disabled: false }),
-				ratioOpfor: new FormControl({ value: 0, disabled: true }),
+				ratioOpfor: new FormControl({ value: 1, disabled: true }),
 				ratioIndforE: new FormControl({
 					value: false,
 					disabled: false
 				}),
-				ratioIndfor: new FormControl({ value: 0, disabled: true }),
+				ratioIndfor: new FormControl({ value: 1, disabled: true }),
 				ratioCivE: new FormControl({ value: false, disabled: false }),
-				ratioCiv: new FormControl({ value: 0, disabled: true })
+				ratioCiv: new FormControl({ value: 1, disabled: true })
 			},
 			{
 				validators: [
