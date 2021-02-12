@@ -146,7 +146,7 @@ $mat-dark-theme-background: (
 // Theme Config
 
 body {
-	--primary-color: #373737;
+	--primary-color: colors.$primary;
 	--primary-lighter-color: #c3c3c3;
 	--primary-darker-color: #232323;
 	--text-primary-color: #{$light-primary-text};
@@ -155,10 +155,10 @@ body {
 }
 
 $mat-primary: (
-	main: #373737,
+	main: colors.$primary,
 	lighter: #c3c3c3,
 	darker: #232323,
-	200: #373737,
+	200: colors.$primary,
 	// For slide toggle,
 	contrast:
 		(
@@ -170,7 +170,7 @@ $mat-primary: (
 $theme-primary: mat-palette($mat-primary, main, lighter, darker);
 
 body {
-	--accent-color: #92753d;
+	--accent-color: colors.$accent;
 	--accent-lighter-color: #ded6c5;
 	--accent-darker-color: #755827;
 	--text-accent-color: #{$light-primary-text};
@@ -179,10 +179,10 @@ body {
 }
 
 $mat-accent: (
-	main: #92753d,
+	main: colors.$accent,
 	lighter: #ded6c5,
 	darker: #755827,
-	200: #92753d,
+	200: colors.$accent,
 	// For slide toggle,
 	contrast:
 		(
@@ -322,7 +322,7 @@ $altTheme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
 }
 
 body {
-	background-color: #373737;
+	background-color: colors.$primary;
 	font-family: Roboto, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -352,7 +352,7 @@ a:hover {
 }
 
 .container {
-	margin-top: 100px;	
+	margin-top: 100px;
 }
 
 .column {
@@ -379,53 +379,6 @@ a:hover {
 	color: colors.$accent !important;
 }
 
-.btn {
-	display: inline-block;
-	padding: 6px 12px;
-	margin-bottom: 0;
-	font-size: 14px;
-	font-weight: 400;
-	line-height: 1.42857143;
-	text-align: center;
-	white-space: nowrap;
-	vertical-align: middle;
-	-ms-touch-action: manipulation;
-	touch-action: manipulation;
-
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	background-image: none;
-	background-color: colors.$accent;
-	color: white;
-	outline: none;
-	border: none;
-
-	transition: all 0.1s ease-in-out;
-
-	div {
-		transition: all 0.1s ease-in-out;
-	}
-
-	cursor: pointer;
-
-	&:hover {
-		box-shadow: inset black 0 1px 1px 0;
-
-		div {
-			transform: translateY(1px);
-		}
-	}
-
-	&:active {
-		box-shadow: inset black 0 2.5px 4px 0;
-
-		div {
-			transform: translateY(4px);
-		}
-	}
-}
 
 form {
 	> * {
@@ -440,7 +393,7 @@ input,
 	display: flex;
 	flex: 1;
 	align-items: center;
-	outline: none;
+	outline: none !important;
 	color: white;
 	min-height: 1rem;
 	font-size: 22px;
