@@ -171,11 +171,35 @@ async function getImage(base64Image) {
 	return resizedBuffer;
 }
 
+async function getRemoteUser(id) {
+	const guild = discordJsClient.guilds.cache.get(
+		process.env.DISCORD_SERVER_ID
+	);
+	return guild.members
+		.fetch(id)
+		.then((member) => {
+			return member;
+		})
+		.catch((reason) => {
+			return reason;
+		});
+}
+
 async function postDiscord(reqBody, avatarURL) {
+	const author = await getRemoteUser(reqBody.authorID).then((result) => {
+		return result.nickname
+		? result.nickname
+		: result.displayName
+		? result.displayName
+		: 'error';
+	}).catch((err) => {
+		console.log('err', err);
+		return 'error'
+	});
 	const newMissionEmbed = new Discord.MessageEmbed()
 		.setColor('#22cf26')
 		.setTitle(reqBody.fileName)
-		.setAuthor(`Author: ${reqBody.author}`, avatarURL)
+		.setAuthor(`Author: ${author}`, avatarURL)
 		.addFields(
 			{ name: 'Description:', value: reqBody.description, inline: false },
 			{

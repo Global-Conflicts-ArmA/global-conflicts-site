@@ -55,17 +55,26 @@ export class UserService {
 		return this.httpClient
 			.get<RemoteDiscordUser>('/api/users/fetch/' + id)
 			.toPromise()
-			.then((remoteUser: RemoteDiscordUser) => {
-				if (remoteUser) {
-					console.log('remoteUser: ', remoteUser);
-					return remoteUser.nickname
-						? remoteUser.nickname
-						: remoteUser.displayName
-						? remoteUser.displayName
-						: 'error';
-				} else {
-					return 'error';
-				}
+			.then((result) => {
+				return this.httpClient
+					.get<RemoteDiscordUser>('/api/users/fetch/' + id)
+					.toPromise()
+					.then((remoteUser: RemoteDiscordUser) => {
+						if (remoteUser) {
+							console.log('remoteUser: ', remoteUser);
+							return (
+								remoteUser.nickname ??
+								remoteUser.displayName ??
+								'error'
+							);
+						} else {
+							return 'error';
+						}
+					})
+					.catch((err) => {
+						console.log('error: ', err);
+						return 'error';
+					});
 			})
 			.catch((err) => {
 				console.log('error: ', err);
