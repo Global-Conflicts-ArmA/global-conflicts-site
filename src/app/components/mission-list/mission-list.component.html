@@ -4,9 +4,9 @@
 <div class="flexrow" [class.not-allowed-overlay]="!(discordUser && discordUser?.role)">
 	<div class="controlsColumn">
 		<div class="controlsContainer" [formGroup]="filterGroup">
-			<mat-form-field class="searchFilter mt-4">
+			<mat-form-field color="accent" class="searchFilter mt-4">
 				<mat-label>Search Filter</mat-label>
-				<input matInput formControlName="misSearch" (keyup)="applyFilter()" placeholder="Search Term" #input>
+				<input matInput formControlName="misSearch" (keyup)="applyFilter()" placeholder="Search Term" name="somethingAutofillDoesntKnow" autocomplete="doNotAutoComplete" #input>
 			</mat-form-field>
 			<mat-button-toggle-group class="smaller-toggle-group mb-4" formControlName="misState" (change)="applyFilter()">
 				<mat-button-toggle value="ALL">All</mat-button-toggle>
@@ -15,47 +15,47 @@
 				<mat-button-toggle value="READY">Ready</mat-button-toggle>
 				<mat-button-toggle value="ARCHIVE">Archive</mat-button-toggle>
 			</mat-button-toggle-group>
-			<mat-form-field appearance="fill">
+			<mat-form-field color="accent" appearance="fill">
 				<mat-label>Author:</mat-label>
 				<mat-select value="ALL" formControlName="misAuthor" (selectionChange)="applyFilter()">
 					<mat-option value="ALL">ALL</mat-option>
 					<mat-option *ngFor="let author of userList" [value]="author">{{author}}</mat-option>
 				</mat-select>
 			</mat-form-field>
-			<mat-form-field appearance="fill">
+			<mat-form-field color="accent" appearance="fill">
 				<mat-label>Type:</mat-label>
 				<mat-select value="ALL" formControlName="misType" (selectionChange)="applyFilter()">
 					<mat-option value="ALL">ALL</mat-option>
 					<mat-option *ngFor="let type of mC.MissionTypes" [value]="type.title">{{type.title}}</mat-option>
 				</mat-select>
 			</mat-form-field>
-			<mat-form-field appearance="fill">
+			<mat-form-field color="accent" appearance="fill">
 				<mat-label>Terrain:</mat-label>
 				<mat-select value="ALL" formControlName="misTerrain" (selectionChange)="applyFilter()">
 					<mat-option value="ALL">ALL</mat-option>
 					<mat-option *ngFor="let item of terrainList" [value]="item">{{item}}</mat-option>
 				</mat-select>
 			</mat-form-field>
-			<mat-form-field appearance="fill">
+			<mat-form-field color="accent" appearance="fill">
 				<mat-label>Time:</mat-label>
 				<mat-select value="ALL" formControlName="misTime" (selectionChange)="applyFilter()">
 					<mat-option value="ALL">ALL</mat-option>
 					<mat-option *ngFor="let time of mC.MissionTimes" [value]="time">{{time}}</mat-option>
 				</mat-select>
 			</mat-form-field>
-			<mat-form-field appearance="fill">
+			<mat-form-field color="accent" appearance="fill">
 				<mat-label>Era:</mat-label>
 				<mat-select value="ALL" formControlName="misEra" (selectionChange)="applyFilter()">
 					<mat-option value="ALL">ALL</mat-option>
 					<mat-option *ngFor="let era of mC.MissionEras" [value]="era">{{era}}</mat-option>
 				</mat-select>
 			</mat-form-field>
-			<mat-form-field>
+			<mat-form-field color="accent">
 				<mat-label>Tags</mat-label>
-				<mat-select formControlName="misTags" multiple #missionTags (selectionChange)="applyFilter()">
+				<mat-select  formControlName="misTags" multiple #missionTags (selectionChange)="applyFilter()">
 					<mat-select-trigger>
-						<mat-chip-list>
-							<mat-chip *ngFor="let tag of filterGroup.get('misTags')?.value; let matChipIndex = index"
+						<mat-chip-list >
+							<mat-chip  *ngFor="let tag of filterGroup.get('misTags')?.value; let matChipIndex = index"
 								[removable]="true" (removed)="onListChipRemoved(missionTags, matChipIndex)">
 								{{ tag }}
 								<mat-icon matChipRemove>cancel</mat-icon>
@@ -114,8 +114,8 @@
 			<tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onActivate(row)"></tr>
 
 			<!-- Row shown when there is no matching data. -->
-			<tr class="mat-row" *matNoDataRow>
-				<td class="mat-cell" colspan="8">No data matching the filter</td>
+			<tr class="mat-row empty" *matNoDataRow>
+				<td class="mat-cell" colspan="11">No data matching the filter</td>
 			</tr>
 		</table>
 		<mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
