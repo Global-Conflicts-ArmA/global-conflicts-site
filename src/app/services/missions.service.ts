@@ -56,12 +56,15 @@ export class MissionsService {
 	public downloadFile(filename: string) {
 		console.log(filename);
 		this.httpClient
-			.get(filename, { responseType: 'blob' })
+			.get('/api/missions/download/' + filename, { responseType: 'blob' })
 			.subscribe((res) => {
 				const blob: any = new Blob([res]);
 				const url = window.URL.createObjectURL(blob);
 				console.log(url);
 				fileSaver.saveAs(blob, filename);
+			}, err => {
+				console.log('err: ', err);
+				alert('Could not find mission in archive')
 			});
 	}
 }

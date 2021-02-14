@@ -58,10 +58,7 @@ const uploadMulter = multer({
 	fileFilter: fileFilterFunction,
 	storage: multer.diskStorage({
 		destination: function (req, file, cb) {
-			cb(
-				null,
-				`${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}`
-			);
+			cb(null, `${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}`);
 		},
 		filename: function (req, file, cb) {
 			cb(null, req.body.fileName);
@@ -186,16 +183,18 @@ async function getRemoteUser(id) {
 }
 
 async function postDiscord(reqBody, avatarURL) {
-	const author = await getRemoteUser(reqBody.authorID).then((result) => {
-		return result.nickname
-		? result.nickname
-		: result.displayName
-		? result.displayName
-		: 'error';
-	}).catch((err) => {
-		console.log('err', err);
-		return 'error'
-	});
+	const author = await getRemoteUser(reqBody.authorID)
+		.then((result) => {
+			return result.nickname
+				? result.nickname
+				: result.displayName
+				? result.displayName
+				: 'error';
+		})
+		.catch((err) => {
+			console.log('err', err);
+			return 'error';
+		});
 	const newMissionEmbed = new Discord.MessageEmbed()
 		.setColor('#22cf26')
 		.setTitle(reqBody.fileName)
@@ -411,15 +410,18 @@ router.get('/:uniqueName', async (req, res) => {
 });
 
 router.get('/download/:filename', async (req, res) => {
-	fs.readFile(`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${req.params.filename}`, (err,data) => {
-		if (err) {
-		  res.writeHead(404);
-		  res.end(JSON.stringify(err));
-		  return;
+	fs.readFile(
+		`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${req.params.filename}`,
+		(err, data) => {
+			if (err) {
+				res.writeHead(404);
+				res.end(JSON.stringify(err));
+				return;
+			}
+			res.writeHead(200);
+			res.end(data);
 		}
-		res.writeHead(200);
-		res.end(data);
-	  });
+	);
 });
 
 module.exports = router;
