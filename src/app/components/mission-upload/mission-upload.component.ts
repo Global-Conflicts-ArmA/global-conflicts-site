@@ -1,18 +1,10 @@
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
-	Component,
-	ElementRef,
-	Injectable,
-	OnInit,
-	Pipe,
-	PipeTransform,
-	ViewChild
-} from '@angular/core';
-import {
+	AbstractControl,
 	FormBuilder,
-	FormGroup,
-	Validators,
 	FormControl,
-	AbstractControl
+	FormGroup,
+	Validators
 } from '@angular/forms';
 import { MissionConstants } from '../../constants/missionConstants';
 import { MissionsService } from '../../services/missions.service';
@@ -22,9 +14,6 @@ import { UserService } from '../../services/user.service';
 import { FileValidator } from 'ngx-material-file-input';
 import { MatSelect } from '@angular/material/select';
 import { SharedService } from '@app/services/shared';
-import { MatChipInputEvent } from '@angular/material/chips';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
 import {
 	MatAutocomplete,
 	MatAutocompleteSelectedEvent
@@ -194,20 +183,22 @@ export class MissionUploadComponent implements OnInit {
 		}
 
 		const currentTags = misTagsControl.value as string[];
-
-		if (currentTags.indexOf(event.option.viewValue) === -1) {
+		const indexFound = currentTags.indexOf(event.option.viewValue);
+		if (indexFound === -1) {
 			currentTags.push(event.option.viewValue);
 			misTagsControl.setValue(currentTags);
+		}else{
+			currentTags.splice(indexFound,1);
+			misTagsControl.patchValue(currentTags);
 		}
 	}
 
-	onListChipRemoved(multiSelect: MatSelect, matChipIndex: number): void {
+	onListChipRemoved(matChipIndex: number): void {
 		const misTags = this.missionDescGroup.get('misTags');
 		if (misTags) {
 			const selectedChips = [...misTags.value];
 			selectedChips.splice(matChipIndex, 1);
 			misTags.patchValue(selectedChips);
-			multiSelect.writeValue(selectedChips);
 		}
 	}
 
