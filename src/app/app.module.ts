@@ -39,6 +39,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+
 
 import { HomeComponent } from './components/home/home.component';
 import { MainNavComponent } from './components/main-nav/main-nav.component';
@@ -50,7 +52,7 @@ import { AARComponent } from './components/aar/aar.component';
 import { MissionConstants } from './constants/missionConstants';
 import { MissionDetailsComponent } from './components/mission-details/mission-details.component';
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
-import { SharedService } from "./services/shared";
+import { SharedService } from './services/shared';
 import { RequestCache } from './services/request-cache.service';
 
 @NgModule({
@@ -99,7 +101,8 @@ import { RequestCache } from './services/request-cache.service';
 		MatTableModule,
 		MatPaginatorModule,
 		MatSortModule,
-		BrowserAnimationsModule
+		BrowserAnimationsModule,
+		MatAutocompleteModule
 	],
 	bootstrap: [AppComponent],
 	providers: [
@@ -108,13 +111,13 @@ import { RequestCache } from './services/request-cache.service';
 		{
 			provide: HTTP_INTERCEPTORS,
 			useClass: HttpErrorInterceptor,
-			multi: true,
+			multi: true
 		},
 		RequestCache,
 		{
 			provide: HTTP_INTERCEPTORS,
 			useClass: CachingInterceptor,
-			multi: true,
+			multi: true
 		},
 		{ provide: BrowserXhr, useClass: CustExtBrowserXhr },
 		{
