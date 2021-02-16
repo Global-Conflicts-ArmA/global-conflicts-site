@@ -1,16 +1,10 @@
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
-	Component,
-	Injectable,
-	OnInit,
-	Pipe,
-	PipeTransform
-} from '@angular/core';
-import {
+	AbstractControl,
 	FormBuilder,
-	FormGroup,
-	Validators,
 	FormControl,
-	AbstractControl
+	FormGroup,
+	Validators
 } from '@angular/forms';
 import { MissionConstants } from '../../constants/missionConstants';
 import { MissionsService } from '../../services/missions.service';
@@ -20,6 +14,10 @@ import { UserService } from '../../services/user.service';
 import { FileValidator } from 'ngx-material-file-input';
 import { MatSelect } from '@angular/material/select';
 import { SharedService } from '@app/services/shared';
+import {
+	MatAutocomplete,
+	MatAutocompleteSelectedEvent
+} from '@angular/material/autocomplete';
 
 @Component({
 	selector: 'app-mission-upload',
@@ -67,6 +65,11 @@ export class MissionUploadComponent implements OnInit {
 	missionSizeGroup: FormGroup;
 	missionDescGroup: FormGroup;
 	fileImageGroup: FormGroup;
+
+	filtredTags: string[];
+
+	@ViewChild('tagsTextInput') tagsTextInput: ElementRef<HTMLInputElement>;
+	@ViewChild('auto') matAutocomplete: MatAutocomplete;
 
 	ngOnInit(): void {
 		this.discordUser = this.userService.getUserLocally();
@@ -118,7 +121,7 @@ export class MissionUploadComponent implements OnInit {
 				'',
 				[Validators.required, this.checkMissionDesc()]
 			],
-			misTags: ['', [Validators.required]],
+			misTags: [[], [Validators.required]],
 			misTime: ['', [Validators.required]],
 			misEra: ['', [Validators.required]]
 		});
@@ -132,15 +135,70 @@ export class MissionUploadComponent implements OnInit {
 			},
 			{ validators: [this.checkImageFile.bind(this)] }
 		);
+
+		this.filtredTags = this.mC.MissionTags;
+	}
+	filterTags(value: string) {
+		const filterValue = value.toLowerCase();
+
+		this.filtredTags = this.mC.MissionTags.filter((tag) => {
+			return tag.toLowerCase().indexOf(filterValue) === 0;
+		});
+
+		const misTagsControl = this.missionDescGroup.get('misTags');
+		if (!misTagsControl) {
+			return;
+		}
+
+		const currentTags = misTagsControl.value as string[];
+
+		const indexFound = this.mC.MissionTags.findIndex(
+			(item) => value.toLowerCase() === item.toLowerCase()
+		);
+		if (
+			indexFound !== -1 &&
+			currentTags.indexOf(this.mC.MissionTags[indexFound]) === -1
+		) {
+			currentTags.push(this.mC.MissionTags[indexFound]);
+			misTagsControl.setValue(currentTags);
+			this.tagsTextInput.nativeElement.value = '';
+			this.filtredTags = this.mC.MissionTags;
+		}
 	}
 
-	onListChipRemoved(multiSelect: MatSelect, matChipIndex: number): void {
+	tagsTextInputBlur() {
+		const misTagsControl = this.missionDescGroup.get('misTags');
+		if (!misTagsControl) {
+			return;
+		}
+
+		this.tagsTextInput.nativeElement.value = '';
+		this.filtredTags = this.mC.MissionTags;
+	}
+
+	onTagSelected(event: MatAutocompleteSelectedEvent): void {
+		const misTagsControl = this.missionDescGroup.get('misTags');
+		if (!misTagsControl) {
+			return;
+		}
+
+		const currentTags = misTagsControl.value as string[];
+		const indexFound = currentTags.indexOf(event.option.viewValue);
+		if (indexFound === -1) {
+			currentTags.push(event.option.viewValue);
+			misTagsControl.setValue(currentTags);
+		}else{
+			currentTags.splice(indexFound,1);
+			misTagsControl.patchValue(currentTags);
+		}
+	}
+
+	onListChipRemoved(matChipIndex: number): void {
 		const misTags = this.missionDescGroup.get('misTags');
 		if (misTags) {
 			const selectedChips = [...misTags.value];
 			selectedChips.splice(matChipIndex, 1);
 			misTags.patchValue(selectedChips);
-			multiSelect.writeValue(selectedChips);
 		}
 	}
 
