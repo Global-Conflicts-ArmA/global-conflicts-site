@@ -3,13 +3,7 @@
 		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">
 			You must join our Discord server and complete the welcoming process to upload missions!
 		</div>
-
 		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
-
-			<div *ngIf="isUpdate">
-				You are updating
-			</div>
-
 			<mat-vertical-stepper class="field-container" [linear]="false" #stepper>
 				<mat-step [stepControl]="fileUploadGroup">
 					<form [formGroup]="fileUploadGroup">
@@ -18,8 +12,8 @@
 							<mat-form-field>
 								<mat-label class="inset-label" for="file-input">Select Mission .pbo</mat-label>
 								<ngx-mat-file-input formControlName="missionFile" valuePlaceholder="No file selected"
-									required [accept]="'.pbo'" #missionFile
-									(change)="missionToUpload = $event.target.files[0]; buildMissionFileName()">
+									[required]="true" [accept]="'.pbo'" #missionFile
+									(change)="missionToUpload = $any($event.target).files[0]; buildMissionFileName()">
 								</ngx-mat-file-input>
 								<mat-icon color="white" matSuffix>folder</mat-icon>
 								<button mat-icon-button *ngIf="!missionFile.empty"
@@ -39,7 +33,7 @@
 							<mat-form-field>
 								<mat-label class="inset-label">Mission Name</mat-label>
 								<input matInput formControlName="missionName" maxlength="31"
-									placeholder="Operation Boomstick" required autocomplete="off" id="name"
+									placeholder="Operation Boomstick" required autocomplete="off"
 									(ngModelChange)="buildMissionFileName()">
 								<mat-error>{{getNameErrorMessage()}}</mat-error>
 							</mat-form-field>
@@ -51,15 +45,15 @@
 					<form [formGroup]="missionTypeGroup">
 						<ng-template matStepLabel>Mission Type</ng-template>
 						<div class="mt-2">
-							<mat-radio-group formControlName="missionType" #missionType #matInput
+							<mat-radio-group formControlName="missionType" #missionType
 								(ngModelChange)="selectMissionType(); buildMissionFileName()" required>
 								<mat-radio-button *ngFor="let type of mC.MissionTypes" [value]="type">
 									{{type.title}}
 								</mat-radio-button>
 							</mat-radio-group>
 							<mat-slide-toggle style="display: flex;" formControlName="ratioLOL"
-								*ngIf="missionTypeGroup.get('missionType')?.value?.title == 'LOL'" #matInput
-								class="mb-4 mt-4" L (change)="ratioOverride()">
+								*ngIf="missionTypeGroup.get('missionType')?.value?.title == 'LOL'" class="mb-4 mt-4" L
+								(change)="ratioOverride()">
 								Team Ratios
 							</mat-slide-toggle>
 						</div>
@@ -74,14 +68,12 @@
 							<mat-form-field>
 								<mat-label class="inset-label">Minimum Players</mat-label>
 								<input matInput formControlName="minPlayers" autocomplete="off" placeholder="10"
-									type="number" id="minPlayers" #minSizeInput maxlength="3"
-									(ngModelChange)="minPlayers = minSizeInput.value; buildMissionFileName()">
+									type="number" maxlength="3" (ngModelChange)="buildMissionFileName()">
 							</mat-form-field>
 							<mat-form-field>
 								<mat-label class="inset-label">Maximum Players</mat-label>
 								<input matInput formControlName="maxPlayers" autocomplete="off" placeholder="22"
-									type="number" id="maxPlayers" #maxSizeInput maxlength="3"
-									(ngModelChange)="maxPlayers = maxSizeInput.value; buildMissionFileName()">
+									type="number" maxlength="3" (ngModelChange)="buildMissionFileName()">
 							</mat-form-field>
 							<mat-error>{{getSizeErrorMessage()}}</mat-error>
 						</div>
@@ -120,10 +112,16 @@
 								<mat-label class="inset-label">Description</mat-label>
 								<textarea matInput formControlName="misDescription" autocomplete="off"
 									placeholder="USMC raids ammo depot | Defenders chooses weather" type="string"
-									#misDescription maxlength="100" id="misDescription"
-									(ngModelChange)="buildMissionDesc()"></textarea>
+									maxlength="180" (ngModelChange)="buildMissionDesc()"></textarea>
 								<mat-error>{{getDescErrorMessage()}}</mat-error>
 							</mat-form-field>
+							<mat-slide-toggle style="display: flex;" formControlName="misJip" checked="true"
+								class="mb-4 mt-4">
+								JIP
+							</mat-slide-toggle>
+							<mat-slide-toggle style="display: flex;" formControlName="misRespawn" class="mb-4 mt-4">
+								Respawn
+							</mat-slide-toggle>
 							<mat-form-field>
 								<mat-label>Tags</mat-label>
 								<mat-select formControlName="misTags" multiple #missionTags>
@@ -171,10 +169,10 @@
 							</mat-slide-toggle>
 							<mat-form-field *ngIf="fileImageGroup.get('imgToggle')?.value">
 								<mat-label class="inset-label" for="file-input">Select Image</mat-label>
-								<ngx-mat-file-input formControlName="missionImage" #missionImage
-									valuePlaceholder="No file selected" [accept]="['.png', '.jpg', '.jpeg']"
-									(change)="missionImageFile = $event.target.files[0]; setImagePreview($event.target.files[0])"
-									required>
+								<ngx-mat-file-input formControlName="missionImage" valuePlaceholder="No file selected"
+									[accept]="'.png, .jpg, .jpeg'" #missionImage
+									(change)="missionImageFile = $any($event.target).files[0]; setImagePreview($any($event.target).files[0])"
+									[required]="true">
 								</ngx-mat-file-input>
 								<mat-icon color="white" matSuffix>add_photo_alternate</mat-icon>
 								<button mat-icon-button *ngIf="!missionImage.empty"
@@ -190,8 +188,8 @@
 				<mat-step>
 					<ng-template matStepLabel>Submit</ng-template>
 					<div>
-						<!--<button mat-button [disabled]="uploadingState!='ready' && uploadingState!='error'" (click)="submitMission()">Submit Mission</button>-->
-						<button mat-button (click)="submitMission()">Submit Mission</button>
+						<button mat-button [disabled]="uploadingState!='ready' && uploadingState!='error'"
+							(click)="submitMission()">Submit Mission</button>
 					</div>
 					<div class="upload-result">
 						<div class="result-error" *ngIf="uploadingState=='error'">Failed to upload mission</div>

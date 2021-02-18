@@ -21,7 +21,6 @@ fileFilterFunction = async function (req, file, callback) {
 	if (req.authError) {
 		return callback(null, false);
 	}
-
 	req.missionDataErrors = validateUploadData(req.body);
 	if (Object.keys(req.missionDataErrors).length > 0) {
 		callback(null, false);
@@ -56,6 +55,54 @@ fileFilterFunction = async function (req, file, callback) {
 const uploadMulter = multer({
 	limits: { fieldSize: 25 * 1024 * 1024 },
 	fileFilter: fileFilterFunction,
+	storage: multer.diskStorage({
+		destination: function (req, file, cb) {
+			cb(null, `${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}`);
+		},
+		filename: function (req, file, cb) {
+			cb(null, req.body.update.fileName);
+		}
+	})
+});
+
+updateFileFilterFunction = async function (req, file, callback) {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User is not allowed to upload missions.'
+	);
+	if (req.authError) {
+		return callback(null, false);
+	}
+	console.log('req.body: ', req.body);
+	if (file.mimetype !== 'application/octet-stream') {
+		req.missionDataErrors.file = 'File is not a .pbo.';
+		callback(null, false);
+		return;
+	} else {
+		const originalNameArray = file.originalname.split('.');
+		const format = originalNameArray[originalNameArray.length - 1];
+		if (format !== 'pbo') {
+			req.missionDataErrors.file = 'File is not a pbo.';
+			callback(null, false);
+			return;
+		} else if (
+			fs.existsSync(
+				`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${file.originalname}`
+			)
+		) {
+			req.missionDataErrors.misc =
+				'A mission with this filename already exists.';
+			callback(null, false);
+			return;
+		}
+	}
+	req.file = file;
+	callback(null, true);
+};
+
+const updateMulter = multer({
+	limits: { fieldSize: 25 * 1024 * 1024 },
+	fileFilter: updateFileFilterFunction,
 	storage: multer.diskStorage({
 		destination: function (req, file, cb) {
 			cb(null, `${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}`);
@@ -98,7 +145,7 @@ function validateUploadData(reqBody, res) {
 	if (!reqBody.era) {
 		errors.era = 'Missing era.';
 	}
-	if (!reqBody.version) {
+	if (!reqBody.lastVersion) {
 		errors.version = 'Missing Version.';
 	}
 	if (!reqBody.updates) {
@@ -158,9 +205,12 @@ async function getImage(base64Image) {
 	let parts = base64Image.split(';');
 	let mimType = parts[0].split(':')[1];
 	let imageData = parts[1].split(',')[1];
-	var img = await Buffer.from(imageData, 'base64');
+	var img = Buffer.from(imageData, 'base64');
 	const resizedBuffer = await sharp(img)
-		.resize(256, 256)
+		.resize({
+			fit: sharp.fit.contain,
+			height: 256
+		})
 		.toBuffer()
 		.catch((e) => {
 			console.log('imageError', e);
@@ -289,13 +339,15 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		size: req.body.size,
 		ratios: req.body.ratios,
 		description: req.body.description,
+		jip: req.body.jip,
+		respawn: req.body.respawn,
 		tags: req.body.tags,
 		timeOfDay: req.body.timeOfDay,
 		era: req.body.era,
 		uploadDate: Date.now(),
 		lastUpdate: Date.now(),
 		updates: [firstUpdate],
-		version: req.body.version,
+		lastVersion: req.body.lastVersion,
 		reports: req.body.reports,
 		reviews: req.body.reviews
 	};
@@ -376,7 +428,7 @@ router.get('/:uniqueName', async (req, res) => {
 			authError: req.authError
 		});
 	}
-	Mission.findOne({ uniqueName: req.params.uniqueName }, async (err, doc) => {
+	Mission.findOne({ uniqueName: req.params.uniqueName }, (err, doc) => {
 		if (err) {
 			res.status(500).send(err);
 		} else {
@@ -409,7 +461,290 @@ router.get('/:uniqueName', async (req, res) => {
 		});
 });
 
+router.post('/report', uploadMulter.none(), async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to list missions.'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
+	const report = {
+		version: req.body.data.version,
+		authorID: req.body.data.authorID,
+		date: req.body.data.date,
+		report: req.body.data.report
+	};
+	if (req.body.data.log) {
+		report.log = req.body.data.log;
+	}
+	const options = {
+		upsert: true,
+		safe: true,
+		new: true
+	};
+	const query = { uniqueName: req.body.uniqueName };
+	Mission.findOneAndUpdate(query, {}, options, (err, missionData) => {
+		if (err) {
+			console.log(err);
+		} else {
+			console.log('missionData.reports: ', missionData.reports);
+			if (!missionData.reports) {
+				missionData.reports = [report];
+			} else {
+				missionData.reports.push(report);
+			}
+			missionData.save((error2) => {
+				if (error2) {
+					console.log(error2);
+				}
+			});
+			postDiscordReport(
+				report,
+				missionData,
+				req.discordUser.user.displayAvatarURL()
+			);
+			return res.send({ ok: true });
+		}
+	});
+});
+
+function buildVersionStr(versionObj) {
+	if (versionObj.major <= -1) {
+		return 'General';
+	}
+	let versionStr = versionObj.major.toString();
+	if (versionObj.minor) {
+		versionStr = versionStr + versionObj.minor;
+	}
+	return versionStr;
+}
+
+async function postDiscordReport(report, missionData, avatarURL) {
+	const author = await getRemoteUser(report.authorID)
+		.then((result) => {
+			return result.nickname
+				? result.nickname
+				: result.displayName
+				? result.displayName
+				: 'error';
+		})
+		.catch((err) => {
+			console.log('err', err);
+			return 'error';
+		});
+	const versionStr = buildVersionStr(report.version);
+	const reportEmbed = new Discord.MessageEmbed()
+		.setColor('#22cf26')
+		.setTitle(`Mission: ${missionData.name}`)
+		.setAuthor(`Author: ${author}`, avatarURL)
+		.addFields({ name: 'Version:', value: versionStr, inline: false })
+		.addFields({ name: 'Report:', value: report.report, inline: false })
+		.setTimestamp(report.date)
+		.setURL('')
+		.setFooter('\u3000'.repeat(10 /*any big number works too*/) + '|');
+	if (report.log) {
+		const resizedBuffer = await getImage(missionData.image);
+		let attachment = new Discord.MessageAttachment(
+			resizedBuffer,
+			'img.png'
+		);
+		reportEmbed.addField('Log:', `\`\`\`\n ${report.log} \n \`\`\``, false);
+	}
+	if (missionData.image) {
+		const resizedBuffer = await getImage(missionData.image);
+		let attachment = new Discord.MessageAttachment(
+			resizedBuffer,
+			'img.png'
+		);
+		reportEmbed.attachFiles([attachment]);
+		reportEmbed.setImage('attachment://img.png');
+	}
+	discordJsClient.channels.cache
+		.get(process.env.DISCORD_BOT_CHANNEL)
+		.send('New report added', reportEmbed);
+}
+
+router.post('/review', uploadMulter.none(), async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to list missions.'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
+	const review = {
+		version: req.body.data.version,
+		authorID: req.body.data.authorID,
+		date: req.body.data.date,
+		review: req.body.data.review
+	};
+	const options = {
+		upsert: true,
+		safe: true,
+		new: true
+	};
+	const query = { uniqueName: req.body.uniqueName };
+	Mission.findOneAndUpdate(query, {}, options, (err, missionData) => {
+		if (err) {
+			console.log(err);
+		} else {
+			console.log('missionData.reviews: ', missionData.reviews);
+			if (!missionData.reviews) {
+				missionData.reviews = [review];
+			} else {
+				missionData.reviews.push(review);
+			}
+			missionData.save((error2) => {
+				if (error2) {
+					console.log(error2);
+				}
+			});
+			postDiscordReview(
+				review,
+				missionData,
+				req.discordUser.user.displayAvatarURL()
+			);
+			return res.send({ ok: true });
+		}
+	});
+});
+
+async function postDiscordReview(review, missionData, avatarURL) {
+	const author = await getRemoteUser(review.authorID)
+		.then((result) => {
+			return result.nickname
+				? result.nickname
+				: result.displayName
+				? result.displayName
+				: 'error';
+		})
+		.catch((err) => {
+			console.log('err', err);
+			return 'error';
+		});
+	const versionStr = buildVersionStr(review.version);
+	const reviewEmbed = new Discord.MessageEmbed()
+		.setColor('#22cf26')
+		.setTitle(`Mission: ${missionData.name}`)
+		.setAuthor(`Author: ${author}`, avatarURL)
+		.addFields({ name: 'Version:', value: versionStr, inline: false })
+		.addFields({ name: 'Review:', value: review.review, inline: false })
+		.setTimestamp(review.date)
+		.setURL('')
+		.setFooter('\u3000'.repeat(10 /*any big number works too*/) + '|');
+	if (missionData.image) {
+		const resizedBuffer = await getImage(missionData.image);
+		let attachment = new Discord.MessageAttachment(
+			resizedBuffer,
+			'img.png'
+		);
+		reviewEmbed.attachFiles([attachment]);
+		reviewEmbed.setImage('attachment://img.png');
+	}
+	discordJsClient.channels.cache
+		.get(process.env.DISCORD_BOT_CHANNEL)
+		.send('New review added', reviewEmbed);
+}
+
+router.post('/update', updateMulter.single('fileData'), async (req, res) => {
+	console.log('update triggered');
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to update mission.'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
+	const update = {
+		version: req.body.version,
+		authorID: req.body.authorID,
+		date: req.body.date,
+		changeLog: req.body.changeLog,
+		fileName: req.body.fileName
+	};
+	const options = {
+		upsert: true,
+		safe: true,
+		new: true
+	};
+	const query = { uniqueName: req.body.uniqueName };
+	Mission.findOneAndUpdate(query, {}, options, (err, missionData) => {
+		if (err) {
+			console.log(err);
+		} else {
+			console.log('missionData.updates: ', missionData.updates);
+			missionData.updates.push(update);
+			missionData.lastUpdate = update.date;
+			missionData.lastVersion = update.version;
+			missionData.save((error2) => {
+				if (error2) {
+					console.log(error2);
+				}
+			});
+			postDiscordUpdate(
+				update,
+				missionData,
+				req.discordUser.user.displayAvatarURL()
+			);
+			return res.send({ ok: true });
+		}
+	});
+});
+
+async function postDiscordUpdate(update, missionData, avatarURL) {
+	const author = await getRemoteUser(update.authorID)
+		.then((result) => {
+			return result.nickname
+				? result.nickname
+				: result.displayName
+				? result.displayName
+				: 'error';
+		})
+		.catch((err) => {
+			console.log('err', err);
+			return 'error';
+		});
+	const versionStr = buildVersionStr(update.version);
+	const updateEmbed = new Discord.MessageEmbed()
+		.setColor('#22cf26')
+		.setTitle(`Mission: ${missionData.name}`)
+		.setAuthor(`Author: ${author}`, avatarURL)
+		.addFields({ name: 'Version:', value: versionStr, inline: false })
+		.addFields({ name: 'Changelog:', value: `\`\`\`\n ${update.changeLog} \n \`\`\``, inline: false })
+		.setTimestamp(update.date)
+		.setURL('')
+		.setFooter('\u3000'.repeat(10 /*any big number works too*/) + '|');
+	if (missionData.image) {
+		const resizedBuffer = await getImage(missionData.image);
+		let attachment = new Discord.MessageAttachment(
+			resizedBuffer,
+			'img.png'
+		);
+		updateEmbed.attachFiles([attachment]);
+		updateEmbed.setImage('attachment://img.png');
+	}
+	discordJsClient.channels.cache
+		.get(process.env.DISCORD_BOT_CHANNEL)
+		.send('Mission updated', updateEmbed);
+}
+
 router.get('/download/:filename', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to download missions.'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
 	fs.readFile(
 		`${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${req.params.filename}`,
 		(err, data) => {

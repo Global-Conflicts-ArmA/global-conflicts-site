@@ -1,9 +1,4 @@
-import {
-	Component,
-	OnInit,
-	ViewChild,
-	DoCheck
-} from '@angular/core';
+import { Component, OnInit, ViewChild, DoCheck } from '@angular/core';
 import { Router } from '@angular/router';
 import { MissionsService } from '../../services/missions.service';
 import { IMission, IUpdate } from '../../models/mission';
@@ -20,6 +15,7 @@ import {
 	FormGroup,
 	Validators
 } from '@angular/forms';
+import { SharedService } from '@app/services/shared';
 
 @Component({
 	selector: 'app-mission-list',
@@ -28,7 +24,7 @@ import {
 })
 export class MissionListComponent implements OnInit {
 	@ViewChild(MatPaginator) paginator: MatPaginator;
-	@ViewChild(MatTable) table: MatTable<any>;
+	@ViewChild('missionsTable') missionsTable: MatTable<IMission>;
 	@ViewChild(MatSort) sort: MatSort;
 
 	rowData: IMission[] = [];
@@ -41,7 +37,7 @@ export class MissionListComponent implements OnInit {
 		'terrain',
 		'era',
 		'authorName',
-		'version',
+		'lastVersionStr',
 		'lastUpdate',
 		'uploadDate'
 	];
@@ -55,39 +51,55 @@ export class MissionListComponent implements OnInit {
 		public userService: UserService,
 		private router: Router,
 		public mC: MissionConstants,
-		private formBuilder: FormBuilder
+		private formBuilder: FormBuilder,
+		private sharedService: SharedService
 	) {}
 
-	refresh() {
+	public refresh() {
 		this.missionsService.list().subscribe((value) => {
 			this.userList = [];
 			console.log('got value: ', value);
 			value.map((mission: IMission) => {
 				console.log('mission.authorID: ', mission.authorID);
-				this.userService.getDiscordUsername(
-					mission.authorID
-				).then((result) => {
-					mission.authorName = result;
-					if (!this.userList.includes(mission.authorName)) {
-						this.userList.push(mission.authorName);
-					}
-					console.log('mission.authorName: ', mission.authorName);
-					mission.updates.map((update: IUpdate) => {
-						this.userService.getDiscordUsername(
-							update.authorID
-						).then((_result) => {
-							update.authorName = _result;
-							if (!this.userList.includes(update.authorName)) {
-								this.userList.push(update.authorName);
-							}
-							console.log('update.authorName: ', update.authorName);
-						}).catch((err) => {
-							console.log('err: ', err);
+				this.userService
+					.getDiscordUsername(mission.authorID)
+					.then((result) => {
+						mission.authorName = result;
+						if (!this.userList.includes(mission.authorName)) {
+							this.userList.push(mission.authorName);
+						}
+						console.log('mission.authorName: ', mission.authorName);
+						mission.lastVersionStr = this.missionsService.buildVersionStr(
+							mission.lastVersion
+						);
+						mission.updates.map((update: IUpdate) => {
+							this.userService
+								.getDiscordUsername(update.authorID)
+								.then((_result) => {
+									update.authorName = _result;
+									if (
+										!this.userList.includes(
+											update.authorName
+										)
+									) {
+										this.userList.push(update.authorName);
+									}
+									console.log(
+										'update.authorName: ',
+										update.authorName
+									);
+									update.versionStr = this.missionsService.buildVersionStr(
+										update.version
+									);
+								})
+								.catch((err) => {
+									console.log('err: ', err);
+								});
 						});
+					})
+					.catch((err) => {
+						console.log('err: ', err);
 					});
-				}).catch((err) => {
-					console.log('err: ', err);
-				});
 			});
 			console.log('done map');
 			this.userList.sort();
@@ -262,6 +274,7 @@ export class MissionListComponent implements OnInit {
 			?.value?.toLowerCase();
 		if (searchFilter && searchFilter !== '') {
 			console.log('searchFilter: ', searchFilter);
+
 			filteredData = filteredData.filter((element: IMission) => {
 				return (
 					element.name.toLowerCase().includes(searchFilter) ||
@@ -278,7 +291,9 @@ export class MissionListComponent implements OnInit {
 					element.updates.some((update: IUpdate) => {
 						return update.authorName === searchFilter;
 					}) ||
-					element.version.toString().includes(searchFilter) ||
+					this.missionsService
+						.buildVersionStr(element.lastVersion)
+						.includes(searchFilter) ||
 					this.missionsService
 						.getTerrainData(element.terrain)
 						.name.toLowerCase()

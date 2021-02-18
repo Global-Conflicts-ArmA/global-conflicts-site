@@ -9,6 +9,8 @@ import { RemoteDiscordUser } from '../models/remoteDiscordUser';
 	providedIn: 'root'
 })
 export class UserService {
+	userCache: RemoteDiscordUser[] = [];
+
 	constructor(
 		private httpClient: HttpClient,
 		private cookieService: CookieService
@@ -52,16 +54,22 @@ export class UserService {
 	}
 
 	public async getDiscordUsername(id: string): Promise<string> {
-		return this.httpClient
-			.get<RemoteDiscordUser>('/api/users/fetch/' + id)
-			.toPromise()
-			.then((result) => {
-				return this.httpClient
-					.get<RemoteDiscordUser>('/api/users/fetch/' + id)
-					.toPromise()
-					.then((remoteUser: RemoteDiscordUser) => {
+		const user = this.userCache.find((result) => {
+			return result.userID === id;
+		});
+		if (user) {
+			return user.nickname ?? user.displayName ?? 'error';
+		} else {
+			return this.httpClient
+				.get<RemoteDiscordUser>('/api/users/fetch/' + id)
+				.toPromise()
+				.then(async (result) => {
+					try {
+						const remoteUser = await this.httpClient
+							.get<RemoteDiscordUser>('/api/users/fetch/' + id)
+							.toPromise();
 						if (remoteUser) {
-							console.log('remoteUser: ', remoteUser);
+							this.userCache.push(remoteUser);
 							return (
 								remoteUser.nickname ??
 								remoteUser.displayName ??
@@ -70,16 +78,16 @@ export class UserService {
 						} else {
 							return 'error';
 						}
-					})
-					.catch((err) => {
+					} catch (err) {
 						console.log('error: ', err);
 						return 'error';
-					});
-			})
-			.catch((err) => {
-				console.log('error: ', err);
-				return 'error';
-			});
+					}
+				})
+				.catch((err) => {
+					console.log('error: ', err);
+					return 'error';
+				});
+		}
 	}
 
 	public async getUserSettings(id: string): Promise<IUserSettings> {

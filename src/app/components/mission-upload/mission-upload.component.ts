@@ -20,6 +20,7 @@ import { UserService } from '../../services/user.service';
 import { FileValidator } from 'ngx-material-file-input';
 import { MatSelect } from '@angular/material/select';
 import { SharedService } from '@app/services/shared';
+import { Router } from '@angular/router';
 
 @Component({
 	selector: 'app-mission-upload',
@@ -33,18 +34,17 @@ export class MissionUploadComponent implements OnInit {
 		private userService: UserService,
 		private formBuilder: FormBuilder,
 		public mC: MissionConstants,
-		private sharedService: SharedService
+		private sharedService: SharedService,
+		private router: Router
 	) {}
 
 	isUpdate = false;
 	discordUser: DiscordUser | null;
 	misType = 'CO';
-	missionToUpload: File;
+	missionToUpload: File | null;
 	ratio: string;
 	description: string;
 	missionName: string;
-	minPlayers = 2;
-	maxPlayers = 99;
 	version: number;
 	uploadPressed = false;
 	missionErrors: object = {};
@@ -120,7 +120,9 @@ export class MissionUploadComponent implements OnInit {
 			],
 			misTags: ['', [Validators.required]],
 			misTime: ['', [Validators.required]],
-			misEra: ['', [Validators.required]]
+			misEra: ['', [Validators.required]],
+			misJip: [true, [Validators.required]],
+			misRespawn: [false, [Validators.required]]
 		});
 		this.fileImageGroup = this.formBuilder.group(
 			{
@@ -634,7 +636,9 @@ export class MissionUploadComponent implements OnInit {
 			];
 		}
 		const uploadUpdate: IUpdate = {
-			version: 1,
+			version: {
+				major: 1
+			},
 			authorID: this.discordUser?.id ?? '',
 			date: new Date(),
 			fileName: this.missionFileName ?? '',
@@ -651,19 +655,16 @@ export class MissionUploadComponent implements OnInit {
 				max: maxSize
 			},
 			ratios: parsedRatios,
-			description: this.missionDescGroup.get('misDescription')?.value
-				? this.missionDescGroup.get('misDescription')?.value
-				: '',
-			tags: this.missionDescGroup.get('misTags')?.value
-				? this.missionDescGroup.get('misTags')?.value
-				: [''],
-			timeOfDay: this.missionDescGroup.get('misTime')?.value
-				? this.missionDescGroup.get('misTime')?.value
-				: 'Custom',
-			era: this.missionDescGroup.get('misEra')?.value
-				? this.missionDescGroup.get('misEra')?.value
-				: 'Custom',
-			version: 1,
+			description:
+				this.missionDescGroup.get('misDescription')?.value ?? '',
+			jip: this.missionDescGroup.get('misJip')?.value ?? false,
+			respawn: this.missionDescGroup.get('misRespawn')?.value ?? false,
+			tags: this.missionDescGroup.get('misTags')?.value ?? [''],
+			timeOfDay: this.missionDescGroup.get('misTime')?.value ?? 'Custom',
+			era: this.missionDescGroup.get('misEra')?.value ?? 'Custom',
+			lastVersion: {
+				major: 1
+			},
 			uploadDate: new Date(),
 			lastUpdate: new Date(),
 			updates: [uploadUpdate]
@@ -681,6 +682,9 @@ export class MissionUploadComponent implements OnInit {
 			() => {
 				this.uploadingState = 'success';
 				this.authError = null;
+				this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+				this.router.onSameUrlNavigation = 'reload';
+				this.router.navigate(['/mission-list']);
 			},
 			(httpError) => {
 				this.missionErrors = httpError.error.missionErrors ?? {};

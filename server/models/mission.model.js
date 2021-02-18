@@ -1,4 +1,3 @@
-const { bool } = require('joi');
 const { mongooseConfig } = require('../config/mongoose-config');
 const Schema = mongooseConfig.Schema;
 
@@ -39,6 +38,14 @@ const MissionSchema = new Schema(
 			type: String,
 			required: true
 		},
+		jip: {
+			type: Boolean,
+			required: true
+		},
+		respawn: {
+			type: Boolean,
+			required: true
+		},
 		tags: [String],
 		timeOfDay: {
 			type: String,
@@ -63,8 +70,14 @@ const MissionSchema = new Schema(
 		updates: [
 			{
 				version: {
-					type: Number,
-					required: true
+					major: {
+						type: Number,
+						required: true
+					},
+					minor: {
+						type: String,
+						required: false
+					}
 				},
 				authorID: {
 					type: String,
@@ -90,9 +103,15 @@ const MissionSchema = new Schema(
 				}
 			}
 		],
-		version: {
-			type: Number,
-			required: true
+		lastVersion: {
+			major: {
+				type: Number,
+				required: true
+			},
+			minor: {
+				type: String,
+				required: false
+			}
 		},
 		reports: [
 			{
@@ -108,10 +127,20 @@ const MissionSchema = new Schema(
 					type: String,
 					required: true
 				},
+				log: {
+					type: String,
+					required: false
+				},
 				version: {
-					type: Number,
-					required: true
-				}
+					major: {
+						type: Number,
+						required: true
+					},
+					minor: {
+						type: String,
+						required: false
+					}
+				},
 			}
 		],
 		reviews: [
@@ -129,9 +158,15 @@ const MissionSchema = new Schema(
 					required: true
 				},
 				version: {
-					type: Number,
-					required: true
-				}
+					major: {
+						type: Number,
+						required: true
+					},
+					minor: {
+						type: String,
+						required: false
+					}
+				},
 			}
 		]
 	},
