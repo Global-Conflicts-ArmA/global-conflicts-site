@@ -41,6 +41,10 @@ export class MissionsService {
 		return this.httpClient.post(`/api/missions/update`, formData);
 	}
 
+	public submitEdit(formData: FormData) {
+		return this.httpClient.post(`/api/missions/edit`, formData);
+	}
+
 	public getTerrainData(terrainName: string | undefined) {
 		return terrainName ? this.mC.MissionTerrains[terrainName] : undefined;
 	}

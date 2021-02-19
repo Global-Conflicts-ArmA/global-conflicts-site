@@ -33,7 +33,24 @@ const MissionSchema = new Schema(
 				required: true
 			}
 		},
-		ratios: [Number],
+		ratios: {
+			blufor: {
+				type: Number,
+				required: false
+			},
+			opfor: {
+				type: Number,
+				required: false
+			},
+			indfor: {
+				type: Number,
+				required: false
+			},
+			civ: {
+				type: Number,
+				required: false
+			}
+		},
 		description: {
 			type: String,
 			required: true

@@ -44,7 +44,6 @@ export class DialogSubmitUpdateComponent implements OnInit {
 		major: number;
 		minor?: string;
 	};
-	uploadingState: string;
 
 	ngOnInit(): void {
 		this.discordUser = this.userService.getUserLocally();
@@ -219,6 +218,7 @@ export class DialogSubmitUpdateComponent implements OnInit {
 	}
 
 	submit() {
+		this.sharedService.uploadingState = 'uploading';
 		const fileName = this.buildMissionFileName();
 		const update: IUpdate = {
 			version: this.newVersion,
@@ -235,16 +235,13 @@ export class DialogSubmitUpdateComponent implements OnInit {
 		formData.append('fileData', this.missionToUpload);
 		this.missionsService.submitUpdate(formData).subscribe(
 			() => {
-				this.uploadingState = 'success';
-				const currentUrl = this.router.url + '?';
-				this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-				this.router.onSameUrlNavigation = 'reload';
-				this.router.navigate([this.router.url]);
+				this.sharedService.uploadingState = 'success';
+				this.dialogRef.close();
 			},
 			(httpError) => {
-				this.uploadingState = 'error';
+				this.sharedService.uploadingState = 'error';
+				this.dialogRef.close();
 			}
 		);
-		console.log('submitted');
 	}
 }

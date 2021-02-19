@@ -15,7 +15,7 @@ import {
 import { MissionConstants } from '../../constants/missionConstants';
 import { MissionsService } from '../../services/missions.service';
 import { DiscordUser } from '../../models/discorduser';
-import { IMission, IUpdate } from '../../models/mission';
+import { IMission, IRatios, IUpdate } from '../../models/mission';
 import { UserService } from '../../services/user.service';
 import { FileValidator } from 'ngx-material-file-input';
 import { MatSelect } from '@angular/material/select';
@@ -34,22 +34,19 @@ export class MissionUploadComponent implements OnInit {
 		private userService: UserService,
 		private formBuilder: FormBuilder,
 		public mC: MissionConstants,
-		private sharedService: SharedService,
+		public sharedService: SharedService,
 		private router: Router
 	) {}
 
-	isUpdate = false;
 	discordUser: DiscordUser | null;
 	misType = 'CO';
 	missionToUpload: File | null;
-	ratio: string;
 	description: string;
 	missionName: string;
 	version: number;
 	uploadPressed = false;
 	missionErrors: object = {};
 	authError: string | null;
-	uploadingState = 'ready';
 	missionFileName = '.pbo';
 	missionDescription = '';
 	missionImageFile = null;
@@ -573,7 +570,7 @@ export class MissionUploadComponent implements OnInit {
 			if (result == null) {
 				this.sendMission(nameVar, uniqueNameVar);
 			} else {
-				this.uploadingState = 'name-conflict';
+				this.sharedService.uploadingState = 'name-conflict';
 			}
 		});
 	}
@@ -605,35 +602,31 @@ export class MissionUploadComponent implements OnInit {
 
 	sendMission(nameVar: string, uniqueNameVar: string) {
 		const misType = this.missionTypeGroup.get('missionType')?.value.title;
-		const minSize = parseFloat(
-			this.missionSizeGroup.get('minPlayers')?.value
-		);
-		const maxSize = parseFloat(
-			this.missionSizeGroup.get('maxPlayers')?.value
-		);
-		let parsedRatios: number[] = [-1, -1, -1, -1];
+		const minSize = this.missionSizeGroup.get('minPlayers')?.value;
+		const maxSize = this.missionSizeGroup.get('maxPlayers')?.value;
+		const parsedRatios: IRatios = {};
 		if (
 			['TVT', 'COTVT'].includes(misType) ||
 			(misType === 'LOL' && this.missionTypeGroup.get('ratioLOL')?.value)
 		) {
-			parsedRatios = [
-				this.missionSizeGroup.get('ratioBluforE')?.value
-					? parseFloat(
-							this.missionSizeGroup.get('ratioBlufor')?.value
-					  )
-					: -1,
-				this.missionSizeGroup.get('ratioOpforE')?.value
-					? parseFloat(this.missionSizeGroup.get('ratioOpfor')?.value)
-					: -1,
-				this.missionSizeGroup.get('ratioIndforE')?.value
-					? parseFloat(
-							this.missionSizeGroup.get('ratioIndfor')?.value
-					  )
-					: -1,
-				this.missionSizeGroup.get('ratioCivE')?.value
-					? parseFloat(this.missionSizeGroup.get('ratioCiv')?.value)
-					: -1
-			];
+			if (this.missionSizeGroup.get('ratioBluforE')?.value) {
+				parsedRatios.blufor = this.missionSizeGroup.get(
+					'ratioBlufor'
+				)?.value;
+			}
+			if (this.missionSizeGroup.get('ratioOpforE')?.value) {
+				parsedRatios.opfor = this.missionSizeGroup.get(
+					'ratioOpfor'
+				)?.value;
+			}
+			if (this.missionSizeGroup.get('ratioIndforE')?.value) {
+				parsedRatios.indfor = this.missionSizeGroup.get(
+					'ratioIndfor'
+				)?.value;
+			}
+			if (this.missionSizeGroup.get('ratioCivE')?.value) {
+				parsedRatios.civ = this.missionSizeGroup.get('ratioCiv')?.value;
+			}
 		}
 		const uploadUpdate: IUpdate = {
 			version: {
@@ -654,7 +647,6 @@ export class MissionUploadComponent implements OnInit {
 				min: minSize,
 				max: maxSize
 			},
-			ratios: parsedRatios,
 			description:
 				this.missionDescGroup.get('misDescription')?.value ?? '',
 			jip: this.missionDescGroup.get('misJip')?.value ?? false,
@@ -669,10 +661,13 @@ export class MissionUploadComponent implements OnInit {
 			lastUpdate: new Date(),
 			updates: [uploadUpdate]
 		};
+		if (parsedRatios) {
+			mission.ratios = parsedRatios;
+		}
 		if (this.fileImageGroup.get('imgToggle')?.value) {
 			mission.image = this.missionImageSrc;
 		}
-		this.uploadingState = 'uploading';
+		this.sharedService.uploadingState = 'uploading';
 		this.authError = null;
 		const formData: any = new FormData();
 		this.buildFormData(formData, mission);
@@ -680,7 +675,7 @@ export class MissionUploadComponent implements OnInit {
 		formData.append('fileData', this.missionToUpload);
 		this.missionsService.upload(formData).subscribe(
 			() => {
-				this.uploadingState = 'success';
+				this.sharedService.uploadingState = 'success';
 				this.authError = null;
 				this.router.routeReuseStrategy.shouldReuseRoute = () => false;
 				this.router.onSameUrlNavigation = 'reload';
@@ -689,7 +684,7 @@ export class MissionUploadComponent implements OnInit {
 			(httpError) => {
 				this.missionErrors = httpError.error.missionErrors ?? {};
 				this.authError = httpError.error.authError;
-				this.uploadingState = 'error';
+				this.sharedService.uploadingState = 'error';
 			}
 		);
 	}

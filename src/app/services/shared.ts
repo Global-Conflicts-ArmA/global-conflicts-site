@@ -8,9 +8,9 @@ import { IMission } from '@app/models/mission';
 	providedIn: 'root'
 })
 export class SharedService {
-	constructor(
-		private httpClient: HttpClient
-	) {}
+	constructor(private httpClient: HttpClient) {}
+
+	uploadingState: string;
 
 	public bytesToSize(bytes: number) {
 		const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];

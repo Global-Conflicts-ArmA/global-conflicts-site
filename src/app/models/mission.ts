@@ -17,6 +17,13 @@ export interface IUpdate {
 	versionStr?: string;
 }
 
+export interface IRatios {
+	blufor?: number;
+	opfor?: number;
+	indfor?: number;
+	civ?: number;
+}
+
 export interface IReport {
 	version: {
 		major: number;
@@ -42,6 +49,22 @@ export interface IReview {
 	versionStr?: string;
 }
 
+export interface IEdit {
+	size?: {
+		min: number;
+		max: number;
+	};
+	type?: string;
+	ratios?: IRatios;
+	description?: string;
+	jip?: boolean;
+	respawn?: boolean;
+	tags?: string[];
+	timeOfDay?: string;
+	era?: string;
+	image?: string;
+}
+
 export interface IMission {
 	uniqueName: string;
 	name: string;
@@ -53,7 +76,7 @@ export interface IMission {
 		min: number;
 		max: number;
 	};
-	ratios: number[];
+	ratios?: IRatios;
 	description: string;
 	jip: boolean;
 	respawn: boolean;
@@ -69,7 +92,6 @@ export interface IMission {
 		minor?: string;
 	};
 	lastVersionStr?: string;
-	paths?: string[];
-	reports?: any[];
-	reviews?: any[];
+	reports?: IReport[];
+	reviews?: IReview[];
 }

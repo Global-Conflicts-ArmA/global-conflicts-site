@@ -60,7 +60,7 @@ const uploadMulter = multer({
 			cb(null, `${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}`);
 		},
 		filename: function (req, file, cb) {
-			cb(null, req.body.update.fileName);
+			cb(null, req.body.fileName);
 		}
 	})
 });
@@ -270,25 +270,19 @@ async function postDiscord(reqBody, avatarURL) {
 		.setURL('')
 		.setFooter('\u3000'.repeat(10 /*any big number works too*/) + '|');
 
-	if (
-		reqBody.ratios &&
-		(reqBody.ratios[0] > -1 ||
-			reqBody.ratios[1] > -1 ||
-			reqBody.ratios[2] > -1 ||
-			reqBody.ratios[3] > -1)
-	) {
+	if (reqBody.ratios) {
 		let ratioStr = '';
-		if (reqBody.ratios[0] > -1) {
-			ratioStr = ratioStr + `**Blufor:** ${reqBody.ratios[0]} `;
+		if (reqBody.ratios.blufor) {
+			ratioStr = ratioStr + `**Blufor:** ${reqBody.ratios.blufor} `;
 		}
-		if (reqBody.ratios[1] > -1) {
-			ratioStr = ratioStr + `**Opfor:** ${reqBody.ratios[1]} `;
+		if (reqBody.ratios.opfor) {
+			ratioStr = ratioStr + `**Opfor:** ${reqBody.ratios.opfor} `;
 		}
-		if (reqBody.ratios[2] > -1) {
-			ratioStr = ratioStr + `**Indfor:** ${reqBody.ratios[2]} `;
+		if (reqBody.ratios.indfor) {
+			ratioStr = ratioStr + `**Indfor:** ${reqBody.ratios.indfor} `;
 		}
-		if (reqBody.ratios[3] > -1) {
-			ratioStr = ratioStr + `**Civ:** ${reqBody.ratios[3]} `;
+		if (reqBody.ratios.civ) {
+			ratioStr = ratioStr + `**Civ:** ${reqBody.ratios.civ} `;
 		}
 		newMissionEmbed.addField('Ratios:', ratioStr, false);
 	}
@@ -337,7 +331,6 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		terrain: req.body.terrain,
 		type: req.body.type,
 		size: req.body.size,
-		ratios: req.body.ratios,
 		description: req.body.description,
 		jip: req.body.jip,
 		respawn: req.body.respawn,
@@ -351,7 +344,9 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		reports: req.body.reports,
 		reviews: req.body.reviews
 	};
-	console.log('size type:', typeof mission.size);
+	if (req.body.ratios) {
+		mission.ratios = req.body.ratios;
+	}
 	if (req.body.image) {
 		mission.image = req.body.image;
 	}
@@ -546,11 +541,6 @@ async function postDiscordReport(report, missionData, avatarURL) {
 		.setURL('')
 		.setFooter('\u3000'.repeat(10 /*any big number works too*/) + '|');
 	if (report.log) {
-		const resizedBuffer = await getImage(missionData.image);
-		let attachment = new Discord.MessageAttachment(
-			resizedBuffer,
-			'img.png'
-		);
 		reportEmbed.addField('Log:', `\`\`\`\n ${report.log} \n \`\`\``, false);
 	}
 	if (missionData.image) {
@@ -652,7 +642,6 @@ async function postDiscordReview(review, missionData, avatarURL) {
 }
 
 router.post('/update', updateMulter.single('fileData'), async (req, res) => {
-	console.log('update triggered');
 	req = await getDiscordUserFromCookies(
 		req,
 		'User not allowed to update mission.'
@@ -717,7 +706,11 @@ async function postDiscordUpdate(update, missionData, avatarURL) {
 		.setTitle(`Mission: ${missionData.name}`)
 		.setAuthor(`Author: ${author}`, avatarURL)
 		.addFields({ name: 'Version:', value: versionStr, inline: false })
-		.addFields({ name: 'Changelog:', value: `\`\`\`\n ${update.changeLog} \n \`\`\``, inline: false })
+		.addFields({
+			name: 'Changelog:',
+			value: `\`\`\`\n ${update.changeLog} \n \`\`\``,
+			inline: false
+		})
 		.setTimestamp(update.date)
 		.setURL('')
 		.setFooter('\u3000'.repeat(10 /*any big number works too*/) + '|');
@@ -733,6 +726,130 @@ async function postDiscordUpdate(update, missionData, avatarURL) {
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
 		.send('Mission updated', updateEmbed);
+}
+
+router.post('/edit', updateMulter.none(), async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to update mission.'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
+	const edit = req.body.data;
+	const options = {
+		upsert: true,
+		safe: true,
+		new: true
+	};
+	const query = { uniqueName: req.body.uniqueName };
+	Mission.findOneAndUpdate(query, edit, options, (err, missionData) => {
+		if (err) {
+			console.log(err);
+		} else {
+			if (edit.image && edit.image === 'remove') {
+				missionData.image = undefined;
+				missionData.save((err2, doc) => {
+					if (err2) {
+						console.log(err);
+					} else {
+						postDiscordEdit(edit, doc, req.discordUser.user);
+						return res.send({ ok: true });
+					}
+				});
+			} else {
+				postDiscordEdit(edit, missionData, req.discordUser.user);
+				return res.send({ ok: true });
+			}
+		}
+	});
+});
+
+async function postDiscordEdit(edit, missionData, user) {
+	const author = await getRemoteUser(user.id)
+		.then((result) => {
+			return result.nickname
+				? result.nickname
+				: result.displayName
+				? result.displayName
+				: 'error';
+		})
+		.catch((err) => {
+			console.log('err', err);
+			return 'error';
+		});
+	const updateEmbed = new Discord.MessageEmbed()
+		.setColor('#22cf26')
+		.setTitle(`Mission: ${missionData.name}`)
+		.setAuthor(`Author: ${author}`, user.displayAvatarURL())
+		.setTimestamp(Date.now())
+		.setURL('')
+		.setFooter('\u3000'.repeat(10 /*any big number works too*/) + '|');
+	if (edit.type) {
+		updateEmbed.addField('Type:', edit.type, false);
+	}
+	if (edit.ratios) {
+		let ratioStr = '';
+		if (reqBody.ratios.blufor) {
+			ratioStr = ratioStr + `**Blufor:** ${reqBody.ratios.blufor} `;
+		}
+		if (reqBody.ratios.opfor) {
+			ratioStr = ratioStr + `**Opfor:** ${reqBody.ratios.opfor} `;
+		}
+		if (reqBody.ratios.indfor) {
+			ratioStr = ratioStr + `**Indfor:** ${reqBody.ratios.indfor} `;
+		}
+		if (reqBody.ratios.civ) {
+			ratioStr = ratioStr + `**Civ:** ${reqBody.ratios.civ} `;
+		}
+		updateEmbed.addField('Ratios:', ratioStr, false);
+	}
+	if (edit.size) {
+		updateEmbed.addField(
+			'Player Count:',
+			`**Min:** ${edit.size.min} **Max:** ${edit.size.max}`,
+			false
+		);
+	}
+	if (edit.description) {
+		updateEmbed.addField('Description:', edit.description, false);
+	}
+	if (edit.jip) {
+		updateEmbed.addField('JiP:', edit.jip, false);
+	}
+	if (edit.respawn) {
+		updateEmbed.addField('Respawn:', edit.respawn, false);
+	}
+	if (edit.tags) {
+		updateEmbed.addField('Tags:', edit.tags.join(', '), false);
+	}
+	if (edit.timeOfDay) {
+		updateEmbed.addField('Time of Day:', edit.timeOfDay, false);
+	}
+	if (edit.era) {
+		updateEmbed.addField('Era:', edit.era, false);
+	}
+	if (edit.image) {
+		if (edit.image === 'remove') {
+			updateEmbed.addField('Image:', 'Image Removed', false);
+		} else {
+			updateEmbed.addField('Image:', 'Image Added', false);
+		}
+	}
+	if (missionData.image) {
+		const resizedBuffer = await getImage(missionData.image);
+		let attachment = new Discord.MessageAttachment(
+			resizedBuffer,
+			'img.png'
+		);
+		updateEmbed.attachFiles([attachment]);
+		updateEmbed.setImage('attachment://img.png');
+	}
+	discordJsClient.channels.cache
+		.get(process.env.DISCORD_BOT_CHANNEL)
+		.send('Mission details edited', updateEmbed);
 }
 
 router.get('/download/:filename', async (req, res) => {
