@@ -150,7 +150,7 @@ $mat-dark-theme-background: (
 // Theme Config
 
 body {
-	--primary-color: #373737;
+	--primary-color: colors.$primary;
 	--primary-lighter-color: #c3c3c3;
 	--primary-darker-color: #232323;
 	--text-primary-color: #{$light-primary-text};
@@ -159,10 +159,10 @@ body {
 }
 
 $mat-primary: (
-	main: #373737,
+	main: colors.$primary,
 	lighter: #c3c3c3,
 	darker: #232323,
-	200: #373737,
+	200: colors.$primary,
 	// For slide toggle,
 	contrast:
 		(
@@ -174,7 +174,7 @@ $mat-primary: (
 $theme-primary: mat-palette($mat-primary, main, lighter, darker);
 
 body {
-	--accent-color: #92753d;
+	--accent-color: colors.$accent;
 	--accent-lighter-color: #ded6c5;
 	--accent-darker-color: #755827;
 	--text-accent-color: #{$light-primary-text};
@@ -183,10 +183,10 @@ body {
 }
 
 $mat-accent: (
-	main: #92753d,
+	main: colors.$accent,
 	lighter: #ded6c5,
 	darker: #755827,
-	200: #92753d,
+	200: colors.$accent,
 	// For slide toggle,
 	contrast:
 		(
@@ -326,7 +326,7 @@ $altTheme: mat-light-theme($theme-primary, $theme-accent, $theme-warn);
 }
 
 body {
-	background-color: #373737;
+	background-color: colors.$primary;
 	font-family: Roboto, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -382,6 +382,7 @@ a:hover {
 .accent-color {
 	color: colors.$accent !important;
 }
+
 
 .mat-dialog-container {
 	min-width: 10rem;
@@ -449,7 +450,7 @@ input,
 	display: flex;
 	flex: 1;
 	align-items: center;
-	outline: none;
+	outline: none !important;
 	color: white;
 	min-height: 1rem;
 	font-size: 22px;

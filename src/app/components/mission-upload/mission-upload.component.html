@@ -1,7 +1,7 @@
-<div class="container">
-	<div style="position: relative">
-		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">
-			You must join our Discord server and complete the welcoming process to upload missions!
+<div class='container'>
+	<div style='position: relative'>
+		<div class='not-allowed-text' *ngIf='!(discordUser && discordUser.role)'>You must join our Discord server and
+			complete the welcoming process to upload missions!
 		</div>
 		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
 			<mat-vertical-stepper class="field-container" [linear]="true" #stepper>
@@ -15,19 +15,20 @@
 									[required]="true" [accept]="'.pbo'" #missionFile
 									(change)="missionToUpload = $any($event.target).files[0]; buildMissionFileName()">
 								</ngx-mat-file-input>
-								<mat-icon color="white" matSuffix>folder</mat-icon>
-								<button mat-icon-button *ngIf="!missionFile.empty"
-									(click)="missionFile.clear($event); missionToUpload = null;">
-									<mat-icon matSuffix>clear</mat-icon> Clear Selection
+								<mat-icon color='white' matSuffix>folder</mat-icon>
+								<button mat-icon-button *ngIf='!missionFile.empty'
+												(click)='missionFile.clear($event); missionToUpload = null'>
+									<mat-icon matSuffix>clear</mat-icon>
+									Clear Selection
 								</button>
-								<mat-error>{{getFileErrorMessage()}}</mat-error>
+								<mat-error>{{ getFileErrorMessage() }}</mat-error>
 							</mat-form-field>
 						</div>
 						<button mat-button matStepperNext>Next</button>
 					</form>
 				</mat-step>
-				<mat-step [stepControl]="missionNameGroup">
-					<form [formGroup]="missionNameGroup">
+				<mat-step [stepControl]='missionNameGroup'>
+					<form [formGroup]='missionNameGroup'>
 						<ng-template matStepLabel>Mission Name</ng-template>
 						<div>
 							<mat-form-field>
@@ -41,8 +42,8 @@
 						<button mat-button matStepperNext>Next</button>
 					</form>
 				</mat-step>
-				<mat-step [stepControl]="missionTypeGroup">
-					<form [formGroup]="missionTypeGroup">
+				<mat-step [stepControl]='missionTypeGroup'>
+					<form [formGroup]='missionTypeGroup'>
 						<ng-template matStepLabel>Mission Type</ng-template>
 						<div class="mt-2">
 							<mat-radio-group formControlName="missionType" #missionType
@@ -57,12 +58,12 @@
 								Team Ratios
 							</mat-slide-toggle>
 						</div>
-						<mat-error>{{getTypeErrorMessage()}}</mat-error>
+						<mat-error>{{ getTypeErrorMessage() }}</mat-error>
 						<button mat-button matStepperNext>Next</button>
 					</form>
 				</mat-step>
-				<mat-step [stepControl]="missionSizeGroup">
-					<form [formGroup]="missionSizeGroup">
+				<mat-step [stepControl]='missionSizeGroup'>
+					<form [formGroup]='missionSizeGroup'>
 						<ng-template matStepLabel>Player Count</ng-template>
 						<div>
 							<mat-form-field>
@@ -75,96 +76,137 @@
 								<input matInput formControlName="maxPlayers" autocomplete="off" placeholder="22"
 									type="number" maxlength="3" (ngModelChange)="buildMissionFileName()">
 							</mat-form-field>
-							<mat-error>{{getSizeErrorMessage()}}</mat-error>
+							<mat-error>{{ getSizeErrorMessage() }}</mat-error>
 						</div>
-						<mat-label *ngIf="getIfTVT()" class="inset-label row">Side Ratios:</mat-label>
-						<div *ngIf="getIfTVT()" style="display: flex;">
-							<mat-checkbox formControlName="ratioBluforE" class="inset-label"
-								style="align-self: center;">BLUFOR:</mat-checkbox>
-							<mat-slider formControlName="ratioBlufor" class="blueSlider column"
-								[disabled]="!(missionSizeGroup.get('ratioBluforE')?.value ? missionSizeGroup.get('ratioBluforE')?.value: false)"
-								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="1" [max]="5"></mat-slider>
-							<mat-checkbox formControlName="ratioOpforE" class="inset-label" style="align-self: center;">
-								OPFOR:</mat-checkbox>
-							<mat-slider formControlName="ratioOpfor" class="redSlider column"
-								[disabled]="!(missionSizeGroup.get('ratioOpforE')?.value ? missionSizeGroup.get('ratioOpforE')?.value: false)"
-								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="1" [max]="5"></mat-slider>
-							<mat-checkbox formControlName="ratioIndforE" class="inset-label"
-								style="align-self: center;">INDFOR:</mat-checkbox>
-							<mat-slider formControlName="ratioIndfor" class="greenSlider column"
-								[disabled]="!(missionSizeGroup.get('ratioIndforE')?.value ? missionSizeGroup.get('ratioIndforE')?.value: false)"
-								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="1" [max]="5"></mat-slider>
-							<mat-checkbox formControlName="ratioCivE" class="inset-label" style="align-self: center;">
-								CIVILIAN:</mat-checkbox>
-							<mat-slider formControlName="ratioCiv" class="yellowSlider column"
-								[disabled]="!(missionSizeGroup.get('ratioCivE')?.value ? missionSizeGroup.get('ratioCivE')?.value: false)"
-								[thumbLabel]="true" [vertical]="true" [step]="0.1" [min]="1" [max]="5"></mat-slider>
+						<mat-label *ngIf='getIfTVT()' class='inset-label row'>Side Ratios:</mat-label>
+						<div *ngIf='getIfTVT()' style='display: flex'>
+							<mat-checkbox formControlName='ratioBluforE' class='inset-label' style='align-self: center'>BLUFOR:
+							</mat-checkbox>
+							<mat-slider
+								formControlName='ratioBlufor'
+								class='blueSlider column'
+								[disabled]="!(missionSizeGroup.get('ratioBluforE')?.value ? missionSizeGroup.get('ratioBluforE')?.value : false)"
+								[thumbLabel]='true'
+								[vertical]='true'
+								[step]='0.1'
+								[min]='1'
+								[max]='5'
+							></mat-slider>
+							<mat-checkbox formControlName='ratioOpforE' class='inset-label' style='align-self: center'> OPFOR:
+							</mat-checkbox>
+							<mat-slider
+								formControlName='ratioOpfor'
+								class='redSlider column'
+								[disabled]="!(missionSizeGroup.get('ratioOpforE')?.value ? missionSizeGroup.get('ratioOpforE')?.value : false)"
+								[thumbLabel]='true'
+								[vertical]='true'
+								[step]='0.1'
+								[min]='1'
+								[max]='5'
+							></mat-slider>
+							<mat-checkbox formControlName='ratioIndforE' class='inset-label' style='align-self: center'>INDFOR:
+							</mat-checkbox>
+							<mat-slider
+								formControlName='ratioIndfor'
+								class='greenSlider column'
+								[disabled]="!(missionSizeGroup.get('ratioIndforE')?.value ? missionSizeGroup.get('ratioIndforE')?.value : false)"
+								[thumbLabel]='true'
+								[vertical]='true'
+								[step]='0.1'
+								[min]='1'
+								[max]='5'
+							></mat-slider>
+							<mat-checkbox formControlName='ratioCivE' class='inset-label' style='align-self: center'> CIVILIAN:
+							</mat-checkbox>
+							<mat-slider
+								formControlName='ratioCiv'
+								class='yellowSlider column'
+								[disabled]="!(missionSizeGroup.get('ratioCivE')?.value ? missionSizeGroup.get('ratioCivE')?.value : false)"
+								[thumbLabel]='true'
+								[vertical]='true'
+								[step]='0.1'
+								[min]='1'
+								[max]='5'
+							></mat-slider>
 						</div>
-						<mat-error>{{getRatioErrorMessage()}}</mat-error>
+						<mat-error>{{ getRatioErrorMessage() }}</mat-error>
 						<button mat-button matStepperNext>Next</button>
 					</form>
 				</mat-step>
-				<mat-step [stepControl]="missionDescGroup">
-					<form [formGroup]="missionDescGroup">
+				<mat-step [stepControl]='missionDescGroup'>
+					<form [formGroup]='missionDescGroup'>
 						<ng-template matStepLabel>Description</ng-template>
 						<div>
-							<mat-form-field>
-								<mat-label class="inset-label">Description</mat-label>
-								<textarea matInput formControlName="misDescription" autocomplete="off"
-									placeholder="USMC raids ammo depot | Defenders chooses weather" type="string"
-									maxlength="180" (ngModelChange)="buildMissionDesc()"></textarea>
-								<mat-error>{{getDescErrorMessage()}}</mat-error>
+							<mat-form-field color='accent'>
+								<mat-label class='inset-label'>Description</mat-label>
+								<textarea
+									matInput
+									formControlName='misDescription'
+									autocomplete='off'
+									placeholder='USMC raids ammo depot | Defenders chooses weather'
+									type='string'
+									#misDescription
+									maxlength='100'
+									id='misDescription'
+									(ngModelChange)='buildMissionDesc()'
+								></textarea>
+								<mat-error>{{ getDescErrorMessage() }}</mat-error>
 							</mat-form-field>
-							<mat-slide-toggle style="display: flex;" formControlName="misJip" checked="true"
-								class="mb-4 mt-4">
-								JIP
-							</mat-slide-toggle>
-							<mat-slide-toggle style="display: flex;" formControlName="misRespawn" class="mb-4 mt-4">
-								Respawn
-							</mat-slide-toggle>
-							<mat-form-field>
-								<mat-label>Tags</mat-label>
-								<mat-select formControlName="misTags" multiple #missionTags>
-									<mat-select-trigger>
-										<mat-chip-list>
-											<mat-chip
-												*ngFor="let tag of missionDescGroup.get('misTags')?.value; let matChipIndex = index"
-												[removable]="true"
-												(removed)="onListChipRemoved(missionTags, matChipIndex)">
-												{{ tag }}
-												<mat-icon matChipRemove>cancel</mat-icon>
-											</mat-chip>
-										</mat-chip-list>
-									</mat-select-trigger>
-									<mat-option *ngFor="let tag of mC.MissionTags.sort()" [value]="tag">{{tag}}
+
+							<mat-form-field color='accent'>
+								<mat-label class='inset-label'>Tags</mat-label>
+								<mat-chip-list #chipList aria-label='Tags'>
+									<mat-chip
+										*ngFor="let tag of missionDescGroup.get('misTags')?.value; let matChipIndex = index"
+										[removable]='true'
+										(removed)='onListChipRemoved(matChipIndex)'
+									>
+										{{ tag }}
+										<mat-icon matChipRemove>cancel</mat-icon>
+									</mat-chip>
+									<input
+										placeholder='Tags'
+										(keyup)='filterTags($event.target.value)'
+										[matAutocomplete]='auto'
+										#tagsTextInput
+										(blur)='tagsTextInputBlur()'
+										#trigger='matAutocompleteTrigger'
+										[matChipInputFor]='chipList'
+										[matChipInputAddOnBlur]='false'
+
+									/>
+								</mat-chip-list>
+								<mat-autocomplete #auto='matAutocomplete' (optionSelected)='onTagSelected($event)'>
+									<mat-option (click)='$event.stopPropagation(); trigger.openPanel()' *ngFor='let tag of filtredTags'
+															[value]='tag'>
+										{{ tag }}
 									</mat-option>
-								</mat-select>
-								<mat-error>{{getTagsErrorMessage()}}</mat-error>
+								</mat-autocomplete>
 							</mat-form-field>
-							<mat-label class="mr-4 mb-4 mt-4" style="display: flex;">Time of Day:</mat-label>
-							<mat-radio-group formControlName="misTime" #misTime required>
-								<mat-radio-button *ngFor="let time of mC.MissionTimes" [value]="time">
-									{{time}}
-								</mat-radio-button>
-							</mat-radio-group>
-							<mat-error>{{getReqErrorMessage('misTime')}}</mat-error>
-							<mat-label class="mr-4 mb-4 mt-4" style="display: flex;">Era:</mat-label>
-							<mat-button-toggle-group formControlName="misEra" #misEra required>
-								<mat-button-toggle *ngFor="let era of mC.MissionEras" [value]="era">
-									{{era}}
+
+							<mat-label class='mr-4 mb-4 mt-4' style='display: flex'>Time of Day:</mat-label>
+							<mat-button-toggle-group formControlName='misTime' #misTime required>
+								<mat-button-toggle *ngFor='let time of mC.MissionTimes' [value]='time'>
+									{{ time }}
 								</mat-button-toggle>
 							</mat-button-toggle-group>
-							<mat-error>{{getReqErrorMessage('misEra')}}</mat-error>
+							<mat-error>{{ getReqErrorMessage('misTime') }}</mat-error>
+							<mat-label class='mr-4 mb-4 mt-4' style='display: flex'>Era:</mat-label>
+							<mat-button-toggle-group formControlName='misEra' #misEra required>
+								<mat-button-toggle *ngFor='let era of mC.MissionEras' [value]='era'>
+									{{ era }}
+								</mat-button-toggle>
+							</mat-button-toggle-group>
+							<mat-error>{{ getReqErrorMessage('misEra') }}</mat-error>
 						</div>
 						<button mat-button matStepperNext>Next</button>
 					</form>
 				</mat-step>
-				<mat-step [stepControl]="fileImageGroup">
-					<form [formGroup]="fileImageGroup">
+				<mat-step [stepControl]='fileImageGroup'>
+					<form [formGroup]='fileImageGroup'>
 						<ng-template matStepLabel>Image</ng-template>
 						<div>
-							<mat-slide-toggle #matInput class="mb-4" formControlName="imgToggle"
-								(change)="changeImageToggle()">
+							<mat-slide-toggle #matInput class='mb-4' formControlName='imgToggle' (change)='changeImageToggle()'>
 								Custom Mission Image
 							</mat-slide-toggle>
 							<mat-form-field *ngIf="fileImageGroup.get('imgToggle')?.value">
@@ -174,13 +216,14 @@
 									(change)="missionImageFile = $any($event.target).files[0]; setImagePreview($any($event.target).files[0])"
 									[required]="true">
 								</ngx-mat-file-input>
-								<mat-icon color="white" matSuffix>add_photo_alternate</mat-icon>
-								<button mat-icon-button *ngIf="!missionImage.empty"
-									(click)="missionImage.clear($event); missionImageFile = null; missionImageSrc = null">
-									<mat-icon matSuffix>clear</mat-icon> Clear Selection
+								<mat-icon color='white' matSuffix>add_photo_alternate</mat-icon>
+								<button mat-icon-button *ngIf='!missionImage.empty'
+												(click)='missionImage.clear($event); missionImageFile = null; missionImageSrc = null'>
+									<mat-icon matSuffix>clear</mat-icon>
+									Clear Selection
 								</button>
 							</mat-form-field>
-							<mat-error>{{getImageErrorMessage()}}</mat-error>
+							<mat-error>{{ getImageErrorMessage() }}</mat-error>
 						</div>
 						<button mat-button matStepperNext>Next</button>
 					</form>
@@ -203,8 +246,8 @@
 						<div class="result-success" *ngIf="sharedService.uploadingState=='success'"> Mission uploaded!
 						</div>
 					</div>
-					<div class="upload-result">
-						<div class="result-error" *ngIf="authError">{{authError}}</div>
+					<div class='upload-result'>
+						<div class='result-error' *ngIf='authError'>{{ authError }}</div>
 					</div>
 				</mat-step>
 			</mat-vertical-stepper>
