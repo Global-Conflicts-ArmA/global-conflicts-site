@@ -29,12 +29,10 @@ export class DialogSubmitReviewComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.discordUser = this.userService.getUserLocally();
-		this.reviewGroup = this.formBuilder.group(
-			{
-				version: ['', [Validators.required]],
-				review: ['', [Validators.required]]
-			}
-		);
+		this.reviewGroup = this.formBuilder.group({
+			version: ['', [Validators.required]],
+			review: ['', [Validators.required]]
+		});
 	}
 
 	buildFormData(
@@ -79,9 +77,11 @@ export class DialogSubmitReviewComponent implements OnInit {
 		this.missionsService.submitReview(formData).subscribe(
 			() => {
 				console.log('upload success');
+				this.dialogRef.close();
 			},
 			(httpError) => {
 				console.log('upload error');
+				this.dialogRef.close();
 			}
 		);
 	}

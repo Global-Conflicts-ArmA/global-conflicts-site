@@ -7,7 +7,7 @@
         <mat-select formControlName="version">
           <mat-option *ngFor="let update of mission.updates" [value]="update.version">
             {{missionsService.buildVersionStr(
-              update.version
+            update.version
             )}}
           </mat-option>
           <mat-option [value]="{major: -1}"> General </mat-option>
@@ -43,7 +43,7 @@
   </div>
   <div class="col-4"></div>
   <div mat-dialog-actions class="col-2">
-    <button mat-button [mat-dialog-close]="" [disabled]="checkForm()" (click)="submit()">Submit</button>
+    <button mat-button [disabled]="checkForm()" (click)="submit()">Submit</button>
   </div>
   <div class="col-2"></div>
 </div>

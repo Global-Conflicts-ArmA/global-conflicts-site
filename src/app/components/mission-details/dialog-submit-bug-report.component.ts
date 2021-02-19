@@ -51,7 +51,7 @@ export class DialogSubmitBugReportComponent implements OnInit {
 		const report = this.bugReportGroup.get('report')?.errors;
 		const version = this.bugReportGroup.get('version')?.errors;
 		const logEnabled = this.bugReportGroup.get('logEnabled')?.errors;
-		return [report, version, logEnabled].some(e => e !== null)
+		return [report, version, logEnabled].some((e) => e !== null);
 	}
 
 	checkLog(controlGroup: AbstractControl) {
@@ -155,9 +155,11 @@ export class DialogSubmitBugReportComponent implements OnInit {
 		this.missionsService.submitReport(formData).subscribe(
 			() => {
 				console.log('upload success');
+				this.dialogRef.close();
 			},
 			(httpError) => {
 				console.log('upload error');
+				this.dialogRef.close();
 			}
 		);
 	}

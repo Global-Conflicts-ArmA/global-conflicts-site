@@ -4,7 +4,7 @@
 			You must join our Discord server and complete the welcoming process to upload missions!
 		</div>
 		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
-			<mat-vertical-stepper class="field-container" [linear]="false" #stepper>
+			<mat-vertical-stepper class="field-container" [linear]="true" #stepper>
 				<mat-step [stepControl]="fileUploadGroup">
 					<form [formGroup]="fileUploadGroup">
 						<ng-template matStepLabel>Mission File</ng-template>
@@ -188,15 +188,20 @@
 				<mat-step>
 					<ng-template matStepLabel>Submit</ng-template>
 					<div>
-						<button mat-button [disabled]="uploadingState!='ready' && uploadingState!='error'"
+						<button mat-button
+							[disabled]="sharedService.uploadingState!='ready' && sharedService.uploadingState!='error'"
 							(click)="submitMission()">Submit Mission</button>
 					</div>
 					<div class="upload-result">
-						<div class="result-error" *ngIf="uploadingState=='error'">Failed to upload mission</div>
-						<div class="name-conflict" *ngIf="uploadingState=='name-conflict'">A mission with this name on
+						<div class="result-error" *ngIf="sharedService.uploadingState=='error'">Failed to upload mission
+						</div>
+						<div class="name-conflict" *ngIf="sharedService.uploadingState=='name-conflict'">A mission with
+							this name on
 							this terrain already exists!</div>
-						<div class="result-uploading" *ngIf="uploadingState=='uploading'">Uploading mission...</div>
-						<div class="result-success" *ngIf="uploadingState=='success'"> Mission uploaded!</div>
+						<div class="result-uploading" *ngIf="sharedService.uploadingState=='uploading'">Uploading
+							mission...</div>
+						<div class="result-success" *ngIf="sharedService.uploadingState=='success'"> Mission uploaded!
+						</div>
 					</div>
 					<div class="upload-result">
 						<div class="result-error" *ngIf="authError">{{authError}}</div>

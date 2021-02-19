@@ -19,8 +19,9 @@ import {
 	ScrollStrategy,
 	ScrollStrategyOptions
 } from '@angular/cdk/overlay';
-import { MatTable } from '@angular/material/table';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { DialogEditDetailsComponent } from './dialog-edit-details.component';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
 	selector: 'app-mission-details',
@@ -29,8 +30,11 @@ import { DialogEditDetailsComponent } from './dialog-edit-details.component';
 })
 export class MissionDetailsComponent implements OnInit {
 	@ViewChild('updatesTable') updatesTable: MatTable<IUpdate>;
+	@ViewChild('updatesSort') updatesSort: MatSort;
 	@ViewChild('bugReportsTable') bugReportsTable: MatTable<IReport>;
+	@ViewChild('reportsSort') reportsSort: MatSort;
 	@ViewChild('reviewsTable') reviewsTable: MatTable<IReview>;
+	@ViewChild('reviewsSort') reviewsSort: MatSort;
 
 	constructor(
 		private userService: UserService,
@@ -38,15 +42,16 @@ export class MissionDetailsComponent implements OnInit {
 		private sharedService: SharedService,
 		private route: ActivatedRoute,
 		public dialog: MatDialog,
-		public overlay: Overlay
+		public overlay: Overlay,
+		private router: Router
 	) {}
 	discordUser: DiscordUser | null;
 	mission: IMission | null;
-	reports: IReport[];
-	updates: IUpdate[];
-	reviews: IReview[];
+	dataSourceUpdates: MatTableDataSource<IUpdate>;
 	updateColumns = ['date', 'versionStr', 'authorName', 'status', 'buttons'];
+	dataSourceReports: MatTableDataSource<IReport>;
 	reportColumns = ['date', 'versionStr', 'authorName', 'buttons'];
+	dataSourceReviews: MatTableDataSource<IReview>;
 	reviewColumns = ['date', 'versionStr', 'authorName', 'buttons'];
 	uniqueName: string | null;
 
@@ -71,8 +76,7 @@ export class MissionDetailsComponent implements OnInit {
 						update.version
 					);
 				});
-				mission.reports = mission.reports ?? [];
-				mission.reports.map(async (report: IReport) => {
+				mission.reports?.map(async (report: IReport) => {
 					report.authorName = await this.userService.getDiscordUsername(
 						report.authorID
 					);
@@ -80,8 +84,7 @@ export class MissionDetailsComponent implements OnInit {
 						report.version
 					);
 				});
-				mission.reviews = mission.reviews ?? [];
-				mission.reviews.map(async (review: IReview) => {
+				mission.reviews?.map(async (review: IReview) => {
 					review.authorName = await this.userService.getDiscordUsername(
 						review.authorID
 					);
@@ -90,10 +93,45 @@ export class MissionDetailsComponent implements OnInit {
 					);
 				});
 				this.mission = mission;
-				this.reports = mission.reports;
-				this.reviews = mission.reviews;
-				this.updates = mission.updates;
-				console.log('mission: ', mission);
+				this.dataSourceUpdates = new MatTableDataSource<IUpdate>(
+					mission.updates
+				);
+				this.dataSourceUpdates.sortingDataAccessor = (
+					item,
+					property
+				) => {
+					switch (property) {
+						default:
+							return item[property];
+					}
+				};
+				this.dataSourceUpdates.sort = this.updatesSort;
+				this.dataSourceReports = new MatTableDataSource<IReport>(
+					mission.reports
+				);
+				this.dataSourceReports.sortingDataAccessor = (
+					item,
+					property
+				) => {
+					switch (property) {
+						default:
+							return item[property];
+					}
+				};
+				this.dataSourceReports.sort = this.reportsSort;
+				this.dataSourceReviews = new MatTableDataSource<IReview>(
+					mission.reviews
+				);
+				this.dataSourceReviews.sortingDataAccessor = (
+					item,
+					property
+				) => {
+					switch (property) {
+						default:
+							return item[property];
+					}
+				};
+				this.dataSourceReviews.sort = this.reviewsSort;
 			});
 	}
 
@@ -108,10 +146,16 @@ export class MissionDetailsComponent implements OnInit {
 		});
 	}
 
-	public updateMission(mission: IMission | null = this.mission) {
+	public updateMission(
+		mission: IMission | null = this.mission,
+		table = this.updatesTable
+	) {
 		const dialogRef = this.dialog.open(DialogSubmitUpdateComponent, {
 			data: mission,
 			minWidth: '20rem'
+		});
+		dialogRef.afterClosed().subscribe(() => {
+			this.refresh();
 		});
 	}
 
@@ -120,6 +164,9 @@ export class MissionDetailsComponent implements OnInit {
 		const dialogRef = this.dialog.open(DialogEditDetailsComponent, {
 			data: mission,
 			minWidth: '20rem'
+		});
+		dialogRef.afterClosed().subscribe(() => {
+			this.refresh();
 		});
 	}
 

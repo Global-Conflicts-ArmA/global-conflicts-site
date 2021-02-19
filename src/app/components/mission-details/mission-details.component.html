@@ -9,7 +9,8 @@
 				<div class="mission-spacer"></div>
 				<div class="mission-title">{{ mission?.name }}</div>
 				<!--TODO: edit mission details dialog-->
-				<button mat-flat-button class="mission-button" color="accent" matTooltip="Edit mission">
+				<button mat-flat-button class="mission-button" color="accent" matTooltip="Edit mission"
+					(click)="editMission()">
 					<mat-icon>build</mat-icon>
 				</button>
 			</div>
@@ -69,12 +70,16 @@
 								</div>
 							</div>
 						</div>
-						<div class="col">
-							<!--<div class="details-label">Ratios</div>-->
-							<!-- TODO: switch for ratios <div [ngSwitch]="mission?.era">
-								<div *ngSwitchCase="expression">output</div>
-								<div *ngSwitchDefault>N/A</div>
-							</div>-->
+						<div class="col" *ngIf="mission?.ratios">
+							<div class="details-label">Ratios</div>
+							<div class="details-value" *ngIf="mission?.ratios?.blufor">Blufor: {{
+								mission?.ratios?.blufor }}</div>
+							<div class="details-value" *ngIf="mission?.ratios?.opfor">Opfor: {{ mission?.ratios?.opfor
+								}}</div>
+							<div class="details-value" *ngIf="mission?.ratios?.indfor">Indfor: {{
+								mission?.ratios?.indfor }}</div>
+							<div class="details-value" *ngIf="mission?.ratios?.civ">Civ: {{ mission?.ratios?.civ }}
+							</div>
 						</div>
 					</div>
 					<div class="row mb-4">
@@ -108,7 +113,8 @@
 					</button>
 				</div>
 			</div>
-			<table mat-table #updatesTable [dataSource]="this.updates" class="matTable" matSort style="width: 100%;">
+			<table mat-table #updatesTable #updatesSort="matSort" [dataSource]="this.dataSourceUpdates" class="matTable"
+				matSort style="width: 100%;">
 				<ng-container matColumnDef="date">
 					<th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
 					<td mat-cell *matCellDef="let element">{{missionsService.getDate(element.date)}}</td>
@@ -207,7 +213,8 @@
 					</button>
 				</div>
 			</div>
-			<table mat-table #bugReportsTable [dataSource]="this.reports" class="matTable" matSort style="width: 100%;">
+			<table mat-table #bugReportsTable #reportsSort="matSort" [dataSource]="this.dataSourceReports"
+				class="matTable" matSort style="width: 100%;">
 				<ng-container matColumnDef="date">
 					<th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
 					<td mat-cell *matCellDef="let element">{{missionsService.getDate(element.date)}}</td>
@@ -250,7 +257,8 @@
 					</button>
 				</div>
 			</div>
-			<table mat-table #reviewsTable [dataSource]="this.reviews" class="matTable" matSort style="width: 100%;">
+			<table mat-table #reviewsTable #reviewsSort="matSort" [dataSource]="this.dataSourceReviews" class="matTable"
+				matSort style="width: 100%;">
 				<ng-container matColumnDef="date">
 					<th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
 					<td mat-cell *matCellDef="let element">{{missionsService.getDate(element.date)}}</td>
