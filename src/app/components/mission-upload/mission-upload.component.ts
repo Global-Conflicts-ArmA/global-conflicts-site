@@ -6,13 +6,12 @@ import {
 	FormGroup,
 	Validators
 } from '@angular/forms';
-import { MissionConstants } from '../../constants/missionConstants';
-import { MissionsService } from '../../services/missions.service';
-import { DiscordUser } from '../../models/discorduser';
-import { IMission, IRatios, IUpdate } from '../../models/mission';
-import { UserService } from '../../services/user.service';
+import { MissionConstants } from '@app/constants/missionConstants';
+import { MissionsService } from '@app/services/missions.service';
+import { DiscordUser } from '@app/models/discorduser';
+import { IMission, IRatios, IUpdate } from '@app/models/mission';
+import { UserService } from '@app/services/user.service';
 import { FileValidator } from 'ngx-material-file-input';
-import { MatSelect } from '@angular/material/select';
 import { SharedService } from '@app/services/shared';
 import {
 	MatAutocomplete,
@@ -186,8 +185,8 @@ export class MissionUploadComponent implements OnInit {
 		if (indexFound === -1) {
 			currentTags.push(event.option.viewValue);
 			misTagsControl.setValue(currentTags);
-		}else{
-			currentTags.splice(indexFound,1);
+		} else {
+			currentTags.splice(indexFound, 1);
 			misTagsControl.patchValue(currentTags);
 		}
 	}
@@ -205,8 +204,7 @@ export class MissionUploadComponent implements OnInit {
 		const safeMissionName = missionName
 			.replace(' ', '_')
 			.replace(/\W/g, '');
-		const uniqueName = safeMissionName + '_' + terrain;
-		return uniqueName;
+		return safeMissionName + '_' + terrain;
 	}
 
 	checkFileName() {
@@ -745,5 +743,13 @@ export class MissionUploadComponent implements OnInit {
 				this.sharedService.uploadingState = 'error';
 			}
 		);
+	}
+
+	onRatioEnabledChange(controlName: string) {
+		if (this.missionSizeGroup.get(controlName)?.enabled) {
+			this.missionSizeGroup.get(controlName)?.disable();
+		} else {
+			this.missionSizeGroup.get(controlName)?.enable();
+		}
 	}
 }

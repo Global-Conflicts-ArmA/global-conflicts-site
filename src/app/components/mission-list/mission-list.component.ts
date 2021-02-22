@@ -1,20 +1,15 @@
-import { Component, OnInit, ViewChild, DoCheck } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MissionsService } from '../../services/missions.service';
-import { IMission, IUpdate } from '../../models/mission';
-import { DiscordUser } from '../../models/discorduser';
-import { UserService } from '../../services/user.service';
-import { MatTableDataSource, MatTable } from '@angular/material/table';
+import { MissionsService } from '@app/services/missions.service';
+import { IMission, IUpdate } from '@app/models/mission';
+import { DiscordUser } from '@app/models/discorduser';
+import { UserService } from '@app/services/user.service';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSelect } from '@angular/material/select';
-import { MissionConstants, ITerrain } from '@app/constants/missionConstants';
-import {
-	FormBuilder,
-	FormControl,
-	FormGroup,
-	Validators
-} from '@angular/forms';
+import { ITerrain, MissionConstants } from '@app/constants/missionConstants';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { SharedService } from '@app/services/shared';
 
 @Component({

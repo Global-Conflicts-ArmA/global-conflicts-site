@@ -47,6 +47,7 @@ Thumbs.db
 *.env
 
 # Test Directories
+/MockServers/*
 /TestServer
 /mainServer
 /Archive

@@ -16,7 +16,6 @@
 									[accept]="'.pbo'"
 									#missionFile
 									(change)="missionToUpload = $any($event.target).files[0]; buildMissionFileName()"
-								>
 								</ngx-mat-file-input>
 								<mat-icon color="white" matSuffix>folder</mat-icon>
 								<button mat-icon-button *ngIf="!missionFile.empty" (click)="missionFile.clear($event); missionToUpload = null">

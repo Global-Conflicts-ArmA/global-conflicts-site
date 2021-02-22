@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MissionsService } from '@app/services/missions.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DiscordUser } from '@app/models/discorduser';
@@ -34,6 +34,7 @@ export class MissionDetailsComponent implements OnInit {
 		public dialog: MatDialog,
 		public overlay: Overlay
 	) {}
+
 	discordUser: DiscordUser | null;
 	mission: IMission | null;
 	dataSourceUpdates: MatTableDataSource<IUpdate>;
