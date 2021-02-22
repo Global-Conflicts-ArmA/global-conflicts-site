@@ -492,6 +492,27 @@ input,
 	user-select: none;
 }
 
+.loading-overlay {
+	opacity: 1;
+	cursor: not-allowed !important;
+	filter: blur(4px);
+	-o-filter: blur(4px);
+	-ms-filter: blur(4px);
+	-moz-filter: blur(4px);
+	-webkit-filter: blur(4px);
+	pointer-events: none;
+	user-select: none;
+}
+
+.center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-moz-transform: translateX(-50%) translateY(-50%);
+	-webkit-transform: translateX(-50%) translateY(-50%);
+	transform: translateX(-50%) translateY(-50%);
+}
+
 .dark-background {
 	background-color: colors.$primary-dark;
 	background-size: auto;

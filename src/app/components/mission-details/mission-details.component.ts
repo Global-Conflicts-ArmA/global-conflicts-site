@@ -54,6 +54,7 @@ export class MissionDetailsComponent implements OnInit {
 	dataSourceReviews: MatTableDataSource<IReview>;
 	reviewColumns = ['date', 'versionStr', 'authorName', 'buttons'];
 	uniqueName: string | null;
+	doneLoading = false;
 
 	ngOnInit(): void {
 		this.discordUser = this.userService.getUserLocally();
@@ -132,6 +133,7 @@ export class MissionDetailsComponent implements OnInit {
 					}
 				};
 				this.dataSourceReviews.sort = this.reviewsSort;
+				this.doneLoading = true;
 			});
 	}
 
@@ -159,7 +161,6 @@ export class MissionDetailsComponent implements OnInit {
 		});
 	}
 
-	// TODO: make edit mission details dialog
 	public editMission(mission: IMission | null = this.mission) {
 		const dialogRef = this.dialog.open(DialogEditDetailsComponent, {
 			data: mission,

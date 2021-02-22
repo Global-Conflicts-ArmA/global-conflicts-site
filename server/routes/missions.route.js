@@ -792,17 +792,17 @@ async function postDiscordEdit(edit, missionData, user) {
 	}
 	if (edit.ratios) {
 		let ratioStr = '';
-		if (reqBody.ratios.blufor) {
-			ratioStr = ratioStr + `**Blufor:** ${reqBody.ratios.blufor} `;
+		if (edit.ratios.blufor) {
+			ratioStr = ratioStr + `**Blufor:** ${edit.ratios.blufor} `;
 		}
-		if (reqBody.ratios.opfor) {
-			ratioStr = ratioStr + `**Opfor:** ${reqBody.ratios.opfor} `;
+		if (edit.ratios.opfor) {
+			ratioStr = ratioStr + `**Opfor:** ${edit.ratios.opfor} `;
 		}
-		if (reqBody.ratios.indfor) {
-			ratioStr = ratioStr + `**Indfor:** ${reqBody.ratios.indfor} `;
+		if (edit.ratios.indfor) {
+			ratioStr = ratioStr + `**Indfor:** ${edit.ratios.indfor} `;
 		}
-		if (reqBody.ratios.civ) {
-			ratioStr = ratioStr + `**Civ:** ${reqBody.ratios.civ} `;
+		if (edit.ratios.civ) {
+			ratioStr = ratioStr + `**Civ:** ${edit.ratios.civ} `;
 		}
 		updateEmbed.addField('Ratios:', ratioStr, false);
 	}
@@ -851,6 +851,44 @@ async function postDiscordEdit(edit, missionData, user) {
 		.get(process.env.DISCORD_BOT_CHANNEL)
 		.send('Mission details edited', updateEmbed);
 }
+
+router.post('/moveFile', updateMulter.none(), async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to move missions.'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
+	const query = { uniqueName: req.body.uniqueName };
+	const archivePath = `${process.env.ROOT_FOLDER}${process.env.ARCHIVE}/${req.body.filename}`;
+	switch (req.body.mode) {
+		case AddReady:
+			const destPath = `${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}/${req.body.filename}`;
+			fs.copyFile(filePath, destPath, fs.constants.COPYFILE_EXCL, err => {
+				if (err) {
+					console.log(err);
+				} else {
+					return res.send({ ok: true });
+				}
+			})
+			break;
+		case RemoveReady:
+			const filePath = `${process.env.ROOT_FOLDER}${process.env.TEST_SERVER_READY}/${req.body.filename}`;
+			fs.unlink(filePath, err => {
+				if (err) {
+					console.log(err);
+				} else {
+					return res.send({ ok: true });
+				}
+			})
+			break;
+		default:
+			break;
+	}
+});
 
 router.get('/download/:filename', async (req, res) => {
 	req = await getDiscordUserFromCookies(
