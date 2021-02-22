@@ -1,4 +1,7 @@
 <div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">You must join our Discord server and complete the welcoming process to see our mission list!</div>
+<div class="center" *ngIf="!doneLoading">
+	<mat-progress-spinner diameter="100" mode="indeterminate" color="accent">Loading</mat-progress-spinner>
+</div>
 <div [class.not-allowed-overlay]="!doneLoading">
 	<div class="flexrow" [class.not-allowed-overlay]="!(discordUser && discordUser?.role)">
 		<div class="controlsColumn">

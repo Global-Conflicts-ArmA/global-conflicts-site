@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MissionsService } from '@app/services/missions.service';
 import { MatDialog } from '@angular/material/dialog';
-
 import { DiscordUser } from '@app/models/discorduser';
 import { UserService } from '@app/services/user.service';
 import { IMission, IReport, IReview, IUpdate } from '@app/models/mission';
@@ -14,7 +13,7 @@ import { DialogSubmitReviewComponent } from './dialog-submit-review.component';
 import { DialogViewReviewComponent } from './dialog-view-review.component';
 import { DialogSubmitUpdateComponent } from './dialog-submit-update.component';
 import { Overlay } from '@angular/cdk/overlay';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource } from '@angular/material/table';
 import { DialogEditDetailsComponent } from './dialog-edit-details.component';
 import { MatSort } from '@angular/material/sort';
 
@@ -24,21 +23,16 @@ import { MatSort } from '@angular/material/sort';
 	styleUrls: ['./mission-details.component.scss']
 })
 export class MissionDetailsComponent implements OnInit {
-	@ViewChild('updatesTable') updatesTable: MatTable<IUpdate>;
 	@ViewChild('updatesSort') updatesSort: MatSort;
-	@ViewChild('bugReportsTable') bugReportsTable: MatTable<IReport>;
 	@ViewChild('reportsSort') reportsSort: MatSort;
-	@ViewChild('reviewsTable') reviewsTable: MatTable<IReview>;
 	@ViewChild('reviewsSort') reviewsSort: MatSort;
 
 	constructor(
 		private userService: UserService,
 		public missionsService: MissionsService,
-		private sharedService: SharedService,
 		private route: ActivatedRoute,
 		public dialog: MatDialog,
-		public overlay: Overlay,
-		private router: Router
+		public overlay: Overlay
 	) {}
 	discordUser: DiscordUser | null;
 	mission: IMission | null;
@@ -49,6 +43,7 @@ export class MissionDetailsComponent implements OnInit {
 	dataSourceReviews: MatTableDataSource<IReview>;
 	reviewColumns = ['date', 'versionStr', 'authorName', 'buttons'];
 	uniqueName: string | null;
+	doneLoading = false;
 
 	ngOnInit(): void {
 		this.discordUser = this.userService.getUserLocally();
@@ -127,6 +122,7 @@ export class MissionDetailsComponent implements OnInit {
 					}
 				};
 				this.dataSourceReviews.sort = this.reviewsSort;
+				this.doneLoading = true;
 			});
 	}
 
@@ -141,10 +137,7 @@ export class MissionDetailsComponent implements OnInit {
 		});
 	}
 
-	public updateMission(
-		mission: IMission | null = this.mission,
-		table = this.updatesTable
-	) {
+	public updateMission(mission: IMission | null = this.mission) {
 		const dialogRef = this.dialog.open(DialogSubmitUpdateComponent, {
 			data: mission,
 			minWidth: '20rem'
@@ -165,10 +158,7 @@ export class MissionDetailsComponent implements OnInit {
 		});
 	}
 
-	public submitBugReport(
-		mission: IMission | null = this.mission,
-		table = this.bugReportsTable
-	) {
+	public submitBugReport(mission: IMission | null = this.mission) {
 		const dialogRef = this.dialog.open(DialogSubmitBugReportComponent, {
 			data: mission,
 			scrollStrategy: this.overlay.scrollStrategies.noop(),
@@ -191,10 +181,7 @@ export class MissionDetailsComponent implements OnInit {
 		});
 	}
 
-	public submitReview(
-		mission: IMission | null = this.mission,
-		table = this.reviewsTable
-	) {
+	public submitReview(mission: IMission | null = this.mission) {
 		const dialogRef = this.dialog.open(DialogSubmitReviewComponent, {
 			data: mission,
 			scrollStrategy: this.overlay.scrollStrategies.noop(),

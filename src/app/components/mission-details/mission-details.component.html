@@ -1,278 +1,283 @@
 <div class="container">
 	<div style="position: relative">
+		<div class="center" *ngIf="!doneLoading">
+			<mat-progress-spinner diameter="100" mode="indeterminate" color="accent">Loading</mat-progress-spinner>
+		</div>
 		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser?.role)">You must join our Discord server and complete the welcoming process to upload missions!</div>
-		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser?.role)">
-			<div class="mission-title-container">
-				<div class="mission-spacer"></div>
-				<div class="mission-title">{{ mission?.name }}</div>
-				<!--TODO: edit mission details dialog-->
-				<button mat-flat-button class="mission-button" color="accent" matTooltip="Edit mission" (click)="editMission()">
-					<mat-icon>build</mat-icon>
-				</button>
-			</div>
-			<div class="row mb-4">
-				<div class="col-5 col-md-5>">
-					<img class="img-details" [src]="missionsService.getImage(mission)" alt="Mission image" />
-				</div>
-				<div class="col-7">
-					<div class="row mb-4 mt-4">
-						<div class="col">
-							<div class="details-label">Author</div>
-							<div class="details-value">{{ mission?.authorName }}</div>
-						</div>
-						<div class="col">
-							<div class="details-label">Map</div>
-							<div class="details-value">{{ mission?.terrain }}</div>
-						</div>
-						<div class="col">
-							<div class="details-label">Type</div>
-							<div class="details-value">{{ mission?.type }}</div>
-						</div>
-					</div>
-					<div class="row mb-4">
-						<div class="col">
-							<div class="details-label">Players</div>
-							<div class="details-value">Min: {{ mission?.size?.min }} Max: {{ mission?.size?.max }}</div>
-						</div>
-						<div class="col">
-							<div class="details-label">Time</div>
-							<div class="details-value">{{ mission?.timeOfDay }}</div>
-						</div>
-						<div class="col">
-							<div class="details-label">Era</div>
-							<div class="details-value">{{ mission?.era }}</div>
-						</div>
-					</div>
-					<div class="row mb-4">
-						<div class="col">
-							<div class="details-label">JIP</div>
-							<div [ngSwitch]="mission?.jip">
-								<div *ngSwitchCase="true">
-									<mat-icon class="green-icon">check</mat-icon>
-								</div>
-								<div *ngSwitchDefault>
-									<mat-icon class="red-icon">close</mat-icon>
-								</div>
-							</div>
-						</div>
-						<div class="col">
-							<div class="details-label">Respawn</div>
-							<div [ngSwitch]="mission?.respawn">
-								<div *ngSwitchCase="true">
-									<mat-icon class="green-icon">check</mat-icon>
-								</div>
-								<div *ngSwitchDefault>
-									<mat-icon class="red-icon">close</mat-icon>
-								</div>
-							</div>
-						</div>
-						<div class="col" *ngIf="mission?.ratios">
-							<div class="details-label">Ratios</div>
-							<div class="details-value" *ngIf="mission?.ratios?.blufor">Blufor: {{ mission?.ratios?.blufor }}</div>
-							<div class="details-value" *ngIf="mission?.ratios?.opfor">Opfor: {{ mission?.ratios?.opfor }}</div>
-							<div class="details-value" *ngIf="mission?.ratios?.indfor">Indfor: {{ mission?.ratios?.indfor }}</div>
-							<div class="details-value" *ngIf="mission?.ratios?.civ">Civ: {{ mission?.ratios?.civ }}</div>
-						</div>
-					</div>
-					<div class="row mb-4">
-						<div class="col-12">
-							<div class="details-label">Tags</div>
-							<mat-chip-list>
-								<mat-chip *ngFor="let tag of mission?.tags">
-									{{ tag }}
-								</mat-chip>
-							</mat-chip-list>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-12">
-							<div class="details-label">Description</div>
-							<div class="details-value">{{ mission?.description }}</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!--Updates-->
-		<div class="row mb-4">
-			<div class="table-header">
-				<div class="spacer"></div>
-				<div class="table-title">Updates</div>
-				<div class="table-button-container">
-					<button mat-flat-button class="table-button" color="accent" (click)="updateMission()" matTooltip="Update mission">
-						<mat-icon>upload_file</mat-icon>
+		<div [class.not-allowed-overlay]="!doneLoading" *ngIf="!!mission">
+			<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser?.role)">
+				<div class="mission-title-container">
+					<div class="mission-spacer"></div>
+					<div class="mission-title">{{ mission?.name }}</div>
+					<!--TODO: edit mission details dialog-->
+					<button mat-flat-button class="mission-button" color="accent" matTooltip="Edit mission" (click)="editMission()">
+						<mat-icon>build</mat-icon>
 					</button>
 				</div>
-			</div>
-			<table mat-table #updatesSort="matSort" [dataSource]="this.dataSourceUpdates" class="matTable" matSort style="width: 100%">
-				<ng-container matColumnDef="date">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
-					<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.date) }}</td>
-				</ng-container>
-				<ng-container matColumnDef="versionStr">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header>Version</th>
-					<td mat-cell *matCellDef="let element">{{ element.versionStr }}</td>
-				</ng-container>
-				<ng-container matColumnDef="authorName">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header>Author</th>
-					<td mat-cell *matCellDef="let element">{{ element.authorName }}</td>
-				</ng-container>
-				<ng-container matColumnDef="status">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
-					<td mat-cell *matCellDef="let element">
+				<div class="row mb-4">
+					<div class="col-5 col-md-5>">
+						<img class="img-details" [src]="missionsService.getImage(mission)" alt="Mission image" />
+					</div>
+					<div class="col-7">
+						<div class="row mb-4 mt-4">
+							<div class="col">
+								<div class="details-label">Author</div>
+								<div class="details-value">{{ mission?.authorName }}</div>
+							</div>
+							<div class="col">
+								<div class="details-label">Map</div>
+								<div class="details-value">{{ mission?.terrain }}</div>
+							</div>
+							<div class="col">
+								<div class="details-label">Type</div>
+								<div class="details-value">{{ mission?.type }}</div>
+							</div>
+						</div>
+						<div class="row mb-4">
+							<div class="col">
+								<div class="details-label">Players</div>
+								<div class="details-value">Min: {{ mission?.size?.min }} Max: {{ mission?.size?.max }}</div>
+							</div>
+							<div class="col">
+								<div class="details-label">Time</div>
+								<div class="details-value">{{ mission?.timeOfDay }}</div>
+							</div>
+							<div class="col">
+								<div class="details-label">Era</div>
+								<div class="details-value">{{ mission?.era }}</div>
+							</div>
+						</div>
+						<div class="row mb-4">
+							<div class="col">
+								<div class="details-label">JIP</div>
+								<div [ngSwitch]="mission?.jip">
+									<div *ngSwitchCase="true">
+										<mat-icon class="green-icon">check</mat-icon>
+									</div>
+									<div *ngSwitchDefault>
+										<mat-icon class="red-icon">close</mat-icon>
+									</div>
+								</div>
+							</div>
+							<div class="col">
+								<div class="details-label">Respawn</div>
+								<div [ngSwitch]="mission?.respawn">
+									<div *ngSwitchCase="true">
+										<mat-icon class="green-icon">check</mat-icon>
+									</div>
+									<div *ngSwitchDefault>
+										<mat-icon class="red-icon">close</mat-icon>
+									</div>
+								</div>
+							</div>
+							<div class="col" *ngIf="mission?.ratios">
+								<div class="details-label">Ratios</div>
+								<div class="details-value" *ngIf="mission?.ratios?.blufor">Blufor: {{ mission?.ratios?.blufor }}</div>
+								<div class="details-value" *ngIf="mission?.ratios?.opfor">Opfor: {{ mission?.ratios?.opfor }}</div>
+								<div class="details-value" *ngIf="mission?.ratios?.indfor">Indfor: {{ mission?.ratios?.indfor }}</div>
+								<div class="details-value" *ngIf="mission?.ratios?.civ">Civ: {{ mission?.ratios?.civ }}</div>
+							</div>
+						</div>
+						<div class="row mb-4">
+							<div class="col-12">
+								<div class="details-label">Tags</div>
+								<mat-chip-list>
+									<mat-chip *ngFor="let tag of mission?.tags">
+										{{ tag }}
+									</mat-chip>
+								</mat-chip-list>
+							</div>
+						</div>
 						<div class="row">
-							<div class="col"></div>
-							<div class="col-2">
-								<div class="table-title">Main</div>
-								<div [ngSwitch]="element.main">
-									<div *ngSwitchCase="true">
-										<mat-icon class="green-icon">check</mat-icon>
-									</div>
-									<div *ngSwitchDefault>
-										<mat-icon class="red-icon">close</mat-icon>
-									</div>
-								</div>
+							<div class="col-12">
+								<div class="details-label">Description</div>
+								<div class="details-value">{{ mission?.description }}</div>
 							</div>
-							<div class="col-2">
-								<div class="table-title">Test</div>
-								<div [ngSwitch]="element.test">
-									<div *ngSwitchCase="true">
-										<mat-icon class="green-icon">check</mat-icon>
-									</div>
-									<div *ngSwitchDefault>
-										<mat-icon class="red-icon">close</mat-icon>
-									</div>
-								</div>
-							</div>
-							<div class="col-2">
-								<div class="table-title">Ready</div>
-								<div [ngSwitch]="element.ready">
-									<div *ngSwitchCase="true">
-										<mat-icon class="green-icon">check</mat-icon>
-									</div>
-									<div *ngSwitchDefault>
-										<mat-icon class="red-icon">close</mat-icon>
-									</div>
-								</div>
-							</div>
-							<div class="col-2">
-								<div class="table-title">Archive</div>
-								<div [ngSwitch]="element.archive">
-									<div *ngSwitchCase="true">
-										<mat-icon class="green-icon">check</mat-icon>
-									</div>
-									<div *ngSwitchDefault>
-										<mat-icon class="red-icon">close</mat-icon>
-									</div>
-								</div>
-							</div>
-							<div class="col"></div>
 						</div>
-					</td>
-				</ng-container>
-				<ng-container matColumnDef="buttons">
-					<th mat-header-cell class="table-header-action" *matHeaderCellDef mat-sort-header>Actions</th>
-					<!--TODO: update action funcs -->
-					<td mat-cell *matCellDef="let element">
-						<button mat-flat-button color="primary" [disabled]="!element.archive" matTooltip="Download" (click)="missionsService.downloadFile(element.fileName)">
-							<mat-icon>download</mat-icon>
-						</button>
-						<button mat-flat-button color="primary" matTooltip="Changelog" (click)="viewUpdate(element)">
-							<mat-icon>article</mat-icon>
-						</button>
-						<!--TODO: create action panel for mission manipulation -->
-						<button mat-flat-button color="primary" matTooltip="Actions">
-							<mat-icon>keyboard_arrow_right</mat-icon>
-						</button>
-					</td>
-				</ng-container>
-				<tr mat-header-row *matHeaderRowDef="updateColumns; sticky: true"></tr>
-				<tr mat-row *matRowDef="let row; columns: updateColumns"></tr>
-			</table>
-		</div>
-		<!--Reports-->
-		<div class="row mb-4">
-			<div class="table-header">
-				<div class="spacer"></div>
-				<div class="table-title">Reports</div>
-				<div class="table-button-container">
-					<button mat-flat-button class="table-button" color="accent" (click)="submitBugReport()" matTooltip="Submit a Bug Report">
-						<mat-icon>bug_report</mat-icon>
-					</button>
+					</div>
 				</div>
 			</div>
-			<table mat-table #reportsSort="matSort" [dataSource]="this.dataSourceReports" class="matTable" matSort style="width: 100%">
-				<ng-container matColumnDef="date">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
-					<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.date) }}</td>
-				</ng-container>
-				<ng-container matColumnDef="versionStr">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header>Version</th>
-					<td mat-cell *matCellDef="let element">{{ element.versionStr }}</td>
-				</ng-container>
-				<ng-container matColumnDef="authorName">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header>Author</th>
-					<td mat-cell *matCellDef="let element">{{ element.authorName }}</td>
-				</ng-container>
-				<ng-container matColumnDef="buttons">
-					<th mat-header-cell class="table-header-action" *matHeaderCellDef mat-sort-header>Actions</th>
-					<td mat-cell *matCellDef="let element">
-						<button mat-flat-button color="primary" matTooltip="Report" (click)="viewBugReport(element)">
-							<mat-icon>article</mat-icon>
+			<!--Updates-->
+			<div class="row mb-4">
+				<div class="table-header">
+					<div class="spacer"></div>
+					<div class="table-title">Updates</div>
+					<div class="table-button-container">
+						<button mat-flat-button class="table-button" color="accent" (click)="updateMission()" matTooltip="Update mission">
+							<mat-icon>upload_file</mat-icon>
 						</button>
-						<button mat-flat-button color="primary" matTooltip="Actions">
-							<mat-icon>keyboard_arrow_right</mat-icon>
-						</button>
-					</td>
-				</ng-container>
-				<tr mat-header-row *matHeaderRowDef="reportColumns; sticky: true"></tr>
-				<tr mat-row *matRowDef="let row; columns: reportColumns"></tr>
-				<tr class="mat-row" *matNoDataRow>
-					<td class="mat-cell" colspan="4">No Reports</td>
-				</tr>
-			</table>
-		</div>
-		<!--Reviews-->
-		<div class="row mb-4">
-			<div class="table-header">
-				<div class="spacer"></div>
-				<div class="table-title">Reviews</div>
-				<div class="table-button-container">
-					<button mat-flat-button class="table-button" color="accent" (click)="submitReview()" matTooltip="Submit a Review">
-						<mat-icon>note_add</mat-icon>
-					</button>
+					</div>
 				</div>
+				<table mat-table #updatesSort="matSort" [dataSource]="this.dataSourceUpdates" class="matTable" matSort style="width: 100%">
+					<ng-container matColumnDef="date">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+						<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.date) }}</td>
+					</ng-container>
+					<ng-container matColumnDef="versionStr">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>Version</th>
+						<td mat-cell *matCellDef="let element">{{ element.versionStr }}</td>
+					</ng-container>
+					<ng-container matColumnDef="authorName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>Author</th>
+						<td mat-cell *matCellDef="let element">{{ element.authorName }}</td>
+					</ng-container>
+					<ng-container matColumnDef="status">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+						<td mat-cell *matCellDef="let element">
+							<div class="row">
+								<div class="col"></div>
+								<div class="col-2">
+									<div class="table-title">Main</div>
+									<div [ngSwitch]="element.main">
+										<div *ngSwitchCase="true">
+											<mat-icon class="green-icon">check</mat-icon>
+										</div>
+										<div *ngSwitchDefault>
+											<mat-icon class="red-icon">close</mat-icon>
+										</div>
+									</div>
+								</div>
+								<div class="col-2">
+									<div class="table-title">Test</div>
+									<div [ngSwitch]="element.test">
+										<div *ngSwitchCase="true">
+											<mat-icon class="green-icon">check</mat-icon>
+										</div>
+										<div *ngSwitchDefault>
+											<mat-icon class="red-icon">close</mat-icon>
+										</div>
+									</div>
+								</div>
+								<div class="col-2">
+									<div class="table-title">Ready</div>
+									<div [ngSwitch]="element.ready">
+										<div *ngSwitchCase="true">
+											<mat-icon class="green-icon">check</mat-icon>
+										</div>
+										<div *ngSwitchDefault>
+											<mat-icon class="red-icon">close</mat-icon>
+										</div>
+									</div>
+								</div>
+								<div class="col-2">
+									<div class="table-title">Archive</div>
+									<div [ngSwitch]="element.archive">
+										<div *ngSwitchCase="true">
+											<mat-icon class="green-icon">check</mat-icon>
+										</div>
+										<div *ngSwitchDefault>
+											<mat-icon class="red-icon">close</mat-icon>
+										</div>
+									</div>
+								</div>
+								<div class="col"></div>
+							</div>
+						</td>
+					</ng-container>
+					<ng-container matColumnDef="buttons">
+						<th mat-header-cell class="table-header-action" *matHeaderCellDef mat-sort-header>Actions</th>
+						<!--TODO: update action funcs -->
+						<td mat-cell *matCellDef="let element">
+							<button mat-flat-button color="primary" [disabled]="!element.archive" matTooltip="Download" (click)="missionsService.downloadFile(element.fileName)">
+								<mat-icon>download</mat-icon>
+							</button>
+							<button mat-flat-button color="primary" matTooltip="Changelog" (click)="viewUpdate(element)">
+								<mat-icon>article</mat-icon>
+							</button>
+							<!--TODO: create action panel for mission manipulation -->
+							<button mat-flat-button color="primary" matTooltip="Actions">
+								<mat-icon>keyboard_arrow_right</mat-icon>
+							</button>
+						</td>
+					</ng-container>
+					<tr mat-header-row *matHeaderRowDef="updateColumns; sticky: true"></tr>
+					<tr mat-row *matRowDef="let row; columns: updateColumns"></tr>
+				</table>
 			</div>
-			<table mat-table #reviewsSort="matSort" [dataSource]="this.dataSourceReviews" class="matTable" matSort style="width: 100%">
-				<ng-container matColumnDef="date">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
-					<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.date) }}</td>
-				</ng-container>
-				<ng-container matColumnDef="versionStr">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header>Version</th>
-					<td mat-cell *matCellDef="let element">{{ element.versionStr }}</td>
-				</ng-container>
-				<ng-container matColumnDef="authorName">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header>Author</th>
-					<td mat-cell *matCellDef="let element">{{ element.authorName }}</td>
-				</ng-container>
-				<ng-container matColumnDef="buttons">
-					<th mat-header-cell class="table-header-action" *matHeaderCellDef mat-sort-header>Actions</th>
-					<td mat-cell *matCellDef="let element">
-						<button mat-flat-button matTooltip="View Review" (click)="viewReview(element)">
-							<mat-icon>article</mat-icon>
+			<!--Reports-->
+			<div class="row mb-4">
+				<div class="table-header">
+					<div class="spacer"></div>
+					<div class="table-title">Reports</div>
+					<div class="table-button-container">
+						<button mat-flat-button class="table-button" color="accent" (click)="submitBugReport()" matTooltip="Submit a Bug Report">
+							<mat-icon>bug_report</mat-icon>
 						</button>
-						<button mat-flat-button matTooltip="Actions">
-							<mat-icon>keyboard_arrow_right</mat-icon>
+					</div>
+				</div>
+				<table mat-table #reportsSort="matSort" [dataSource]="this.dataSourceReports" class="matTable" matSort style="width: 100%">
+					<ng-container matColumnDef="date">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+						<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.date) }}</td>
+					</ng-container>
+					<ng-container matColumnDef="versionStr">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>Version</th>
+						<td mat-cell *matCellDef="let element">{{ element.versionStr }}</td>
+					</ng-container>
+					<ng-container matColumnDef="authorName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>Author</th>
+						<td mat-cell *matCellDef="let element">{{ element.authorName }}</td>
+					</ng-container>
+					<ng-container matColumnDef="buttons">
+						<th mat-header-cell class="table-header-action" *matHeaderCellDef mat-sort-header>Actions</th>
+						<td mat-cell *matCellDef="let element">
+							<button mat-flat-button color="primary" matTooltip="Report" (click)="viewBugReport(element)">
+								<mat-icon>article</mat-icon>
+							</button>
+							<button mat-flat-button color="primary" matTooltip="Actions">
+								<mat-icon>keyboard_arrow_right</mat-icon>
+							</button>
+						</td>
+					</ng-container>
+					<tr mat-header-row *matHeaderRowDef="reportColumns; sticky: true"></tr>
+					<tr mat-row *matRowDef="let row; columns: reportColumns"></tr>
+					<tr class="mat-row" *matNoDataRow>
+						<td class="mat-cell" colspan="4">No Reports</td>
+					</tr>
+				</table>
+			</div>
+			<!--Reviews-->
+			<div class="row mb-4">
+				<div class="table-header">
+					<div class="spacer"></div>
+					<div class="table-title">Reviews</div>
+					<div class="table-button-container">
+						<button mat-flat-button class="table-button" color="accent" (click)="submitReview()" matTooltip="Submit a Review">
+							<mat-icon>note_add</mat-icon>
 						</button>
-					</td>
-				</ng-container>
-				<tr mat-header-row *matHeaderRowDef="reviewColumns; sticky: true"></tr>
-				<tr mat-row *matRowDef="let row; columns: reviewColumns"></tr>
-				<tr class="mat-row" *matNoDataRow>
-					<td class="mat-cell" colspan="4">No Reviews</td>
-				</tr>
-			</table>
+					</div>
+				</div>
+				<table mat-table #reviewsSort="matSort" [dataSource]="this.dataSourceReviews" class="matTable" matSort style="width: 100%">
+					<ng-container matColumnDef="date">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+						<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.date) }}</td>
+					</ng-container>
+					<ng-container matColumnDef="versionStr">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>Version</th>
+						<td mat-cell *matCellDef="let element">{{ element.versionStr }}</td>
+					</ng-container>
+					<ng-container matColumnDef="authorName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>Author</th>
+						<td mat-cell *matCellDef="let element">{{ element.authorName }}</td>
+					</ng-container>
+					<ng-container matColumnDef="buttons">
+						<th mat-header-cell class="table-header-action" *matHeaderCellDef mat-sort-header>Actions</th>
+						<td mat-cell *matCellDef="let element">
+							<button mat-flat-button matTooltip="View Review" (click)="viewReview(element)">
+								<mat-icon>article</mat-icon>
+							</button>
+							<button mat-flat-button matTooltip="Actions">
+								<mat-icon>keyboard_arrow_right</mat-icon>
+							</button>
+						</td>
+					</ng-container>
+					<tr mat-header-row *matHeaderRowDef="reviewColumns; sticky: true"></tr>
+					<tr mat-row *matRowDef="let row; columns: reviewColumns"></tr>
+					<tr class="mat-row" *matNoDataRow>
+						<td class="mat-cell" colspan="4">No Reviews</td>
+					</tr>
+				</table>
+			</div>
 		</div>
 	</div>
 </div>
