@@ -1,46 +1,49 @@
 <h1 mat-dialog-title>Update for {{mission.name}}</h1>
 <div mat-dialog-content [formGroup]="updateGroup">
-  <div class="col-12">
-    <div class="row mb-4">
-      <mat-slide-toggle style="display: flex;" formControlName="versionType" (change)="buildVersion($event.checked)">
-        Major Change
-      </mat-slide-toggle>
-      <h4>Version: {{versionString}}</h4>
-    </div>
-    <div class="row mb-4">
-      <mat-form-field class="full-width">
-        <mat-label>Changelog:</mat-label>
-        <textarea matInput [cdkTextareaAutosize]="false" [rows]="5" formControlName="changelog"
-          placeholder="Ex. changed the sights for BLUFOR riflemen..."></textarea>
-      </mat-form-field>
-      <mat-error>{{getChangeLogErrorMessages()}}</mat-error>
-    </div>
-    <div class="row mb-2">
-      <h4>Mission File:</h4>
-    </div>
-    <div class="row mb-4">
-      <mat-form-field class="full-width">
-        <mat-label class="inset-label" for="file-input">Select Mission .pbo</mat-label>
-        <ngx-mat-file-input formControlName="missionFile" valuePlaceholder="No file selected" [required]="true"
-          [accept]="'.pbo'" #missionFile (change)="missionToUpload = $any($event.target).files[0];">
-        </ngx-mat-file-input>
-        <mat-icon color="white" matSuffix>folder</mat-icon>
-        <button mat-icon-button *ngIf="!missionFile.empty" (click)="missionFile.clear($event); missionToUpload = null;">
-          <mat-icon matSuffix>clear</mat-icon> Clear Selection
-        </button>
-        <mat-error>{{getFileErrorMessage()}}</mat-error>
-      </mat-form-field>
-    </div>
-  </div>
+	<div class="col-12">
+		<div class="row mb-4">
+			<mat-slide-toggle style="display: flex" formControlName="versionType" (change)="buildVersion($event.checked)"> Major Change </mat-slide-toggle>
+			<h4>Version: {{versionString}}</h4>
+		</div>
+		<div class="row mb-4">
+			<mat-form-field class="full-width">
+				<mat-label>Changelog:</mat-label>
+				<textarea matInput [cdkTextareaAutosize]="false" [rows]="5" formControlName="changelog" placeholder="Ex. changed the sights for BLUFOR riflemen..."></textarea>
+			</mat-form-field>
+			<mat-error>{{getChangeLogErrorMessages()}}</mat-error>
+		</div>
+		<div class="row mb-2">
+			<h4>Mission File:</h4>
+		</div>
+		<div class="row mb-4">
+			<mat-form-field class="full-width">
+				<mat-label class="inset-label" for="file-input">Select Mission .pbo</mat-label>
+				<ngx-mat-file-input
+					formControlName="missionFile"
+					valuePlaceholder="No file selected"
+					[required]="true"
+					[accept]="'.pbo'"
+					#missionFile
+					(change)="missionToUpload = $any($event.target).files[0]"
+				>
+				</ngx-mat-file-input>
+				<mat-icon color="white" matSuffix>folder</mat-icon>
+				<button mat-icon-button *ngIf="!missionFile.empty" (click)="missionFile.clear($event); missionToUpload = null;">
+					<mat-icon matSuffix>clear</mat-icon> Clear Selection
+				</button>
+				<mat-error>{{getFileErrorMessage()}}</mat-error>
+			</mat-form-field>
+		</div>
+	</div>
 </div>
 <div class="row">
-  <div class="col-2"></div>
-  <div mat-dialog-actions class="col-2">
-    <button mat-button [mat-dialog-close]="">Close</button>
-  </div>
-  <div class="col-4"></div>
-  <div mat-dialog-actions class="col-2">
-    <button mat-button [disabled]="checkForm()" (click)="submit()">Submit</button>
-  </div>
-  <div class="col-2"></div>
+	<div class="col-2"></div>
+	<div mat-dialog-actions class="col-2">
+		<button mat-button [mat-dialog-close]="">Close</button>
+	</div>
+	<div class="col-4"></div>
+	<div mat-dialog-actions class="col-2">
+		<button mat-button [disabled]="checkForm()" (click)="submit()">Submit</button>
+	</div>
+	<div class="col-2"></div>
 </div>

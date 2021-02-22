@@ -1,19 +1,17 @@
 <div [ngSwitch]="data.review.version">
-  <div *ngSwitchCase="'General'">
-    <h1 mat-dialog-title>Report for {{data.mission.name}}</h1>
-  </div>
-  <div *ngSwitchDefault>
-    <h1 mat-dialog-title>Report for {{data.mission.name}} version: {{missionsService.buildVersionStr(
-      data.review.version
-    )}}</h1>
-  </div>
+	<div *ngSwitchCase="'General'">
+		<h1 mat-dialog-title>Report for {{data.mission.name}}</h1>
+	</div>
+	<div *ngSwitchDefault>
+		<h1 mat-dialog-title>Report for {{data.mission.name}} version: {{missionsService.buildVersionStr( data.review.version )}}</h1>
+	</div>
 </div>
 <h3 mat-dialog-title>Report by: {{data.review.authorName}}</h3>
 <div mat-dialog-content>
-  <div class="changeLog-background mb-4">
-    <markdown [data]="data.review.review"></markdown>
-  </div>
+	<div class="changeLog-background mb-4">
+		<markdown [data]="data.review.review"></markdown>
+	</div>
 </div>
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="">Close</button>
+	<button mat-button [mat-dialog-close]="">Close</button>
 </div>

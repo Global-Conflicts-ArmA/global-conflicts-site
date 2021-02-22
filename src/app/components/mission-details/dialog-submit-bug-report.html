@@ -1,49 +1,47 @@
 <h1 mat-dialog-title>{{mission.name}}</h1>
 <div mat-dialog-content [formGroup]="bugReportGroup">
-  <div class="col-12">
-    <div class="row mb-4">
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Version:</mat-label>
-        <mat-select formControlName="version">
-          <mat-option *ngFor="let update of mission.updates" [value]="update.version">
-            {{missionsService.buildVersionStr(
-            update.version
-            )}}
-          </mat-option>
-          <mat-option [value]="{major: -1}"> General </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-error>{{getVersionErrorMessages()}}</mat-error>
-    </div>
-    <div class="row mb-4">
-      <mat-form-field class="full-width">
-        <mat-label>Bug Report:</mat-label>
-        <textarea matInput [cdkTextareaAutosize]="false" [rows]="5" formControlName="report"
-          placeholder="Ex. loadout for rifleman slot did not work..."></textarea>
-      </mat-form-field>
-      <mat-error>{{getReportErrorMessages()}}</mat-error>
-    </div>
-    <div class="row mb-4">
-      <mat-slide-toggle class="mb-4" (change)="toggleErrorLog($event)" formControlName="logEnabled">
-        Include Error Log
-      </mat-slide-toggle>
-      <mat-form-field class="full-width" *ngIf="enableErrorLog">
-        <mat-label>Error Log:</mat-label>
-        <textarea matInput [cdkTextareaAutosize]="false" [rows]="5" formControlName="log"
-          placeholder='Ex. Error in expression <classname (configfile >> "CfgWorldList"...'></textarea>
-      </mat-form-field>
-      <mat-error>{{getLogErrorMessages()}}</mat-error>
-    </div>
-  </div>
+	<div class="col-12">
+		<div class="row mb-4">
+			<mat-form-field appearance="fill" class="full-width">
+				<mat-label>Version:</mat-label>
+				<mat-select formControlName="version">
+					<mat-option *ngFor="let update of mission.updates" [value]="update.version"> {{missionsService.buildVersionStr( update.version )}} </mat-option>
+					<mat-option [value]="{major: -1}"> General </mat-option>
+				</mat-select>
+			</mat-form-field>
+			<mat-error>{{getVersionErrorMessages()}}</mat-error>
+		</div>
+		<div class="row mb-4">
+			<mat-form-field class="full-width">
+				<mat-label>Bug Report:</mat-label>
+				<textarea matInput [cdkTextareaAutosize]="false" [rows]="5" formControlName="report" placeholder="Ex. loadout for rifleman slot did not work..."></textarea>
+			</mat-form-field>
+			<mat-error>{{getReportErrorMessages()}}</mat-error>
+		</div>
+		<div class="row mb-4">
+			<mat-slide-toggle class="mb-4" (change)="toggleErrorLog($event)" formControlName="logEnabled"> Include Error Log </mat-slide-toggle>
+			<mat-form-field class="full-width" *ngIf="enableErrorLog">
+				<mat-label>Error Log:</mat-label>
+				<textarea
+					matInput
+					[cdkTextareaAutosize]="false"
+					[rows]="5"
+					formControlName="log"
+					placeholder='Ex. Error in expression <classname (configfile >> "CfgWorldList"...'
+				></textarea>
+			</mat-form-field>
+			<mat-error>{{getLogErrorMessages()}}</mat-error>
+		</div>
+	</div>
 </div>
 <div class="row">
-  <div class="col-2"></div>
-  <div mat-dialog-actions class="col-2">
-    <button mat-button [mat-dialog-close]="">Close</button>
-  </div>
-  <div class="col-4"></div>
-  <div mat-dialog-actions class="col-2">
-    <button mat-button [disabled]="checkForm()" (click)="submit()">Submit</button>
-  </div>
-  <div class="col-2"></div>
+	<div class="col-2"></div>
+	<div mat-dialog-actions class="col-2">
+		<button mat-button [mat-dialog-close]="">Close</button>
+	</div>
+	<div class="col-4"></div>
+	<div mat-dialog-actions class="col-2">
+		<button mat-button [disabled]="checkForm()" (click)="submit()">Submit</button>
+	</div>
+	<div class="col-2"></div>
 </div>

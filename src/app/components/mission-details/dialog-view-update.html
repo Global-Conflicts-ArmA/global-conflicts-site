@@ -1,11 +1,9 @@
-<h1 mat-dialog-title>Changelog for {{data.mission.name}} version: {{missionsService.buildVersionStr(
-  data.update.version
-)}}</h1>
+<h1 mat-dialog-title>Changelog for {{data.mission.name}} version: {{missionsService.buildVersionStr( data.update.version )}}</h1>
 <div mat-dialog-content>
-  <div class="changeLog-background mb-4">
-    <markdown [data]="data.update.changeLog"></markdown>
-  </div>
+	<div class="changeLog-background mb-4">
+		<markdown [data]="data.update.changeLog"></markdown>
+	</div>
 </div>
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="">Close</button>
+	<button mat-button [mat-dialog-close]="">Close</button>
 </div>

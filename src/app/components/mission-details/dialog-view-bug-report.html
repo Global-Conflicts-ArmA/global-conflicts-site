@@ -1,25 +1,23 @@
 <div [ngSwitch]="data.report.version">
-  <div *ngSwitchCase="'General'">
-    <h1 mat-dialog-title>Report for {{data.mission.name}}</h1>
-  </div>
-  <div *ngSwitchDefault>
-    <h1 mat-dialog-title>Report for {{data.mission.name}} version: {{missionsService.buildVersionStr(
-      data.report.version
-    )}}</h1>
-  </div>
+	<div *ngSwitchCase="'General'">
+		<h1 mat-dialog-title>Report for {{data.mission.name}}</h1>
+	</div>
+	<div *ngSwitchDefault>
+		<h1 mat-dialog-title>Report for {{data.mission.name}} version: {{missionsService.buildVersionStr( data.report.version )}}</h1>
+	</div>
 </div>
 <h3 mat-dialog-title>Report by: {{data.report.authorName}}</h3>
 <div mat-dialog-content>
-  <div class="changeLog-background mb-4">
-    <markdown [data]="data.report.report"></markdown>
-  </div>
-  <div *ngIf="data.report.log">
-    <h3>Error Log:</h3>
-    <div class="changeLog-background mb-4">
-      <markdown [data]="data.report.log"></markdown>
-    </div>
-  </div>
+	<div class="changeLog-background mb-4">
+		<markdown [data]="data.report.report"></markdown>
+	</div>
+	<div *ngIf="data.report.log">
+		<h3>Error Log:</h3>
+		<div class="changeLog-background mb-4">
+			<markdown [data]="data.report.log"></markdown>
+		</div>
+	</div>
 </div>
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="">Close</button>
+	<button mat-button [mat-dialog-close]="">Close</button>
 </div>

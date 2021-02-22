@@ -37,6 +37,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { HomeComponent } from './components/home/home.component';
 import { MainNavComponent } from './components/main-nav/main-nav.component';
 import { MissionListComponent } from './components/mission-list/mission-list.component';
@@ -112,7 +113,8 @@ import { DialogEditDetailsComponent } from './components/mission-details/dialog-
 		MatSortModule,
 		MatProgressSpinnerModule,
 		BrowserAnimationsModule,
-		MarkdownModule.forRoot()
+		MarkdownModule.forRoot(),
+		MatAutocompleteModule
 	],
 	bootstrap: [AppComponent],
 	providers: [

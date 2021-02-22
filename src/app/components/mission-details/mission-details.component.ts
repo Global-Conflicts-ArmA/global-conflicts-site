@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { MissionsService } from '../../services/missions.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MissionsService } from '@app/services/missions.service';
 import { MatDialog } from '@angular/material/dialog';
 
-import { DiscordUser } from '../../models/discorduser';
-import { UserService } from '../../services/user.service';
-import { IMission, IReport, IUpdate, IReview } from '../../models/mission';
+import { DiscordUser } from '@app/models/discorduser';
+import { UserService } from '@app/services/user.service';
+import { IMission, IReport, IReview, IUpdate } from '@app/models/mission';
 import { SharedService } from '@app/services/shared';
 import { DialogViewUpdateComponent } from './dialog-view-update.component';
 import { DialogViewBugReportComponent } from './dialog-view-bug-report.component';
@@ -13,12 +13,7 @@ import { DialogSubmitBugReportComponent } from './dialog-submit-bug-report.compo
 import { DialogSubmitReviewComponent } from './dialog-submit-review.component';
 import { DialogViewReviewComponent } from './dialog-view-review.component';
 import { DialogSubmitUpdateComponent } from './dialog-submit-update.component';
-import {
-	BlockScrollStrategy,
-	Overlay,
-	ScrollStrategy,
-	ScrollStrategyOptions
-} from '@angular/cdk/overlay';
+import { Overlay } from '@angular/cdk/overlay';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { DialogEditDetailsComponent } from './dialog-edit-details.component';
 import { MatSort } from '@angular/material/sort';
@@ -54,7 +49,6 @@ export class MissionDetailsComponent implements OnInit {
 	dataSourceReviews: MatTableDataSource<IReview>;
 	reviewColumns = ['date', 'versionStr', 'authorName', 'buttons'];
 	uniqueName: string | null;
-	doneLoading = false;
 
 	ngOnInit(): void {
 		this.discordUser = this.userService.getUserLocally();
@@ -133,7 +127,6 @@ export class MissionDetailsComponent implements OnInit {
 					}
 				};
 				this.dataSourceReviews.sort = this.reviewsSort;
-				this.doneLoading = true;
 			});
 	}
 
@@ -161,6 +154,7 @@ export class MissionDetailsComponent implements OnInit {
 		});
 	}
 
+	// TODO: make edit mission details dialog
 	public editMission(mission: IMission | null = this.mission) {
 		const dialogRef = this.dialog.open(DialogEditDetailsComponent, {
 			data: mission,
