@@ -10,6 +10,10 @@
 @import 'https://fonts.googleapis.com/css?family=Material+Icons';
 @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500');
 
+// prism
+@import 'prismjs/themes/prism-okaidia.css';
+@import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
+
 $fontConfig: (
 	display-4: mat-typography-level(112px, 112px, 300, 'Roboto', -0.0134em),
 	display-3: mat-typography-level(56px, 56px, 400, 'Roboto', -0.0089em),
@@ -380,6 +384,59 @@ a:hover {
 }
 
 
+.mat-dialog-container {
+	min-width: 10rem;
+	padding: 0;
+}
+
+.btn {
+	display: inline-block;
+	padding: 6px 12px;
+	margin-bottom: 0;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.42857143;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	-ms-touch-action: manipulation;
+	touch-action: manipulation;
+
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	background-image: none;
+	background-color: colors.$accent;
+	color: white;
+	outline: none;
+	border: none;
+
+	transition: all 0.1s ease-in-out;
+
+	div {
+		transition: all 0.1s ease-in-out;
+	}
+
+	cursor: pointer;
+
+	&:hover {
+		box-shadow: inset black 0 1px 1px 0;
+
+		div {
+			transform: translateY(1px);
+		}
+	}
+
+	&:active {
+		box-shadow: inset black 0 2.5px 4px 0;
+
+		div {
+			transform: translateY(4px);
+		}
+	}
+}
+
 form {
 	> * {
 		margin-bottom: 20px;
@@ -420,6 +477,10 @@ input,
 	width: 100%;
 }
 
+.full-width {
+	width: 100%;
+}
+
 .not-allowed-overlay {
 	opacity: 0.3;
 	cursor: not-allowed !important;
@@ -430,6 +491,36 @@ input,
 	-webkit-filter: blur(4px);
 	pointer-events: none;
 	user-select: none;
+}
+
+.loading-overlay {
+	opacity: 1;
+	cursor: not-allowed !important;
+	filter: blur(4px);
+	-o-filter: blur(4px);
+	-ms-filter: blur(4px);
+	-moz-filter: blur(4px);
+	-webkit-filter: blur(4px);
+	pointer-events: none;
+	user-select: none;
+}
+
+.center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-moz-transform: translateX(-50%) translateY(-50%);
+	-webkit-transform: translateX(-50%) translateY(-50%);
+	transform: translateX(-50%) translateY(-50%);
+}
+
+.dark-background {
+	background-color: colors.$primary-dark;
+	background-size: auto;
+	background-blend-mode: color;
+	background-origin: content-box;
+	background-clip: content-box;
+	background-position: center;
 }
 
 ul {

@@ -10,14 +10,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RxReactiveFormsModule } from '@rxweb/reactive-form-validators';
 import { AppComponent } from './app.component';
 import { LayoutModule } from '@angular/cdk/layout';
-
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { HttpErrorInterceptor } from './interceptor/httpInterceptor';
-import { CachingInterceptor } from './interceptor/caching-interceptor';
 import { CookieService } from 'ngx-cookie-service';
 import { CustExtBrowserXhr } from './services/cust-ext-browser-xhr';
 import { BrowserXhr } from '@angular/http';
-
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -39,9 +36,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
-import {MatAutocompleteModule} from '@angular/material/autocomplete';
-
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { HomeComponent } from './components/home/home.component';
 import { MainNavComponent } from './components/main-nav/main-nav.component';
 import { MissionListComponent } from './components/mission-list/mission-list.component';
@@ -53,7 +49,14 @@ import { MissionConstants } from './constants/missionConstants';
 import { MissionDetailsComponent } from './components/mission-details/mission-details.component';
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
 import { SharedService } from './services/shared';
-import { RequestCache } from './services/request-cache.service';
+import { DialogViewUpdateComponent } from './components/mission-details/dialog-view-update.component';
+import { DialogViewBugReportComponent } from './components/mission-details/dialog-view-bug-report.component';
+import { DialogSubmitBugReportComponent } from './components/mission-details/dialog-submit-bug-report.component';
+import { DialogViewReviewComponent } from './components/mission-details/dialog-view-review.component';
+import { DialogSubmitReviewComponent } from './components/mission-details/dialog-submit-review.component';
+import { MarkdownModule } from 'ngx-markdown';
+import { DialogSubmitUpdateComponent } from './components/mission-details/dialog-submit-update.component';
+import { DialogEditDetailsComponent } from './components/mission-details/dialog-edit-details.component';
 
 @NgModule({
 	declarations: [
@@ -66,7 +69,14 @@ import { RequestCache } from './services/request-cache.service';
 		WikiComponent,
 		AARComponent,
 		MissionDetailsComponent,
-		UserSettingsComponent
+		UserSettingsComponent,
+		DialogViewUpdateComponent,
+		DialogViewBugReportComponent,
+		DialogSubmitBugReportComponent,
+		DialogViewReviewComponent,
+		DialogSubmitReviewComponent,
+		DialogSubmitUpdateComponent,
+		DialogEditDetailsComponent
 	],
 	imports: [
 		CommonModule,
@@ -101,7 +111,9 @@ import { RequestCache } from './services/request-cache.service';
 		MatTableModule,
 		MatPaginatorModule,
 		MatSortModule,
+		MatProgressSpinnerModule,
 		BrowserAnimationsModule,
+		MarkdownModule.forRoot(),
 		MatAutocompleteModule
 	],
 	bootstrap: [AppComponent],
@@ -111,12 +123,6 @@ import { RequestCache } from './services/request-cache.service';
 		{
 			provide: HTTP_INTERCEPTORS,
 			useClass: HttpErrorInterceptor,
-			multi: true
-		},
-		RequestCache,
-		{
-			provide: HTTP_INTERCEPTORS,
-			useClass: CachingInterceptor,
 			multi: true
 		},
 		{ provide: BrowserXhr, useClass: CustExtBrowserXhr },

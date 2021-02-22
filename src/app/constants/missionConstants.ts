@@ -194,8 +194,7 @@ export class MissionConstants {
 		},
 		Tanoa: {
 			class: 'Tanoa',
-			name: 'Tanoa',
-			defaultImage: '../../../assets/imgs/logo.png'
+			name: 'Tanoa'
 		},
 		fow_map_tarawa: {
 			class: 'fow_map_tarawa',

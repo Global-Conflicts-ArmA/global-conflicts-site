@@ -9,6 +9,8 @@ import { RemoteDiscordUser } from '../models/remoteDiscordUser';
 	providedIn: 'root'
 })
 export class UserService {
+	userCache: RemoteDiscordUser[] = [];
+
 	constructor(
 		private httpClient: HttpClient,
 		private cookieService: CookieService
@@ -52,52 +54,67 @@ export class UserService {
 	}
 
 	public async getDiscordUsername(id: string): Promise<string> {
-		return this.httpClient
-			.get<DiscordUser[]>('/api/users')
-			.toPromise()
-			.then((result) => {
-				// if (result && result.find((element: DiscordUser) => element.id === id)?.username) {
-				// 	const user = result.find(
-				// 		(element: DiscordUser) => element.id === id
-				// 	);
-				// 	return user ? user.username : 'error'
-				// } else {
-					return this.httpClient
-						.get<RemoteDiscordUser>('/api/users/fetch/' + id)
-						.toPromise()
-						.then((remoteUser: RemoteDiscordUser) => {
-							if (remoteUser) {
-								console.log('remoteUser: ', remoteUser);
-								return remoteUser.nickname
-									? remoteUser.nickname
-									: remoteUser.displayName
-									? remoteUser.displayName
-									: 'error';
-							} else {
-								return 'error';
-							}
-						})
-						.catch((err) => {
-							console.log('error: ', err);
+		const user = this.userCache.find((result) => {
+			return result.userID === id;
+		});
+		if (user) {
+			return user.nickname ?? user.displayName ?? 'error';
+		} else {
+			return this.httpClient
+				.get<RemoteDiscordUser>('/api/users/fetch/' + id)
+				.toPromise()
+				.then(async (result) => {
+					try {
+						const remoteUser = await this.httpClient
+							.get<RemoteDiscordUser>('/api/users/fetch/' + id)
+							.toPromise();
+						if (remoteUser) {
+							this.userCache.push(remoteUser);
+							return (
+								remoteUser.nickname ??
+								remoteUser.displayName ??
+								'error'
+							);
+						} else {
 							return 'error';
-						});
-				// }
+						}
+					} catch (err) {
+						console.log('error: ', err);
+						return 'error';
+					}
+				})
+				.catch((err) => {
+					console.log('error: ', err);
+					return 'error';
+				});
+		}
+	}
+
+	public async getUserSettings(id: string): Promise<IUserSettings> {
+		return this.httpClient
+			.get<DiscordUser>('/api/users/' + id)
+			.toPromise()
+			.then((user: DiscordUser) => {
+				const settings = {
+					missionEditDM: true,
+					missionReportDM: true,
+					missionReviewDM: true,
+					missionRemoveDM: true,
+					missionAcceptDM: true
+				};
+				return settings;
 			})
 			.catch((err) => {
 				console.log('error: ', err);
-				return 'error';
+				const settings = {
+					missionEditDM: true,
+					missionReportDM: true,
+					missionReviewDM: true,
+					missionRemoveDM: true,
+					missionAcceptDM: true
+				};
+				return settings;
 			});
-	}
-
-	public getUserSettings(id: string): IUserSettings {
-		const settings = {
-			missionEditDM: true,
-			missionReportDM: true,
-			missionReviewDM: true,
-			missionRemoveDM: true,
-			missionAcceptDM: true
-		};
-		return settings;
 	}
 }
 

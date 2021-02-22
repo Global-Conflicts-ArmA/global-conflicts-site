@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { MatTable } from '@angular/material/table';
+import { IMission } from '@app/models/mission';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class SharedService {
-	constructor(
-		private httpClient: HttpClient
-	) {}
+	constructor(private httpClient: HttpClient) {}
+
+	uploadingState: string;
 
 	public bytesToSize(bytes: number) {
 		const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];

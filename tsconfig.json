@@ -1,29 +1,25 @@
 {
-  "compilerOptions": {
-    "baseUrl": "./",
-    "paths": {
-      "@app/*": [
-        "src/app/*"
-      ]
-    },
-    "target": "ES2015",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
-    "module": "es2020",
-    "moduleResolution": "node",
-    "strict": true,
-    "sourceMap": true,
-    "declaration": false,
-    "importHelpers": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "suppressImplicitAnyIndexErrors": true,
+	"compilerOptions": {
+		"baseUrl": "./",
+		"paths": {
+			"@app/*": ["src/app/*"]
+		},
+		"target": "ES2015",
+		"typeRoots": ["node_modules/@types"],
+		"lib": ["ESNext", "DOM"],
+		"module": "es2020",
+		"moduleResolution": "node",
+		"strict": true,
+		"sourceMap": true,
+		"declaration": false,
+		"importHelpers": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"suppressImplicitAnyIndexErrors": true,
 		"strictPropertyInitialization": false,
 		"noImplicitAny": false
-	}
+	},
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  }
 }

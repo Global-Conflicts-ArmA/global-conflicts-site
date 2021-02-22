@@ -1,14 +1,12 @@
 {
-  "extends": "./tsconfig.json",
-  "files": [
-    "src/polyfills.ts",
-    "src/main.ts"
-  ],
-  "include": [
-    "src/**/*.d.ts"
-  ],
-  "angularCompilerOptions": {
-    "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true
-  }
+	"extends": "./tsconfig.json",
+	"files": ["src/polyfills.ts", "src/main.ts"],
+	"include": ["src/**/*.d.ts"],
+	"angularCompilerOptions": {
+		"fullTemplateTypeCheck": true,
+		"strictInjectionParameters": true
+	},
+	"compilerOptions": {
+		"types": ["prismjs"]
+	}
 }
