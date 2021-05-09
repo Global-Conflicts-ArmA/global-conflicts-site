@@ -6,6 +6,7 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
 	selector: 'app-main-nav',
@@ -19,6 +20,7 @@ export class MainNavComponent implements OnInit {
 		private breakpointObserver: BreakpointObserver,
 		private matIconRegistry: MatIconRegistry,
 		private domSanitizer: DomSanitizer,
+		private router: Router,
 		private userService: UserService
 	) {
 		this.matIconRegistry.addSvgIcon(
@@ -46,5 +48,18 @@ export class MainNavComponent implements OnInit {
 
 	logout() {
 		this.userService.logout();
+	}
+
+	openMissionList() {
+		this.router.navigate([
+			`mission-list`
+		]);
+
+	}
+
+	openUploadForm() {
+		this.router.navigate([
+			`mission-upload`
+		]);
 	}
 }

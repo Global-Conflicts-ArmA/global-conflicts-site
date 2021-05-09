@@ -39,13 +39,17 @@
 	}
 }
 
+::ng-deep .mat-cell{
+	padding: 0px !important;
+}
 
-::ng-deep .mat-sort-header-container {
-	display: flex;
-	justify-content: center !important;
+::ng-deep .mat-header-cell {
+
 	color: colors.$accent !important;
 	font-size: 20px;
-	padding-left: 20px;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	text-align: center !important;
 }
 
 .img-details {
@@ -75,6 +79,7 @@
 	.table-title {
 		flex: 4;
 	}
+
 
 	.table-button-container {
 		flex: 0.5;
@@ -110,3 +115,17 @@ table {
 		display: block;
 	}
 } ;
+
+.mission-status-icon-title{
+	font-size: 8px;
+}
+
+.row-btns{
+	display: flex;
+	justify-content: space-evenly;
+	button{
+		width: 37px!important;
+		padding: 0;
+		min-width: unset!important;
+	}
+}

@@ -1,9 +1,9 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -56,7 +56,16 @@ import { DialogViewReviewComponent } from './components/mission-details/dialog-v
 import { DialogSubmitReviewComponent } from './components/mission-details/dialog-submit-review.component';
 import { MarkdownModule } from 'ngx-markdown';
 import { DialogSubmitUpdateComponent } from './components/mission-details/dialog-submit-update.component';
-import { DialogEditDetailsComponent } from './components/mission-details/dialog-edit-details.component';
+import { DialogActionsComponent } from './components/mission-details/dialog-actions/dialog-actions.component';
+
+import { IConfig, NgxMaskModule } from 'ngx-mask';
+
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import * as Sentry from '@sentry/angular';
+
+const maskConfig: Partial<IConfig> = {
+	validation: false
+};
 
 @NgModule({
 	declarations: [
@@ -76,7 +85,7 @@ import { DialogEditDetailsComponent } from './components/mission-details/dialog-
 		DialogViewReviewComponent,
 		DialogSubmitReviewComponent,
 		DialogSubmitUpdateComponent,
-		DialogEditDetailsComponent
+		DialogActionsComponent
 	],
 	imports: [
 		CommonModule,
@@ -111,13 +120,32 @@ import { DialogEditDetailsComponent } from './components/mission-details/dialog-
 		MatTableModule,
 		MatPaginatorModule,
 		MatSortModule,
+		MatSnackBarModule,
 		MatProgressSpinnerModule,
 		BrowserAnimationsModule,
 		MarkdownModule.forRoot(),
-		MatAutocompleteModule
+		MatAutocompleteModule,
+		NgxMaskModule.forRoot(maskConfig)
 	],
 	bootstrap: [AppComponent],
 	providers: [
+		{
+			provide: ErrorHandler,
+			useValue: Sentry.createErrorHandler({
+				showDialog: true
+			})
+		},
+		{
+			provide: Sentry.TraceService,
+			deps: [Router]
+		},
+		{
+			provide: APP_INITIALIZER,
+			useFactory: () => () => {},
+			deps: [Sentry.TraceService],
+			multi: true
+		},
+
 		CookieService,
 		MissionConstants,
 		{

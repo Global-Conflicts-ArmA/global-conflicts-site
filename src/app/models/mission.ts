@@ -3,6 +3,7 @@ export interface IUpdate {
 		major: number;
 		minor?: string;
 	};
+	_id?: string;
 	authorID: string;
 	authorName?: string;
 	date: Date;

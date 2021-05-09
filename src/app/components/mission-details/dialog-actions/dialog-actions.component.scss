@@ -1,0 +1,19 @@
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 1em 0;
+  button{
+    flex-grow: 1;
+    margin: 0 10px;
+  }
+}
+
+.text{
+  margin: 1em 10px;
+}
+
+hr{
+  margin-left: 10px;
+  margin-right: 10px;
+}

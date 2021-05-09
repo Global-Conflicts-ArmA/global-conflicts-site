@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
-import { Observable, of, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { DiscordUser } from '../models/discorduser';
 import { RemoteDiscordUser } from '../models/remoteDiscordUser';
 
@@ -58,6 +58,7 @@ export class UserService {
 			return result.userID === id;
 		});
 		if (user) {
+
 			return user.nickname ?? user.displayName ?? 'error';
 		} else {
 			return this.httpClient
@@ -115,6 +116,39 @@ export class UserService {
 				};
 				return settings;
 			});
+	}
+
+	public insertUserIds(authorId: string) {
+		const userFound = this.userCache.find((value) => {
+			return value.userID === authorId;
+		});
+		if (!userFound) {
+			this.userCache.push({ userID: authorId });
+		}
+	}
+
+	public async getAuthorsName(): Promise<RemoteDiscordUser[]> {
+		await Promise.all(
+			this.userCache.map(async (userOnCache) => {
+				if (!userOnCache.displayName && userOnCache.userID != null) {
+					await this.httpClient
+						.get<RemoteDiscordUser>(
+							'/api/users/fetch/' + userOnCache.userID
+						)
+						.toPromise()
+						.then((remoteUser) => {
+							if (remoteUser) {
+								userOnCache.displayName =
+									remoteUser.displayName;
+							} else {
+								return 'error';
+							}
+						});
+				}
+			})
+		);
+
+		return this.userCache;
 	}
 }
 

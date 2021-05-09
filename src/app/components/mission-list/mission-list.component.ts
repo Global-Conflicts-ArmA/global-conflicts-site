@@ -52,52 +52,31 @@ export class MissionListComponent implements OnInit {
 	) {}
 
 	public refresh() {
-		this.missionsService.list().subscribe((value) => {
+		this.missionsService.list().subscribe(  (value) => {
 			this.userList = [];
-			console.log('got value: ', value);
+
+
 			value.map((mission: IMission) => {
-				console.log('mission.authorID: ', mission.authorID);
-				this.userService
-					.getDiscordUsername(mission.authorID)
-					.then((result) => {
-						mission.authorName = result;
-						if (!this.userList.includes(mission.authorName)) {
-							this.userList.push(mission.authorName);
-						}
-						console.log('mission.authorName: ', mission.authorName);
-						mission.lastVersionStr = this.missionsService.buildVersionStr(
-							mission.lastVersion
-						);
-						mission.updates.map((update: IUpdate) => {
-							this.userService
-								.getDiscordUsername(update.authorID)
-								.then((_result) => {
-									update.authorName = _result;
-									if (
-										!this.userList.includes(
-											update.authorName
-										)
-									) {
-										this.userList.push(update.authorName);
-									}
-									console.log(
-										'update.authorName: ',
-										update.authorName
-									);
-									update.versionStr = this.missionsService.buildVersionStr(
-										update.version
-									);
-								})
-								.catch((err) => {
-									console.log('err: ', err);
-								});
-						});
-					})
-					.catch((err) => {
-						console.log('err: ', err);
-					});
+				const lastUpdate =
+					mission.updates[mission.updates.length - 1];
+				mission.lastVersionStr = this.missionsService.buildVersionStr(
+					mission.lastVersion
+				);
+				this.userService.insertUserIds(lastUpdate.authorID);
 			});
-			console.log('done map');
+			// iterate the list of users, and get the names of those who doesn't have a name yet
+			 this.userService.getAuthorsName().then(usersOnCache => {
+				 value.map((mission) => {
+					 // find author by id
+					 const userFound = usersOnCache.find(
+						 (userOnCahce) => userOnCahce.userID === mission.authorID
+					 );
+					 if (userFound) {
+						 mission.authorName = userFound.displayName;
+					 }
+				 });
+			} );
+
 			this.userList.sort();
 			this.dataSource = new MatTableDataSource<IMission>(value);
 			this.rowData = this.dataSource.data;

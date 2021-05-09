@@ -9,7 +9,8 @@ import { MissionsService } from '@app/services/missions.service';
 
 @Component({
 	selector: 'dialog-view-review',
-	templateUrl: 'dialog-view-review.html'
+	templateUrl: 'dialog-view-review.html',
+	styleUrls: ['./mission-report-review-bug-dialog.scss']
 })
 export class DialogViewReviewComponent {
 	enableErrorLog = false;

@@ -2,8 +2,8 @@
 	<div style="position: relative">
 		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">You must join our Discord server and complete the welcoming process to upload missions!</div>
 		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
-			<mat-vertical-stepper class="field-container" [linear]="true" #stepper>
-				<mat-step [stepControl]="fileUploadGroup">
+			<mat-vertical-stepper class="field-container" [linear]="false" #stepper>
+				<mat-step *ngIf="isEdit==false" [stepControl]="fileUploadGroup">
 					<form [formGroup]="fileUploadGroup">
 						<ng-template matStepLabel>Mission File</ng-template>
 						<div>
@@ -29,12 +29,12 @@
 						<button mat-button matStepperNext>Next</button>
 					</form>
 				</mat-step>
-				<mat-step [stepControl]="missionNameGroup">
+				<mat-step [stepControl]="missionNameGroup" *ngIf="isEdit==false" >
 					<form [formGroup]="missionNameGroup">
 						<ng-template matStepLabel>Mission Name</ng-template>
 						<div>
 							<mat-form-field>
-								<mat-label class="inset-label">Mission Name</mat-label>
+								<mat-label class="inset-label">Mission Name. Do not put the version here. You won't be able to edit this afterwards.</mat-label>
 								<input
 									matInput
 									formControlName="missionName"
@@ -105,53 +105,51 @@
 							<mat-error>{{ getSizeErrorMessage() }}</mat-error>
 						</div>
 						<mat-label *ngIf="getIfTVT()" class="inset-label row">Side Ratios:</mat-label>
-						<div *ngIf="getIfTVT()" style="display: flex">
-							<mat-checkbox formControlName="ratioBluforE" class="inset-label" style="align-self: center">BLUFOR: </mat-checkbox>
-							<mat-slider
-								formControlName="ratioBlufor"
-								class="blueSlider column"
-								[disabled]="!(missionSizeGroup.get('ratioBluforE')?.value ? missionSizeGroup.get('ratioBluforE')?.value : false)"
-								[thumbLabel]="true"
-								[vertical]="true"
-								[step]="0.1"
-								[min]="1"
-								[max]="5"
-							></mat-slider>
-							<mat-checkbox formControlName="ratioOpforE" class="inset-label" style="align-self: center"> OPFOR: </mat-checkbox>
-							<mat-slider
-								formControlName="ratioOpfor"
-								class="redSlider column"
-								[disabled]="!(missionSizeGroup.get('ratioOpforE')?.value ? missionSizeGroup.get('ratioOpforE')?.value : false)"
-								[thumbLabel]="true"
-								[vertical]="true"
-								[step]="0.1"
-								[min]="1"
-								[max]="5"
-							></mat-slider>
-							<mat-checkbox formControlName="ratioIndforE" class="inset-label" style="align-self: center">INDFOR: </mat-checkbox>
-							<mat-slider
-								formControlName="ratioIndfor"
-								class="greenSlider column"
-								[disabled]="!(missionSizeGroup.get('ratioIndforE')?.value ? missionSizeGroup.get('ratioIndforE')?.value : false)"
-								[thumbLabel]="true"
-								[vertical]="true"
-								[step]="0.1"
-								[min]="1"
-								[max]="5"
-							></mat-slider>
-							<mat-checkbox formControlName="ratioCivE" class="inset-label" style="align-self: center"> CIVILIAN: </mat-checkbox>
-							<mat-slider
-								formControlName="ratioCiv"
-								class="yellowSlider column"
-								[disabled]="!(missionSizeGroup.get('ratioCivE')?.value ? missionSizeGroup.get('ratioCivE')?.value : false)"
-								[thumbLabel]="true"
-								[vertical]="true"
-								[step]="0.1"
-								[min]="1"
-								[max]="5"
-							></mat-slider>
+						<div *ngIf="getIfTVT()" class="ratios-container">
+
+							<mat-form-field>
+								<mat-label class="inset-label">Blufor Ratio</mat-label>
+								<input matInput type="text" formControlName="ratioBlufor" placeholder="Opfor Ratio"  mask="0.0"  />
+								<button matTooltip="Enable/Disable ratio" (click)="onRatioEnabledChange('ratioBlufor')" matSuffix mat-icon-button color="accent"  >
+									<mat-icon *ngIf="missionSizeGroup.get('ratioBlufor')?.enabled">group</mat-icon>
+									<mat-icon *ngIf="!missionSizeGroup.get('ratioBlufor')?.enabled">group_off</mat-icon>
+								</button>
+								<mat-error>{{ getRatioErrorMessage() }}</mat-error>
+							</mat-form-field>
+
+							<mat-form-field>
+								<mat-label class="inset-label">Opfor Ratio</mat-label>
+								<input matInput type="text" formControlName="ratioOpfor" placeholder="Opfor Ratio"  mask="0.0"  />
+								<button matTooltip="Enable/Disable ratio" (click)="onRatioEnabledChange('ratioOpfor')" matSuffix mat-icon-button color="accent"  >
+									<mat-icon *ngIf="missionSizeGroup.get('ratioOpfor')?.enabled">group</mat-icon>
+									<mat-icon *ngIf="!missionSizeGroup.get('ratioOpfor')?.enabled">group_off</mat-icon>
+								</button>
+								<mat-error>{{ getRatioErrorMessage() }}</mat-error>
+							</mat-form-field>
+
+							<mat-form-field>
+								<mat-label class="inset-label">Indfor Ratio</mat-label>
+								<input matInput type="text" formControlName="ratioIndfor" placeholder="Indfor Ratio"  mask="0.0"  />
+								<button matTooltip="Enable/Disable ratio" (click)="onRatioEnabledChange('ratioIndfor')" matSuffix mat-icon-button color="accent"  >
+									<mat-icon *ngIf="missionSizeGroup.get('ratioIndfor')?.enabled">group</mat-icon>
+									<mat-icon *ngIf="!missionSizeGroup.get('ratioIndfor')?.enabled">group_off</mat-icon>
+								</button>
+								<mat-error>{{ getRatioErrorMessage() }}</mat-error>
+							</mat-form-field>
+
+							<mat-form-field>
+								<mat-label class="inset-label">Civ Ratio</mat-label>
+								<input matInput type="text" formControlName="ratioCiv" placeholder="Civ Ratio"  mask="0.0"  />
+								<button matTooltip="Enable/Disable ratio" (click)="onRatioEnabledChange('ratioCiv')" matSuffix mat-icon-button color="accent"  >
+									<mat-icon *ngIf="missionSizeGroup.get('ratioCiv')?.enabled">group</mat-icon>
+									<mat-icon *ngIf="!missionSizeGroup.get('ratioCiv')?.enabled">group_off</mat-icon>
+								</button>
+								<mat-error>{{ getRatioErrorMessage() }}</mat-error>
+
+
+							</mat-form-field>
 						</div>
-						<mat-error>{{ getRatioErrorMessage() }}</mat-error>
+
 						<button mat-button matStepperNext>Next</button>
 					</form>
 				</mat-step>
@@ -181,8 +179,7 @@
 									<mat-chip
 										*ngFor="let tag of missionDescGroup.get('misTags')?.value; let matChipIndex = index"
 										[removable]="true"
-										(removed)="onListChipRemoved(matChipIndex)"
-									>
+										(removed)="onListChipRemoved(matChipIndex)">
 										{{ tag }}
 										<mat-icon matChipRemove>cancel</mat-icon>
 									</mat-chip>
@@ -196,6 +193,7 @@
 										[matChipInputFor]="chipList"
 										[matChipInputAddOnBlur]="false"
 									/>
+									<mat-error>{{getTagsErrorMessage()}}</mat-error>
 								</mat-chip-list>
 								<mat-autocomplete #auto="matAutocomplete" (optionSelected)="onTagSelected($event)">
 									<mat-option (click)="$event.stopPropagation(); trigger.openPanel()" *ngFor="let tag of filtredTags" [value]="tag">
@@ -218,6 +216,17 @@
 								</mat-button-toggle>
 							</mat-button-toggle-group>
 							<mat-error>{{ getReqErrorMessage('misEra') }}</mat-error>
+
+							<div class="checkboxes">
+								<mat-checkbox formControlName="misJip">
+									JIP
+								</mat-checkbox>
+								<mat-checkbox formControlName="misRespawn">
+									Respawn
+								</mat-checkbox>
+
+							</div>
+
 						</div>
 						<button mat-button matStepperNext>Next</button>
 					</form>
@@ -225,8 +234,13 @@
 				<mat-step [stepControl]="fileImageGroup">
 					<form [formGroup]="fileImageGroup">
 						<ng-template matStepLabel>Image</ng-template>
-						<div>
-							<mat-slide-toggle #matInput class="mb-4" formControlName="imgToggle" (change)="changeImageToggle()"> Custom Mission Image </mat-slide-toggle>
+						<div style="display: flex; flex-direction: column;">
+
+
+
+
+
+							<mat-slide-toggle #matInput class="mb-4" formControlName="imgToggle" (change)="changeImageToggle()"> Custom Mission Image {{ isEdit?"(Select this to change the image)":"" }} </mat-slide-toggle>
 							<mat-form-field *ngIf="fileImageGroup.get('imgToggle')?.value">
 								<mat-label class="inset-label" for="file-input">Select Image</mat-label>
 								<ngx-mat-file-input
@@ -251,9 +265,11 @@
 				</mat-step>
 				<mat-step>
 					<ng-template matStepLabel>Submit</ng-template>
+
+
 					<div>
-						<button mat-button [disabled]="sharedService.uploadingState != 'ready' && sharedService.uploadingState != 'error'" (click)="submitMission()">
-							Submit Mission
+						<button style=" display: flex;justify-content: center; margin: 10px 0;" mat-button [disabled]="sharedService.uploadingState!='ready'" (click)="submitMission()">
+							{{isEdit ? 'Edit mission details' : 'Submit Mission'}}
 						</button>
 					</div>
 					<div class="upload-result">
@@ -262,7 +278,7 @@
 						<div class="result-uploading" *ngIf="sharedService.uploadingState == 'uploading'">Uploading mission...</div>
 						<div class="result-success" *ngIf="sharedService.uploadingState == 'success'">Mission uploaded!</div>
 					</div>
-					<div class="upload-result">
+					<div class="upload-result" >
 						<div class="result-error" *ngIf="authError">{{ authError }}</div>
 					</div>
 				</mat-step>

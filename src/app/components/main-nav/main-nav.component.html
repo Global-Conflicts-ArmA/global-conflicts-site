@@ -32,9 +32,9 @@
 			<ng-container *ngIf="!(isHandset$ | async)">
 				<a mat-menu-item class="nav-main-link accent-color" routerLinkActive="active" routerLink="" href="">Home</a>
 				<mat-menu #missionMenu="matMenu">
-					<button mat-menu-item class="nav-main-link" routerLinkActive="active" routerLink="mission-list">List</button>
-					<button mat-menu-item class="nav-main-link" routerLinkActive="active" routerLink="mission-upload">Upload</button>
-					<button mat-menu-item class="nav-main-link" routerLinkActive="active" routerLink="mission-stats">Statistics</button>
+					<button mat-menu-item class="nav-main-link" routerLinkActive="active" (click)="openMissionList()">List</button>
+					<button mat-menu-item class="nav-main-link" routerLinkActive="active" (click)="openUploadForm()">Upload</button>
+					<!--<button mat-menu-item class="nav-main-link" routerLinkActive="active" routerLink="mission-stats">Statistics</button>-->
 				</mat-menu>
 				<a mat-menu-item class="nav-main-link accent-color" [matMenuTriggerFor]="missionMenu">
 					Missions
@@ -55,8 +55,8 @@
 			</button>
 			<mat-menu #avatarMenu="matMenu">
 				<span mat-menu-item class="nav-link-fake" *ngIf="discordUser && discordUser.isProcessed()" [style.color]="discordUser.roleColor">Role: {{ discordUser.role }}</span>
-				<button mat-menu-item class="nav-link" routerLinkActive="active" routerLink="user-content">Content</button>
-				<button mat-menu-item class="nav-link" routerLinkActive="active" routerLink="user-settings">Settings</button>
+				<!--<button mat-menu-item class="nav-link" routerLinkActive="active" routerLink="user-content">Content</button>
+				<button mat-menu-item class="nav-link" routerLinkActive="active" routerLink="user-settings">Settings</button>-->
 				<button mat-menu-item class="nav-link" (click)="logout()">Log Out</button>
 			</mat-menu>
 			<img
