@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IMission, IReport } from '../models/mission';
+import { IMission, IReport, IReview } from '../models/mission';
 import { MissionConstants, ITerrain } from '../constants/missionConstants';
 import { DomSanitizer } from '@angular/platform-browser';
 import { DiscordUser } from '@app/models/discorduser';
@@ -98,4 +98,21 @@ export class MissionsService {
 				}
 			);
 	}
+
+	public removeReviewEntry(uniqueName:string, reviewID: string){
+		return this.httpClient.delete(`/api/missions/review/${uniqueName}/${reviewID}`);
+	}
+
+	public removeReportEntry(uniqueName:string, reportID: string){
+		return this.httpClient.delete(`/api/missions/report/${uniqueName}/${reportID}`);
+	}
+
+    public missionAction(action:string, uniqueName:string,  updateId: string, filename:string,) {
+		return this.httpClient.post(`/api/missions/${uniqueName}/action`,{
+			"action":action,
+			"uniqueName":uniqueName,
+			"updateId":updateId,
+			"filename":filename
+		});
+    }
 }
