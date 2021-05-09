@@ -103,13 +103,13 @@
 }
 
 .btn-outline {
-	background-color: transparent;
-	display: flex;
-	border-style: ridge;
-	color: #7289DA;
-	font: 500 20px/32px Roboto;
-	letter-spacing: 0.0075em;
-	border-width: thin;
+  background-color: transparent;
+  display: flex;
+  border-style: solid;
+  color: #7289DA;
+  font: 500 20px/32px Roboto;
+  letter-spacing: 0.0075em;
+  border-width: 2px;
 }
 
 .discord-icon {
