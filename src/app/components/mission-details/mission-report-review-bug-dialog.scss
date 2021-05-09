@@ -1,0 +1,18 @@
+@use "../../../colors";
+
+.mission-name-version {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  div:first-child{
+    margin-right: 20px;
+  }
+}
+.dialog-header{
+  margin-bottom: 20px;
+}
+
+.text-box {
+  background-color: colors.$primary-dark;
+  padding: 1rem 1rem;
+}
