@@ -1,4 +1,11 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+	Component,
+	ElementRef,
+	Inject,
+	Injector,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 import {
 	AbstractControl,
 	FormBuilder,
@@ -18,6 +25,8 @@ import {
 	MatAutocompleteSelectedEvent
 } from '@angular/material/autocomplete';
 import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
 	selector: 'app-mission-upload',
@@ -32,9 +41,22 @@ export class MissionUploadComponent implements OnInit {
 		private formBuilder: FormBuilder,
 		public mC: MissionConstants,
 		public sharedService: SharedService,
-		private router: Router
-	) {}
+		private router: Router,
+		private _snackBar: MatSnackBar,
+		private injector: Injector
+	) {
+		this.dialogRef = this.injector.get(MatDialogRef, null);
+		this.missionDataFromDetails = this.injector.get(MAT_DIALOG_DATA, null);
+		if (this.dialogRef != null && this.missionDataFromDetails != null) {
+			this.isEdit = true;
+		}
+	}
 
+	private readonly dialogRef;
+	// THIS IS THE MISSION DATA THAT IS LOADED INTO THE DIALOG FROM THE MISSION DETAILS PAGE
+	private readonly missionDataFromDetails: IMission;
+
+	isEdit = false;
 	discordUser: DiscordUser | null;
 	misType = 'CO';
 	missionToUpload: File | null;
@@ -68,6 +90,7 @@ export class MissionUploadComponent implements OnInit {
 	@ViewChild('auto') matAutocomplete: MatAutocomplete;
 
 	ngOnInit(): void {
+		this.sharedService.uploadingState = 'ready';
 		this.discordUser = this.userService.getUserLocally();
 		this.fileUploadGroup = this.formBuilder.group({
 			missionFile: [
@@ -90,26 +113,13 @@ export class MissionUploadComponent implements OnInit {
 			{
 				minPlayers: new FormControl(''),
 				maxPlayers: new FormControl(''),
-				ratioBluforE: new FormControl({
-					value: false,
-					disabled: false
-				}),
 				ratioBlufor: new FormControl({ value: 1, disabled: true }),
-				ratioOpforE: new FormControl({ value: false, disabled: false }),
 				ratioOpfor: new FormControl({ value: 1, disabled: true }),
-				ratioIndforE: new FormControl({
-					value: false,
-					disabled: false
-				}),
-				ratioIndfor: new FormControl({ value: 1, disabled: true }),
-				ratioCivE: new FormControl({ value: false, disabled: false }),
-				ratioCiv: new FormControl({ value: 1, disabled: true })
+				ratioIndfor: new FormControl({ value: null, disabled: true }),
+				ratioCiv: new FormControl({ value: null, disabled: true })
 			},
 			{
-				validators: [
-					this.checkMissionSize,
-					this.checkMissionRatios.bind(this)
-				]
+				validators: [this.checkMissionSize]
 			}
 		);
 		this.missionDescGroup = this.formBuilder.group({
@@ -135,7 +145,77 @@ export class MissionUploadComponent implements OnInit {
 		);
 
 		this.filtredTags = this.mC.MissionTags;
+
+		if (this.isEdit) {
+			this.loadMissionDetailsToForm();
+		}
 	}
+
+	private loadMissionDetailsToForm() {
+		// this.missionDataFromDetails;
+
+		this.missionNameGroup
+			.get('missionName')
+			?.setValue(this.missionDataFromDetails.name);
+		const type = this.mC.MissionTypes.filter((_type) => {
+			return _type.title === this.missionDataFromDetails.type;
+		})[0];
+		this.missionTypeGroup.get('missionType')?.setValue(type);
+		this.missionSizeGroup
+			.get('minPlayers')
+			?.setValue(this.missionDataFromDetails.size.min);
+		this.missionSizeGroup
+			.get('maxPlayers')
+			?.setValue(this.missionDataFromDetails.size.max);
+
+		if (this.missionDataFromDetails.ratios?.blufor != null) {
+			this.missionSizeGroup
+				.get('ratioBlufor')
+				?.setValue(this.missionDataFromDetails.ratios?.blufor);
+			this.missionSizeGroup.get('ratioBlufor')?.enable();
+		}
+
+		if (this.missionDataFromDetails.ratios?.opfor != null) {
+			this.missionSizeGroup
+				.get('ratioOpfor')
+				?.setValue(this.missionDataFromDetails.ratios?.opfor);
+			this.missionSizeGroup.get('ratioOpfor')?.enable();
+		}
+
+		if (this.missionDataFromDetails.ratios?.indfor != null) {
+			this.missionSizeGroup
+				.get('ratioIndfor')
+				?.setValue(this.missionDataFromDetails.ratios?.indfor);
+			this.missionSizeGroup.get('ratioIndfor')?.enable();
+		}
+
+		if (this.missionDataFromDetails.ratios?.civ != null) {
+			this.missionSizeGroup
+				.get('ratioCiv')
+				?.setValue(this.missionDataFromDetails.ratios?.civ);
+			this.missionSizeGroup.get('ratioCiv')?.enable();
+		}
+
+		this.missionDescGroup
+			.get('misDescription')
+			?.setValue(this.missionDataFromDetails.description);
+		this.missionDescGroup
+			.get('misTags')
+			?.setValue(this.missionDataFromDetails.tags);
+		this.missionDescGroup
+			.get('misTime')
+			?.setValue(this.missionDataFromDetails.timeOfDay);
+		this.missionDescGroup
+			.get('misEra')
+			?.setValue(this.missionDataFromDetails.era);
+		this.missionDescGroup
+			.get('misJip')
+			?.setValue(this.missionDataFromDetails.jip);
+		this.missionDescGroup
+			.get('misRespawn')
+			?.setValue(this.missionDataFromDetails.respawn);
+	}
+
 	filterTags(value: string) {
 		const filterValue = value.toLowerCase();
 
@@ -165,13 +245,14 @@ export class MissionUploadComponent implements OnInit {
 	}
 
 	tagsTextInputBlur() {
-		const misTagsControl = this.missionDescGroup.get('misTags');
-		if (!misTagsControl) {
-			return;
-		}
-
-		this.tagsTextInput.nativeElement.value = '';
-		this.filtredTags = this.mC.MissionTags;
+		// console.log("blur")
+		// const misTagsControl = this.missionDescGroup.get('misTags');
+		// if (!misTagsControl) {
+		// 	return;
+		// }
+		//
+		// this.tagsTextInput.nativeElement.value = '';
+		// this.filtredTags = this.mC.MissionTags;
 	}
 
 	onTagSelected(event: MatAutocompleteSelectedEvent): void {
@@ -189,6 +270,8 @@ export class MissionUploadComponent implements OnInit {
 			currentTags.splice(indexFound, 1);
 			misTagsControl.patchValue(currentTags);
 		}
+		this.tagsTextInput.nativeElement.value = '';
+		this.filtredTags = this.mC.MissionTags;
 	}
 
 	onListChipRemoved(matChipIndex: number): void {
@@ -366,6 +449,20 @@ export class MissionUploadComponent implements OnInit {
 				maxSizeCtrl.setErrors(null);
 			}
 		}
+
+		['ratioBlufor', 'ratioOpfor', 'ratioIndfo', 'ratioCiv'].forEach(
+			(controlName) => {
+				if (controlGroup.get(controlName)?.enabled) {
+					const ratio = controlGroup.get(controlName)?.value;
+					if (ratio === 0 || ratio === '') {
+						controlGroup.get(controlName)?.setErrors({
+							ratioZero: true
+						});
+					}
+				}
+			}
+		);
+
 		return null;
 	}
 
@@ -407,38 +504,20 @@ export class MissionUploadComponent implements OnInit {
 		return status;
 	}
 
-	checkMissionRatios(controlGroup: AbstractControl) {
-		const tvt = this.getIfTVT();
-		if (tvt) {
-			const enabledBlu = controlGroup.get('ratioBluforE')?.value;
-			const enabledOp = controlGroup.get('ratioOpforE')?.value;
-			const enabledInd = controlGroup.get('ratioIndforE')?.value;
-			const enabledCiv = controlGroup.get('ratioCivE')?.value;
-			if (
-				[enabledBlu, enabledOp, enabledInd, enabledCiv].filter(Boolean)
-					.length < 2
-			) {
-				controlGroup.get('ratioBluforE')?.setErrors({
-					tooFew: true
-				});
-			} else {
-				controlGroup.get('ratioBluforE')?.setErrors(null);
-			}
-		}
-	}
-
 	getRatioErrorMessage() {
-		const desc = this.missionSizeGroup.get('ratioBluforE');
-		if (desc) {
-			if (desc.hasError('required')) {
-				return `You must provide a ratio in the format of 1.5:1`;
+		let error;
+		['ratioBlufor', 'ratioOpfor', 'ratioIndfor', 'ratioCiv'].forEach(
+			(controlName) => {
+				// @ts-ignore
+				const control = this.missionSizeGroup.controls[controlName];
+				if (control) {
+					if (control.hasError('ratioZero')) {
+						error = 'Ratio cannot be zero';
+					}
+				}
 			}
-			if (desc.hasError('tooFew')) {
-				return `You must select at least two teams`;
-			}
-			return null;
-		}
-		return null;
+		);
+		return error;
 	}
 
 	checkMissionDesc() {
@@ -591,13 +670,23 @@ export class MissionUploadComponent implements OnInit {
 			this.buildMissionFileName();
 		}
 		this.missionSizeGroup.get('ratioBluforE')?.setErrors(null);
+		if (!missionType?.value.ratio) {
+			this.missionSizeGroup.get('ratioBlufor')?.disable();
+			this.missionSizeGroup.get('ratioOpfor')?.disable();
+			this.missionSizeGroup.get('ratioIndfor')?.disable();
+			this.missionSizeGroup.get('ratioCiv')?.disable();
+		} else {
+			this.missionSizeGroup.get('ratioBlufor')?.enable();
+			this.missionSizeGroup.get('ratioOpfor')?.enable();
+		}
 	}
 
 	buildMissionFileName() {
 		const missionName = this.missionNameGroup.get('missionName')?.value;
 		const safeMissionName = missionName
 			.replace(' ', '_')
-			.replace(/\W/g, '');
+			.replace(/\W/g, '')
+			.toUpperCase();
 		const safeMissionType = this.missionTypeGroup.get('missionType')?.value
 			?.str
 			? this.missionTypeGroup.get('missionType')?.value?.str
@@ -618,15 +707,28 @@ export class MissionUploadComponent implements OnInit {
 
 	submitMission() {
 		const nameVar = this.missionNameGroup.get('missionName')?.value;
+
 		const uniqueNameVar = this.makeUniqueMissionMapName(
 			nameVar,
-			this.missionTerrain
+			this.missionTerrain !== ''
+				? this.missionTerrain
+				: this.missionDataFromDetails.terrain
 		);
+
 		this.missionsService.findOne(uniqueNameVar).subscribe((result) => {
-			if (result == null) {
-				this.sendMission(nameVar, uniqueNameVar);
-			} else {
-				this.sharedService.uploadingState = 'name-conflict';
+			if (!this.isEdit) {
+				if (result != null) {
+					this.sharedService.uploadingState = 'name-conflict';
+				} else {
+					this.sendMission(nameVar, uniqueNameVar);
+				}
+			}
+			if (this.isEdit) {
+				if (result != null) {
+					this.sendMission(nameVar, uniqueNameVar);
+				} else {
+					this.sharedService.uploadingState = 'not-found'; // database error, should never happen
+				}
 			}
 		});
 	}
@@ -660,29 +762,11 @@ export class MissionUploadComponent implements OnInit {
 		const misType = this.missionTypeGroup.get('missionType')?.value.title;
 		const minSize = this.missionSizeGroup.get('minPlayers')?.value;
 		const maxSize = this.missionSizeGroup.get('maxPlayers')?.value;
-		const parsedRatios: IRatios = {};
+
 		if (
 			['TVT', 'COTVT'].includes(misType) ||
 			(misType === 'LOL' && this.missionTypeGroup.get('ratioLOL')?.value)
 		) {
-			if (this.missionSizeGroup.get('ratioBluforE')?.value) {
-				parsedRatios.blufor = this.missionSizeGroup.get(
-					'ratioBlufor'
-				)?.value;
-			}
-			if (this.missionSizeGroup.get('ratioOpforE')?.value) {
-				parsedRatios.opfor = this.missionSizeGroup.get(
-					'ratioOpfor'
-				)?.value;
-			}
-			if (this.missionSizeGroup.get('ratioIndforE')?.value) {
-				parsedRatios.indfor = this.missionSizeGroup.get(
-					'ratioIndfor'
-				)?.value;
-			}
-			if (this.missionSizeGroup.get('ratioCivE')?.value) {
-				parsedRatios.civ = this.missionSizeGroup.get('ratioCiv')?.value;
-			}
 		}
 		const uploadUpdate: IUpdate = {
 			version: {
@@ -717,9 +801,28 @@ export class MissionUploadComponent implements OnInit {
 			lastUpdate: new Date(),
 			updates: [uploadUpdate]
 		};
-		if (parsedRatios) {
-			mission.ratios = parsedRatios;
+		mission.ratios = {};
+		if (this.missionSizeGroup.controls['ratioBlufor'].enabled) {
+			mission.ratios.blufor = this.missionSizeGroup.controls[
+				'ratioBlufor'
+			].value;
 		}
+		if (this.missionSizeGroup.controls['ratioOpfor'].enabled) {
+			mission.ratios.opfor = this.missionSizeGroup.controls[
+				'ratioOpfor'
+			].value;
+		}
+		if (this.missionSizeGroup.controls['ratioIndfor'].enabled) {
+			mission.ratios.indfor = this.missionSizeGroup.controls[
+				'ratioIndfor'
+			].value;
+		}
+		if (this.missionSizeGroup.controls['ratioCiv'].enabled) {
+			mission.ratios.civ = this.missionSizeGroup.controls[
+				'ratioCiv'
+			].value;
+		}
+
 		if (this.fileImageGroup.get('imgToggle')?.value) {
 			mission.image = this.missionImageSrc;
 		}
@@ -729,27 +832,53 @@ export class MissionUploadComponent implements OnInit {
 		this.buildFormData(formData, mission);
 		formData.append('fileName', this.missionFileName);
 		formData.append('fileData', this.missionToUpload);
-		this.missionsService.upload(formData).subscribe(
-			() => {
-				this.sharedService.uploadingState = 'success';
-				this.authError = null;
-				this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-				this.router.onSameUrlNavigation = 'reload';
-				this.router.navigate(['/mission-list']);
-			},
-			(httpError) => {
-				this.missionErrors = httpError.error.missionErrors ?? {};
-				this.authError = httpError.error.authError;
-				this.sharedService.uploadingState = 'error';
-			}
-		);
+
+		if (this.isEdit) {
+			this.missionsService.submitEdit(formData).subscribe(
+				() => {
+					this._snackBar.open('Mission attributes edited', '', {
+						duration: 5000
+					});
+					console.log('upload success');
+					this.dialogRef.close(true);
+				},
+				(httpError) => {
+					console.log('upload error');
+					this.dialogRef.close();
+				}
+			);
+		} else {
+			this.missionsService.upload(formData).subscribe(
+				() => {
+					this.sharedService.uploadingState = 'success';
+					this.authError = null;
+					this.router.routeReuseStrategy.shouldReuseRoute = () =>
+						false;
+					this.router.onSameUrlNavigation = 'reload';
+					this._snackBar.open('Mission uploaded', '', {
+						duration: 5000
+					});
+
+					this.router.navigate([
+						`/mission-details/${mission.uniqueName}`
+					]);
+				},
+				(httpError) => {
+					this.missionErrors = httpError.error.missionErrors ?? {};
+					this.authError = httpError.error.authError;
+					this.sharedService.uploadingState = 'error';
+				}
+			);
+		}
 	}
 
 	onRatioEnabledChange(controlName: string) {
 		if (this.missionSizeGroup.get(controlName)?.enabled) {
 			this.missionSizeGroup.get(controlName)?.disable();
+			this.missionSizeGroup.get(controlName)?.setValue(null);
 		} else {
 			this.missionSizeGroup.get(controlName)?.enable();
+			this.missionSizeGroup.get(controlName)?.setValue(1);
 		}
 	}
 }
