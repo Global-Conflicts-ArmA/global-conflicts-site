@@ -1,6 +1,6 @@
 export class RemoteDiscordUser {
-	userID: string;
-	displayName: string;
-	nickname: string;
-	deleted: boolean;
+	userID?: string;
+	displayName?: string;
+	nickname?: string;
+	deleted?: boolean;
 }
