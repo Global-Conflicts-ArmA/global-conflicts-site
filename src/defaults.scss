@@ -537,10 +537,10 @@ mat-button-toggle-group {
 
 
 button:focus {
-	outline-color: colors.$accent !important;
-	outline-offset: -1px !important;
+	outline-color: unset !important;
+	outline-offset: 0px !important;
 	outline-style: solid !important;
-	outline-width: 1px !important;
+	outline-width: 0px !important;
 }
 
 // Handle buttons appropriately, with respect to line-height
