@@ -11,15 +11,15 @@ import { UserService } from '@app/services/user.service';
 @Component({
 	selector: 'dialog-view-bug-report',
 	templateUrl: 'dialog-view-bug-report.html',
-	styles: [
-		'.changeLog-background { background-color: #1d1d1d; background-origin: content-box, padding-box; padding: 1rem 1rem;}'
-	]
+	styleUrls: ['./mission-report-review-bug-dialog.scss']
 })
 export class DialogViewBugReportComponent {
 	enableErrorLog = false;
+
 	constructor(
 		public dialogRef: MatDialogRef<DialogViewBugReportComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: {mission: IMission, report: IReport},
+		@Inject(MAT_DIALOG_DATA)
+		public data: { mission: IMission; report: IReport },
 		private userService: UserService,
 		public missionsService: MissionsService
 	) {

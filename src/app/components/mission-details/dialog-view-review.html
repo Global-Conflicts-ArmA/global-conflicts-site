@@ -1,14 +1,16 @@
-<div [ngSwitch]="data.review.version">
-	<div *ngSwitchCase="'General'">
-		<h1 mat-dialog-title>Report for {{data.mission.name}}</h1>
+<div [ngSwitch]="data.review.version" class="dialog-header">
+	<div *ngSwitchCase="'General'"  class="mission-name-version">
+		<div>Review for: <span style="font-weight: bold">{{data.mission.name}}</span></div>
 	</div>
-	<div *ngSwitchDefault>
-		<h1 mat-dialog-title>Report for {{data.mission.name}} version: {{missionsService.buildVersionStr( data.review.version )}}</h1>
+	<div *ngSwitchDefault  class="mission-name-version">
+			<div>Review for: <span style="font-weight: 400">{{data.mission.name}}</span></div>
+			<div>Version: <span
+				style="font-weight: 400">{{missionsService.buildVersionStr(data.review.version)}}</span></div>
 	</div>
+	<div>Review by: <span style="font-weight: 400">{{data.review.authorName}}</span></div>
 </div>
-<h3 mat-dialog-title>Report by: {{data.review.authorName}}</h3>
 <div mat-dialog-content>
-	<div class="changeLog-background mb-4">
+	<div class="text-box mb-4">
 		<markdown [data]="data.review.review"></markdown>
 	</div>
 </div>

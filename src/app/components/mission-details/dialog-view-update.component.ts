@@ -10,9 +10,7 @@ import { MissionsService } from '@app/services/missions.service';
 @Component({
 	selector: 'dialog-view-update',
 	templateUrl: 'dialog-view-update.html',
-	styles: [
-		'.changeLog-background { background-color: #1d1d1d; background-origin: content-box, padding-box; padding: 1rem 1rem;}'
-	]
+	styleUrls: ['./mission-report-review-bug-dialog.scss']
 })
 export class DialogViewUpdateComponent {
 	constructor(
