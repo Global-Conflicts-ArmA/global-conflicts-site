@@ -1,0 +1,131 @@
+@use "../../../colors";
+.details-label {
+	font-size: 22px;
+	color: colors.$accent;
+	font-family: Roboto;
+	font-weight: 400;
+	margin-bottom: 8px;
+}
+
+.details-break {
+	display: none;
+}
+
+.green-icon {
+	color: green;
+}
+
+.red-icon {
+	color: red;
+}
+
+.mission-title-container {
+	display: flex;
+	flex-direction: row;
+	padding: 0.5rem 0 !important;
+	.mission-spacer {
+		flex: 0.25;
+	}
+	.mission-title {
+		flex: 4;
+		text-align: center !important;
+		align-content: center !important;
+		font: 400 20px/24px Roboto;
+		color: colors.$accent !important;
+		font-size: 32px;
+	}
+	.mission-button {
+		flex: 0.25;
+	}
+}
+
+::ng-deep .mat-cell{
+	padding: 0px !important;
+}
+
+::ng-deep .mat-header-cell {
+
+	color: colors.$accent !important;
+	font-size: 20px;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	text-align: center !important;
+}
+
+.img-details {
+	max-width: 100%;
+	width: 100%;
+	height: auto;
+	background-color: #393939;
+	padding: 0.5rem;
+}
+
+.table-header {
+	text-align: center !important;
+	width: 100%;
+	align-content: center !important;
+	background-color: #393939;
+	font: 400 20px/24px Roboto;
+	color: colors.$accent !important;
+	font-size: 24px;
+	padding: 0.5rem 0 !important;
+	display: flex;
+	flex-direction: row;
+
+	.spacer {
+		flex: 0.5;
+	}
+
+	.table-title {
+		flex: 4;
+	}
+
+
+	.table-button-container {
+		flex: 0.5;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		.table-button {
+			align-self: center;
+			justify-self: center;
+			background-color: #393939;
+		}
+	}
+}
+
+table {
+	text-align: center !important;
+	width: 100%;
+	align-content: center !important;
+	.table-header-action {
+		width: 20%;
+	}
+}
+
+@media (max-width: 575px) {
+	.col-btn {
+		margin: 5px 10px;
+
+		button {
+			width: 100%;
+		}
+	}
+	.details-break {
+		display: block;
+	}
+} ;
+
+.mission-status-icon-title{
+	font-size: 8px;
+}
+
+.row-btns{
+	display: flex;
+	justify-content: space-evenly;
+	button{
+		width: 37px!important;
+		padding: 0;
+		min-width: unset!important;
+	}
+}

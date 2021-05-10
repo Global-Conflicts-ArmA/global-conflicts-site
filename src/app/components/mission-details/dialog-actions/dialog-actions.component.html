@@ -1,0 +1,59 @@
+<h1 mat-dialog-title>Mission File Actions</h1>
+<div mat-dialog-content>
+
+
+	<div *ngIf="canCopyToMainServer() || canCopyToTestServer()" style="margin-top: 10px">
+		<div
+			class="text">For adding missions the server must not be in the mission selection screen, else it will crash.
+		</div>
+		<div class="buttons">
+			<button *ngIf="canCopyToMainServer()" (click)="doAction(COPY_TO_MAIN)" color="accent"
+					mat-raised-button>Copy to Main Server
+			</button>
+			<button *ngIf="canCopyToTestServer()" (click)="doAction(COPY_TO_TEST)" color="accent"
+					mat-raised-button>Copy to Test Server
+			</button>
+		</div>
+	</div>
+
+	<div *ngIf="canRemoveFromMainServer() || canRemoveFromTestServer()">
+		<hr>
+		<div class="text">For removal the server must not have the missions loaded in memory.</div>
+		<div class="buttons">
+			<button *ngIf="canRemoveFromMainServer()" (click)="doAction(REMOVE_FROM_MAIN)" color="accent"
+					mat-raised-button>Remove from Main server
+			</button>
+			<button *ngIf="canRemoveFromTestServer()" (click)="doAction(REMOVE_FROM_TEST)" color="accent"
+					mat-raised-button>Remove from Test server
+			</button>
+		</div>
+	</div>
+
+	<div *ngIf="canMarkAsReady()">
+		<hr>
+		<div class="text">For new missions or major updates, review it with another person before marking it as ready.
+		</div>
+		<div class="buttons">
+			<button *ngIf="canMarkAsReady()" (click)="doAction(MARK_AS_READY)" color="accent"
+					mat-raised-button>Mark as ready
+			</button>
+
+		</div>
+	</div>
+
+	<div *ngIf="canRemoveArchive()">
+		<hr>
+		<div class="text">Removing the archive will delete the mission file from the archive folder AND remove this update entry on the database.
+		</div>
+		<div class="buttons">
+			<button *ngIf="canRemoveArchive" (click)="removeArchive()" color="warn"
+					mat-raised-button>Remove Archive
+			</button>
+
+		</div>
+	</div>
+
+</div>
+<div mat-dialog-actions>
+	<button mat-button [mat-dialog-close]="">Close</button>
+</div>

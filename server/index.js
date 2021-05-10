@@ -6,8 +6,7 @@ module.exports = app;
 
 if (!module.parent) {
 	app.listen(config.port, () => {
+		// tslint:disable-next-line:no-console
 		console.info(`server started on port ${config.port} (${config.env})`);
 	});
 }
-
-

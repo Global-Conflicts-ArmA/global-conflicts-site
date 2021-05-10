@@ -1,0 +1,19 @@
+<div class="dialog-header">
+
+	<div class="mission-name-version">
+		<div>Changelog for: <span style="font-weight: 400">{{data.mission.name}}</span></div>
+		<div>Version: <span
+			style="font-weight: 400">{{missionsService.buildVersionStr(data.update.version)}}</span></div>
+	</div>
+
+</div>
+
+
+<div mat-dialog-content>
+	<div class="text-box mb-4">
+		<markdown [data]="data.update.changeLog"></markdown>
+	</div>
+</div>
+<div mat-dialog-actions>
+	<button mat-button [mat-dialog-close]="">Close</button>
+</div>

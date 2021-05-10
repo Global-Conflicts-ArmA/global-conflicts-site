@@ -7,17 +7,15 @@ const session = require('express-session');
 
 const router = express.Router(); // eslint-disable-line new-cap
 
-
-
 // Generic error handler used by all endpoints.
 function handleError(res, reason, message, code) {
-  console.log("ERROR: " + reason);
-  res.status(code || 500).json({"error": message});
-};
+	console.log('ERROR: ' + reason);
+	res.status(code || 500).json({ error: message });
+}
 
 /** GET /health-check - Check service health */
 router.get('/health-check', function (req, res) {
-  res.send('OK')
+	res.send('OK');
 });
 
 router.use('/auth', authRoute);

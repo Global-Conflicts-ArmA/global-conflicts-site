@@ -1,74 +1,136 @@
-<div class="content">
-	<div style="position: relative">
-		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">
-			You must join our Discord server and complete the welcoming process to see our mission list!
-		</div>
-		<div [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
-			<div>
-				<select
-					[(ngModel)]="selectedServerPath" (ngModelChange)="onSelectedServerPathChange($event)">
-					<option value="MainServer/MPMissions">Main Server</option>
-					<option value="TestServer/MPMissions">Test Server(MPMissions)</option>
-					<option value="TestServer/READY">Test Server(READY)</option>
-				</select>
+<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">You must join our Discord server and complete the welcoming process to see our mission list!</div>
+<div class="center" *ngIf="!doneLoading">
+	<mat-progress-spinner diameter="100" mode="indeterminate" color="accent">Loading</mat-progress-spinner>
+</div>
+<div [class.not-allowed-overlay]="!doneLoading">
+	<div class="flexrow" [class.not-allowed-overlay]="!(discordUser && discordUser?.role)">
+		<div class="controlsColumn">
+			<div class="controlsContainer" [formGroup]="filterGroup">
+				<mat-form-field color="accent" class="searchFilter mt-4">
+					<mat-label>Search Filter</mat-label>
+					<input
+						matInput
+						formControlName="misSearch"
+						(keyup)="applyFilter()"
+						placeholder="Search Term"
+						name="somethingAutofillDoesntKnow"
+						autocomplete="doNotAutoComplete"
+						#input
+					/>
+				</mat-form-field>
+				<mat-button-toggle-group class="smaller-toggle-group mb-4" formControlName="misState" (change)="applyFilter()">
+					<mat-button-toggle value="ALL">All</mat-button-toggle>
+					<mat-button-toggle value="MAIN">Main</mat-button-toggle>
+					<mat-button-toggle value="TEST">Test</mat-button-toggle>
+					<mat-button-toggle value="READY">Ready</mat-button-toggle>
+					<mat-button-toggle value="ARCHIVE">Archive</mat-button-toggle>
+				</mat-button-toggle-group>
+				<mat-form-field color="accent" appearance="fill">
+					<mat-label>Author:</mat-label>
+					<mat-select value="ALL" formControlName="misAuthor" (selectionChange)="applyFilter()">
+						<mat-option value="ALL">ALL</mat-option>
+						<mat-option *ngFor="let author of userList" [value]="author">{{ author }}</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<mat-form-field color="accent" appearance="fill">
+					<mat-label>Type:</mat-label>
+					<mat-select value="ALL" formControlName="misType" (selectionChange)="applyFilter()">
+						<mat-option value="ALL">ALL</mat-option>
+						<mat-option *ngFor="let type of mC.MissionTypes" [value]="type.title">{{ type.title }} </mat-option>
+					</mat-select>
+				</mat-form-field>
+				<mat-form-field color="accent" appearance="fill">
+					<mat-label>Terrain:</mat-label>
+					<mat-select value="ALL" formControlName="misTerrain" (selectionChange)="applyFilter()">
+						<mat-option value="ALL">ALL</mat-option>
+						<mat-option *ngFor="let item of terrainList" [value]="item">{{ item }}</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<mat-form-field color="accent" appearance="fill">
+					<mat-label>Time:</mat-label>
+					<mat-select value="ALL" formControlName="misTime" (selectionChange)="applyFilter()">
+						<mat-option value="ALL">ALL</mat-option>
+						<mat-option *ngFor="let time of mC.MissionTimes" [value]="time">{{ time }}</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<mat-form-field color="accent" appearance="fill">
+					<mat-label>Era:</mat-label>
+					<mat-select value="ALL" formControlName="misEra" (selectionChange)="applyFilter()">
+						<mat-option value="ALL">ALL</mat-option>
+						<mat-option *ngFor="let era of mC.MissionEras" [value]="era">{{ era }}</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<mat-form-field color="accent">
+					<mat-label>Tags</mat-label>
+					<mat-select formControlName="misTags" multiple #missionTags (selectionChange)="applyFilter()">
+						<mat-select-trigger>
+							<mat-chip-list>
+								<mat-chip
+									*ngFor="let tag of filterGroup.get('misTags')?.value; let matChipIndex = index"
+									[removable]="true"
+									(removed)="onListChipRemoved(missionTags, matChipIndex)"
+								>
+									{{ tag }}
+									<mat-icon matChipRemove>cancel</mat-icon>
+								</mat-chip>
+							</mat-chip-list>
+						</mat-select-trigger>
+						<mat-option *ngFor="let tag of mC.MissionTags" [value]="tag">{{ tag }} </mat-option>
+					</mat-select>
+				</mat-form-field>
 			</div>
-			<input
-				type="text"
-				style="width: 100%;
-    		text-align: center;
-    		box-sizing: border-box;"
-				placeholder="Type here to filter any column"
-				[(ngModel)]="searchString"
-				(ngModelChange)="updateFilter($event)"/>
-			<ngx-datatable
-				#myTable
-				class="bootstrap"
-				[columnMode]="ColumnMode.force"
-				[headerHeight]="50"
-				[footerHeight]="50"
-				rowHeight="auto"
-				(activate)="onActivate($event)"
-				[rows]="rows"
-			>
-				<ngx-datatable-column
-					[width]="50"
-					[resizeable]="false"
-					[sortable]="false"
-					[draggable]="false"
-					[canAutoResize]="false"
-					[cellClass]="'button-cell'"
-				>
-					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
-						<a
-							href="javascript:void(0)"
-							[class.datatable-icon-right]="!expanded"
-							[class.datatable-icon-down]="expanded"
-							title="Expand/Collapse Row"
-						>
-						</a>
-					</ng-template>
-				</ngx-datatable-column>
-				<ngx-datatable-row-detail [rowHeight]="150" #myDetailRow>
-					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
-						<div style="padding:10px;">
-							<strong>Description:</strong>
-							<p>{{row.description}}</p>
-						</div>
-					</ng-template>
-				</ngx-datatable-row-detail>
-				<ngx-datatable-column [width]="20" name="Type"></ngx-datatable-column>
-				<ngx-datatable-column [width]="250" name="Name"></ngx-datatable-column>
-				<ngx-datatable-column [width]="20" name="Version"></ngx-datatable-column>
-				<ngx-datatable-column [width]="110" name="Terrain"></ngx-datatable-column>
-				<ngx-datatable-column [width]="60" name="Max Players"></ngx-datatable-column>
-				<ngx-datatable-column [width]="60" name="Min Players"></ngx-datatable-column>
-				<ngx-datatable-column [width]="70" name="Upload Date">
-					<ng-template let-row="row" ngx-datatable-cell-template>
-						{{row.uploadDate | date: 'MM/dd/yyyy'}}
-					</ng-template>
-				</ngx-datatable-column>
-				<ngx-datatable-column [width]="100" name="Author"></ngx-datatable-column>
-			</ngx-datatable>
+		</div>
+		<div class="tableColumn mr-2">
+			<table mat-table [dataSource]="this.dataSource" class="matTable" matSort matSortActive="uploadDate" matSortDirection="desc">
+				<ng-container matColumnDef="name">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+					<td mat-cell *matCellDef="let element">{{ element.name }}</td>
+				</ng-container>
+				<ng-container matColumnDef="type">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+					<td mat-cell *matCellDef="let element">{{ element.type }}</td>
+				</ng-container>
+				<ng-container matColumnDef="size.min">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Min</th>
+					<td mat-cell *matCellDef="let element">{{ element.size.min }}</td>
+				</ng-container>
+				<ng-container matColumnDef="size.max">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Max</th>
+					<td mat-cell *matCellDef="let element">{{ element.size.max }}</td>
+				</ng-container>
+				<ng-container matColumnDef="terrain">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Terrain</th>
+					<td mat-cell *matCellDef="let element">{{ missionsService.getTerrainData(element.terrain).name }}</td>
+				</ng-container>
+				<ng-container matColumnDef="era">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Era</th>
+					<td mat-cell *matCellDef="let element">{{ element.era }}</td>
+				</ng-container>
+				<ng-container matColumnDef="authorName">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Author</th>
+					<td mat-cell *matCellDef="let element">{{ element.authorName }}</td>
+				</ng-container>
+				<ng-container matColumnDef="lastVersionStr">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Version</th>
+					<td mat-cell *matCellDef="let element">{{ element.lastVersionStr }}</td>
+				</ng-container>
+				<ng-container matColumnDef="lastUpdate">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Last Updated</th>
+					<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.lastUpdate) }}</td>
+				</ng-container>
+				<ng-container matColumnDef="uploadDate">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>First Uploaded</th>
+					<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.uploadDate) }}</td>
+				</ng-container>
+				<tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+				<tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="onActivate(row)"></tr>
+
+				<!-- Row shown when there is no matching data. -->
+				<tr class="mat-row empty" *matNoDataRow>
+					<td class="mat-cell" colspan="11">No data matching the filter</td>
+				</tr>
+			</table>
+			<mat-paginator [pageSizeOptions]="[50,100,200]"></mat-paginator>
 		</div>
 	</div>
 </div>

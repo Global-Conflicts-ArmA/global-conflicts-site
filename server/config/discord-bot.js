@@ -8,8 +8,8 @@ let isReady = false;
 
 discordJsClient.once('ready', function () {
 	isReady = true;
+	// tslint:disable-next-line:no-console
 	console.log("DISCORD BOT READY")
-
 
 	discordJsClient.on('message', message => {
 
@@ -44,9 +44,9 @@ discordJsClient.once('ready', function () {
 						copyingMissionMessage.edit(`Mission copied! | Updating database...`).then(sentMessage => {
 							Mission.updateOne({fileName: missionNameDestination}, {
 								$addToSet: {paths: destination}
-								}, (err, docs) => {
-									if (err) {
-										copyingMissionMessage.edit(`Mission copied! | Database update failed: ${err}`)
+								}, (_err, docs) => {
+									if (_err) {
+										copyingMissionMessage.edit(`Mission copied! | Database update failed: ${_err}`)
 									} else {
 										copyingMissionMessage.edit(`Mission copied! | Database updated!`)
 									}
@@ -74,9 +74,9 @@ discordJsClient.once('ready', function () {
 						message.channel.send(`Mission copied! | Updating database...`).then(sentMessage => {
 							Mission.updateOne({fileName: missionName}, {
 								$addToSet: {paths: process.env.MAIN_SERVER_MPMissions}
-							}, (err, docs) => {
-								if (err) {
-									sentMessage.edit(`Mission copied! | Database update failed: ${err}`)
+							}, (_err, docs) => {
+								if (_err) {
+									sentMessage.edit(`Mission copied! | Database update failed: ${_err}`)
 								} else {
 									sentMessage.edit(`Mission copied! | Database updated!`)
 								}
@@ -103,9 +103,9 @@ discordJsClient.once('ready', function () {
 						copyingMissionMessage.edit(`Mission copied! | Updating database...`).then(sentMessage => {
 							Mission.updateOne({fileName: missionName}, {
 								$addToSet: {paths: process.env.TEST_SERVER_MPMissions}
-							}, (err, docs) => {
-								if (err) {
-									copyingMissionMessage.edit(`Mission copied! | Database update failed: ${err}`)
+							}, (_err, docs) => {
+								if (_err) {
+									copyingMissionMessage.edit(`Mission copied! | Database update failed: ${_err}`)
 								} else {
 									copyingMissionMessage.edit(`Mission copied! | Database updated!`)
 								}

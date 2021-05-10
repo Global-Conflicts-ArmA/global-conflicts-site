@@ -1,49 +1,65 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {UserService} from '../../services/user.service';
-import {DiscordUser} from '../../models/discorduser';
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
-import {MatIconRegistry} from "@angular/material/icon";
-import {DomSanitizer} from "@angular/platform-browser";
-import {Observable} from 'rxjs';
-import {map, shareReplay} from 'rxjs/operators';
-
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { UserService } from '../../services/user.service';
+import { DiscordUser } from '../../models/discorduser';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
+import { Observable } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'main-nav',
-  templateUrl: './main-nav.component.html',
-  styleUrls: ['./main-nav.component.scss'],
+	selector: 'app-main-nav',
+	templateUrl: './main-nav.component.html',
+	styleUrls: ['./main-nav.component.scss'],
+	// tslint:disable-next-line:use-component-view-encapsulation
 	encapsulation: ViewEncapsulation.None
 })
-
 export class MainNavComponent implements OnInit {
-
 	constructor(
 		private breakpointObserver: BreakpointObserver,
 		private matIconRegistry: MatIconRegistry,
 		private domSanitizer: DomSanitizer,
+		private router: Router,
 		private userService: UserService
 	) {
 		this.matIconRegistry.addSvgIcon(
-      "discord",
-      this.domSanitizer.bypassSecurityTrustResourceUrl("../../assets/Discord-Logo-Color.svg")
-    );
+			'discord',
+			this.domSanitizer.bypassSecurityTrustResourceUrl(
+				'../../assets/Discord-Logo-Color.svg'
+			)
+		);
 	}
 
 	discordUser: DiscordUser | null;
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 959.99px)')
-    .pipe(
-      map(result => {
-				return result.matches
+	isHandset$: Observable<boolean> = this.breakpointObserver
+		.observe('(max-width: 959.99px)')
+		.pipe(
+			map((result) => {
+				return result.matches;
 			}),
-      shareReplay()
-    )
+			shareReplay()
+		);
 
-		ngOnInit(): void {
-			this.discordUser = this.userService.getUserLocally();
-		}
+	ngOnInit(): void {
+		this.discordUser = this.userService.getUserLocally();
+	}
 
-		logout() {
-			this.userService.logout();
-		}
+	logout() {
+		this.userService.logout();
+	}
+
+	openMissionList() {
+		this.router.navigate([
+			`mission-list`
+		]);
+
+	}
+
+	openUploadForm() {
+		this.router.navigate([
+			`mission-upload`
+		]);
+	}
 }

@@ -6,7 +6,14 @@ export class DiscordUser {
 	roleColor: string;
 	avatarLink: string;
 
-	constructor(id: string, token: string, username: string, role: string, roleColor: string, avatarLink: string) {
+	constructor(
+		id: string,
+		token: string,
+		username: string,
+		role: string,
+		roleColor: string,
+		avatarLink: string,
+	) {
 		this.id = id;
 		this.token = token;
 		this.username = username;
@@ -26,7 +33,6 @@ export class DiscordUser {
 	}
 
 	isTrustedMissionMaker(): boolean {
-		return this.trustedMissionMakerRoles.indexOf((this.role ?? '')) !== -1;
+		return this.trustedMissionMakerRoles.indexOf(this.role ?? '') !== -1;
 	}
-
 }

@@ -1,0 +1,26 @@
+<div [ngSwitch]="data.report.version" class="dialog-header">
+	<div *ngSwitchCase="'General'" class="mission-name-version">
+			<div>Review for: <span style="font-weight: bold">{{data.mission.name}}</span></div>
+	</div>
+	<div *ngSwitchDefault class="mission-name-version">
+			<div>Report for: <span style="font-weight: 400">{{data.mission.name}}</span></div>
+			<div>Version: <span
+				style="font-weight: 400">{{missionsService.buildVersionStr(data.report.version)}}</span></div>
+	</div>
+	<div>Report by: <span style="font-weight: 400">{{data.report.authorName}}</span></div>
+</div>
+<div mat-dialog-content>
+	<div>Report description:</div>
+	<div class="text-box mb-4">
+		<markdown [data]="data.report.report"></markdown>
+	</div>
+	<div *ngIf="data.report.log">
+		<div>Error Log:</div>
+		<div class="text-box mb-4">
+			<markdown [data]="data.report.log"></markdown>
+		</div>
+	</div>
+</div>
+<div mat-dialog-actions>
+	<button mat-button [mat-dialog-close]="">Close</button>
+</div>
