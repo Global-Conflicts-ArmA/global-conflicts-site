@@ -64,7 +64,13 @@ export class MissionsService {
 	}
 
 	public getFileName(uniqueName: string | null): Observable<IMission> {
-		return this.httpClient.get<IMission>(`/api/missions/${uniqueName}`);
+		return this.httpClient.get<IMission>(`/api/missions/${uniqueName}`, {
+			headers: {
+				'Cache-Control': 'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+				'Pragma': 'no-cache',
+				'Expires': '0'
+			}
+		});
 	}
 
 	public buildVersionStr(versionObj: {
