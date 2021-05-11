@@ -317,7 +317,6 @@ router.get('/', async (req, res) => {
 
 //get mission by uniqueName
 router.get('/:uniqueName', async (req, res) => {
-	console.log("test")
 	req = await getDiscordUserFromCookies(
 		req,
 		'User not allowed to list missions.'
