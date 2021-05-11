@@ -849,19 +849,22 @@ export class MissionUploadComponent implements OnInit {
 			);
 		} else {
 			this.missionsService.upload(formData).subscribe(
-				() => {
+				  () => {
 					this.sharedService.uploadingState = 'success';
 					this.authError = null;
 					this.router.routeReuseStrategy.shouldReuseRoute = () =>
 						false;
 					this.router.onSameUrlNavigation = 'reload';
 					this._snackBar.open('Mission uploaded', '', {
-						duration: 5000
+						duration: 6000
 					});
 
-					this.router.navigate([
-						`/mission-details/${mission.uniqueName}`
-					]);
+					setTimeout(()=>{
+						  this.router.navigate([
+							`/mission-details/${mission.uniqueName}`
+						]);
+					}, 2000)
+
 				},
 				(httpError) => {
 					this.missionErrors = httpError.error.missionErrors ?? {};
