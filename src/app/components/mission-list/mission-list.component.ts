@@ -55,14 +55,16 @@ export class MissionListComponent implements OnInit {
 		this.missionsService.list().subscribe(  (value) => {
 			this.userList = [];
 
-
 			value.map((mission: IMission) => {
 				const lastUpdate =
 					mission.updates[mission.updates.length - 1];
 				mission.lastVersionStr = this.missionsService.buildVersionStr(
 					mission.lastVersion
 				);
-				this.userService.insertUserIds(lastUpdate.authorID);
+				if(lastUpdate){
+					this.userService.insertUserIds(lastUpdate.authorID);
+				}
+
 			});
 			// iterate the list of users, and get the names of those who doesn't have a name yet
 			 this.userService.getAuthorsName().then(usersOnCache => {
