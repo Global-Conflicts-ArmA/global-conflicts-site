@@ -23,6 +23,12 @@ fileFilterFunction = async function (req, file, callback) {
 		req,
 		'User is not allowed to upload missions.'
 	);
+	const canUpload = req.discordUser._roles.find(value=>value===process.env.DISCORD_MISSION_MAKER_ID)
+	if(!canUpload){
+		req.authError = 'User is not allowed to upload missions.';
+		return callback(null, false);
+
+	}
 
 	if (req.authError) {
 		return callback(null, false);
