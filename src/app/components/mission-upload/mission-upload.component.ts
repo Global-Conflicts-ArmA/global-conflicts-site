@@ -861,7 +861,7 @@ export class MissionUploadComponent implements OnInit {
 
 					setTimeout(()=>{
 						  this.router.navigate([
-							`/mission-details/${mission.uniqueName}`
+							`/mission-list`
 						]);
 					}, 2000)
 
