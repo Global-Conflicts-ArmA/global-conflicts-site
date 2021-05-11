@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import {Component, enableProdMode, OnInit, ViewEncapsulation} from '@angular/core';
 import { UserService } from '../../services/user.service';
 import { DiscordUser } from '../../models/discorduser';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -7,6 +7,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import {environment} from '../../../environments/environment';
 
 @Component({
 	selector: 'app-main-nav',
@@ -61,5 +62,12 @@ export class MainNavComponent implements OnInit {
 		this.router.navigate([
 			`mission-upload`
 		]);
+	}
+	getDiscordHref(){
+		if (environment.production) {
+			return "https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=http%3A%2F%2Fwww.globalconflicts.net%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds";
+		}else{
+			return "https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds";
+		}
 	}
 }
