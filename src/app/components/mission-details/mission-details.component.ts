@@ -14,7 +14,10 @@ import { DialogSubmitUpdateComponent } from './dialog-submit-update.component';
 import { Overlay } from '@angular/cdk/overlay';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
-import { DialogActionsComponent } from '@app/components/mission-details/dialog-actions/dialog-actions.component';
+import {
+	DialogActionsComponent,
+	MissionActions
+} from '@app/components/mission-details/dialog-actions/dialog-actions.component';
 import { MissionUploadComponent } from '@app/components/mission-upload/mission-upload.component';
 
 @Component({
@@ -223,8 +226,11 @@ export class MissionDetailsComponent implements OnInit {
 			autoFocus: false
 		});
 		dialogRef.afterClosed().subscribe((result) => {
-			if (result === 'refresh') {
-				this.refresh();
+			if (result === MissionActions.REMOVE_ARCHIVE) {
+				this.router.navigate([
+					`mission-list`
+				]);
+
 			}
 		});
 	}
