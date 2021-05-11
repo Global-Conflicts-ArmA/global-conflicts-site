@@ -39,7 +39,6 @@
 							"extractCss": true,
 							"namedChunks": false,
 							"aot": true,
-							"baseHref": "./",
 							"extractLicenses": true,
 							"vendorChunk": false,
 							"buildOptimizer": true,
