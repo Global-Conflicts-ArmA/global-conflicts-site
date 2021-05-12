@@ -122,7 +122,7 @@ async function postDiscordNewMission(reqBody, avatarURL) {
 async function postDiscordMissionReady(request, mission, updateid) {
 
 
-	const author = await getRemoteUserDisplayName(request.discordUser.user.id);
+	const author = await getRemoteUserDisplayName(mission.authorID);
 	const update = mission.updates.filter((updt) => updt._id.toString() === updateid)[0];
 
 	const newMissionEmbed = new Discord.MessageEmbed()
@@ -168,7 +168,7 @@ async function postDiscordReport(report, missionData, avatarURL) {
 	const reportEmbed = new Discord.MessageEmbed()
 		.setColor("#ff0000")
 		.setTitle(`Mission: ${missionData.name}`)
-		.setAuthor(`Author: ${author}`, avatarURL)
+		.setAuthor(`Bug Report Author: ${author}`, avatarURL)
 		.addFields({ name: "Version:", value: versionStr, inline: false })
 		.addFields({ name: "Report:", value: report.report, inline: false })
 		.setTimestamp(report.date)
@@ -188,7 +188,7 @@ async function postDiscordReport(report, missionData, avatarURL) {
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send("New report added", reportEmbed);
+		.send("New bug report added", reportEmbed);
 }
 
 async function postDiscordReview(review, missionData, avatarURL) {
@@ -208,7 +208,7 @@ async function postDiscordReview(review, missionData, avatarURL) {
 	const reviewEmbed = new Discord.MessageEmbed()
 		.setColor("#2261cf")
 		.setTitle(`Mission: ${missionData.name}`)
-		.setAuthor(`Author: ${author}`, avatarURL)
+		.setAuthor(`Review Author: ${author}`, avatarURL)
 		.addFields({ name: "Version:", value: versionStr, inline: false })
 		.addFields({ name: "Review:", value: review.review, inline: false })
 		.setTimestamp(review.date)
@@ -229,7 +229,7 @@ async function postDiscordReview(review, missionData, avatarURL) {
 }
 
 async function postDiscordUpdate(update, missionData, avatarURL) {
-	const author = await getRemoteUser(update.authorID)
+	const author = await getRemoteUser(missionData.authorID)
 		.then((result) => {
 			return result.nickname
 				? result.nickname
@@ -271,7 +271,7 @@ async function postDiscordUpdate(update, missionData, avatarURL) {
 }
 
 async function postDiscordEdit(edit, missionData, user) {
-	const author = await getRemoteUser(user.id)
+	const author = await getRemoteUser(missionData.authorID)
 		.then((result) => {
 			return result.nickname
 				? result.nickname
@@ -356,7 +356,7 @@ async function postDiscordEdit(edit, missionData, user) {
 }
 
 async function postMissionCopiedRemovedToServer(request, mission, updateid, serverName, action, color) {
-	const author = await getRemoteUserDisplayName(request.discordUser.user.id);
+	const author = await getRemoteUserDisplayName(mission.authorID);
 	const update = mission.updates.filter((updt) => updt._id.toString() === updateid)[0];
 
 	const newMissionEmbed = new Discord.MessageEmbed()
