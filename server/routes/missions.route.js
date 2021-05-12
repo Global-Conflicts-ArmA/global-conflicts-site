@@ -323,6 +323,10 @@ router.get('/', async (req, res) => {
 
 //get mission by uniqueName
 router.get('/:uniqueName', async (req, res) => {
+	res.header('ETag', null);
+	res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+	res.header('Expires', '-1');
+	res.header('Pragma', 'no-cache');
 	req = await getDiscordUserFromCookies(
 		req,
 		'User not allowed to list missions.'
