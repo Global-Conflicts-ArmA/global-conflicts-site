@@ -730,6 +730,8 @@ export class MissionUploadComponent implements OnInit {
 					this.sharedService.uploadingState = 'not-found'; // database error, should never happen
 				}
 			}
+		}, error => {
+			console.log("error")
 		});
 	}
 

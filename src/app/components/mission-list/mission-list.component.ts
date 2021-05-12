@@ -95,6 +95,8 @@ export class MissionListComponent implements OnInit {
 			};
 			this.dataSource.sort = this.sort;
 			this.doneLoading = true;
+		},  error => {
+			console.log("error")
 		});
 	}
 

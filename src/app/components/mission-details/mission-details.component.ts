@@ -103,7 +103,9 @@ export class MissionDetailsComponent implements OnInit {
 				);
 
 				this.doneLoading = true;
-			});
+			}, error => {
+			console.log("error")
+		});
 	}
 
 	public viewUpdate(
