@@ -544,11 +544,7 @@ router.post('/update', updateMulter.single('fileData'), async (req, res) => {
 		changeLog: req.body.changeLog,
 		fileName: req.body.fileName
 	};
-	const options = {
-		upsert: true,
-		safe: true,
-		new: true
-	};
+
 	// TODO Allow for mission makers to customize trusted users to update their missions
 	let query;
 	if (
@@ -563,7 +559,7 @@ router.post('/update', updateMulter.single('fileData'), async (req, res) => {
 			authorID: req.discordUser.user.id
 		};
 	}
-	Mission.findOne(query,  options, (err, missionData) => {
+	Mission.findOne(query, (err, missionData) => {
 		if (err) {
 			console.log(err);
 		} else {
