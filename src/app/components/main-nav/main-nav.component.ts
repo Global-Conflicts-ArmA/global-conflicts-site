@@ -65,7 +65,7 @@ export class MainNavComponent implements OnInit {
 	}
 	getDiscordHref(){
 		if (environment.production) {
-			return "https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=https%3A%2F%2Fwww.globalconflicts.net%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds";
+			return "https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=https%3A%2F%2Fglobalconflicts.net%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds";
 		}else{
 			return "https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds";
 		}
