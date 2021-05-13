@@ -84,8 +84,7 @@ async function postDiscordNewMission(reqBody, avatarURL) {
 			}
 		)
 		.setTimestamp()
-		.setURL("")
-		.setFooter("\u3000".repeat(10 /*any big number works too*/) + "|");
+		.setURL(`${reqBody.headers.origin}/mission-details/${reqBody.uniqueName}`)
 
 	if (reqBody.ratios) {
 		let ratioStr = "";
@@ -172,8 +171,7 @@ async function postDiscordReport(report, missionData, avatarURL) {
 		.addFields({ name: "Version:", value: versionStr, inline: false })
 		.addFields({ name: "Report:", value: report.report, inline: false })
 		.setTimestamp(report.date)
-		.setURL("")
-		.setFooter("\u3000".repeat(10 /*any big number works too*/) + "|");
+		.setURL(`globalconflicts.net/mission-details/${missionData.uniqueName}`)
 	if (report.log) {
 		reportEmbed.addField("Log:", `\`\`\`\n ${report.log} \n \`\`\``, false);
 	}
@@ -212,8 +210,7 @@ async function postDiscordReview(review, missionData, avatarURL) {
 		.addFields({ name: "Version:", value: versionStr, inline: false })
 		.addFields({ name: "Review:", value: review.review, inline: false })
 		.setTimestamp(review.date)
-		.setURL("")
-		.setFooter("\u3000".repeat(10 /*any big number works too*/) + "|");
+		.setURL(`globalconflicts.net/mission-details/${missionData.uniqueName}`)
 	if (missionData.image) {
 		const resizedBuffer = await getImage(missionData.image);
 		let attachment = new Discord.MessageAttachment(
@@ -254,8 +251,7 @@ async function postDiscordUpdate(update, missionData, avatarURL) {
 			inline: false
 		})
 		.setTimestamp(update.date)
-		.setURL("")
-		.setFooter("\u3000".repeat(10 /*any big number works too*/) + "|");
+		.setURL(`globalconflicts.net/mission-details/${missionData.uniqueName}`)
 	if (missionData.image) {
 		const resizedBuffer = await getImage(missionData.image);
 		let attachment = new Discord.MessageAttachment(
@@ -288,8 +284,7 @@ async function postDiscordEdit(edit, missionData, user) {
 		.setTitle(`Mission: ${missionData.name}`)
 		.setAuthor(`Author: ${author}`, user.displayAvatarURL())
 		.setTimestamp(Date.now())
-		.setURL("")
-		.setFooter("\u3000".repeat(10 /*any big number works too*/) + "|");
+		.setURL(`globalconflicts.net/mission-details/${missionData.uniqueName}`)
 	if (edit.type) {
 		updateEmbed.addField("Type:", edit.type, false);
 	}
@@ -320,10 +315,10 @@ async function postDiscordEdit(edit, missionData, user) {
 		updateEmbed.addField("Description:", edit.description, false);
 	}
 	if (edit.jip) {
-		updateEmbed.addField("JiP:", edit.jip, false);
+		updateEmbed.addField("JIP:", edit.jip?"YES":"NO", false);
 	}
 	if (edit.respawn) {
-		updateEmbed.addField("Respawn:", edit.respawn, false);
+		updateEmbed.addField("Respawn:", edit.respawn?"YES":"NO", false);
 	}
 	if (edit.tags) {
 		updateEmbed.addField("Tags:", edit.tags.join(", "), false);

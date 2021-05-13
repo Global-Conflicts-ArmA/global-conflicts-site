@@ -626,7 +626,7 @@ router.post('/edit', updateMulter.none(), async (req, res) => {
 	delete edit["terrain"]
 	delete edit["uniqueName"]
 
-	Mission.updateOne(query, {
+	Mission.findOneAndUpdate(query, {
 		"$set": edit
 	}, options, (err, missionData) => {
 		if (err) {
