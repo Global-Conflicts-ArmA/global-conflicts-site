@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IMission, IReport, IReview } from '../models/mission';
-import { MissionConstants, ITerrain } from '../constants/missionConstants';
+import { IMission } from '../models/mission';
+import { MissionConstants } from '../constants/missionConstants';
 import { DomSanitizer } from '@angular/platform-browser';
-import { DiscordUser } from '@app/models/discorduser';
 import * as fileSaver from 'file-saver';
+// @ts-ignore
+import Terrains from '../../assets/terrains.json';
 
 @Injectable({
 	providedIn: 'root'
@@ -46,15 +47,17 @@ export class MissionsService {
 	}
 
 	public getTerrainData(terrainName: string | undefined) {
-		return terrainName ? this.mC.MissionTerrains[terrainName] : undefined;
+		return terrainName ? Terrains.find(terrain=>{
+			return terrain.class === terrainName
+		}) : undefined;
 	}
 
 	public getImage(mission: IMission | null) {
 		if (mission?.image) {
 			return this.sanitizer.bypassSecurityTrustResourceUrl(mission.image);
 		} else {
-			const terrain = this.getTerrainData(mission?.terrain);
-			return terrain?.defaultImage ?? '../../../assets/imgs/noImage.png';
+
+			return '../../../assets/imgs/noImage.png';
 		}
 	}
 

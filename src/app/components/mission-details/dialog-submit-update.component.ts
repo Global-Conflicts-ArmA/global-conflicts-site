@@ -78,7 +78,7 @@ export class DialogSubmitUpdateComponent implements OnInit {
 				return 'Mission file must have a naming scheme of missionName.terrain.pbo';
 			}
 			if (missionFile.hasError('notSameTerrain')) {
-				return `Mission must be on the same terrain: ${terrainObj.name}`;
+				return `Mission must be on the same terrain: ${terrainObj?.display_name}`;
 			}
 			if (missionFile.hasError('maxContentSize')) {
 				const actualSize = missionFile.getError('maxContentSize')
@@ -95,9 +95,10 @@ export class DialogSubmitUpdateComponent implements OnInit {
 	checkFileName() {
 		return (control: FormControl) => {
 			const files = control.value;
-			const terrainObj = this.missionsService.getTerrainData(
+			const uploadedTerrainObject = this.missionsService.getTerrainData(
 				this.mission.terrain
 			);
+
 			if (files && files.files[0]) {
 				const file = files.files[0];
 				const fileNameArray = file.name.split('.');
@@ -114,7 +115,8 @@ export class DialogSubmitUpdateComponent implements OnInit {
 						requiredTerrain: true
 					};
 				} else {
-					if (fileNameArray[1] !== terrainObj.class) {
+
+					if (fileNameArray[1].toLowerCase() !== uploadedTerrainObject?.class.toLowerCase()) {
 						return {
 							notSameTerrain: true
 						};
@@ -189,7 +191,10 @@ export class DialogSubmitUpdateComponent implements OnInit {
 		const terrainObj = this.missionsService.getTerrainData(
 			this.mission.terrain
 		);
-		return `${safeMissionType}${this.mission.size.max}_${this.mission.name}_V${this.versionString}.${terrainObj.class}.pbo`;
+		if(terrainObj){
+			return `${safeMissionType}${this.mission.size.max}_${this.mission.name}_V${this.versionString}.${terrainObj.class}.pbo`;
+		}
+
 	}
 
 	buildFormData(
@@ -220,6 +225,11 @@ export class DialogSubmitUpdateComponent implements OnInit {
 	submit() {
 		this.sharedService.uploadingState = 'uploading';
 		const fileName = this.buildMissionFileName();
+
+		if(!fileName){
+			return;
+		}
+
 		const update: IUpdate = {
 			version: this.newVersion,
 			authorID: this.discordUser?.id ?? '',

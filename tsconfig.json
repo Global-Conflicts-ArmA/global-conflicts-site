@@ -17,7 +17,9 @@
 		"experimentalDecorators": true,
 		"suppressImplicitAnyIndexErrors": true,
 		"strictPropertyInitialization": false,
-		"noImplicitAny": false
+		"noImplicitAny": false,
+		"resolveJsonModule": true,
+		"esModuleInterop": true
 	},
   "angularCompilerOptions": {
     "strictTemplates": true

@@ -16,7 +16,7 @@ import {
 import { MissionConstants } from '@app/constants/missionConstants';
 import { MissionsService } from '@app/services/missions.service';
 import { DiscordUser } from '@app/models/discorduser';
-import { IMission, IRatios, IUpdate } from '@app/models/mission';
+import { IMission, IUpdate } from '@app/models/mission';
 import { UserService } from '@app/services/user.service';
 import { FileValidator } from 'ngx-material-file-input';
 import { SharedService } from '@app/services/shared';
@@ -27,7 +27,8 @@ import {
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-
+// @ts-ignore
+import Terrains from '../../../assets/terrains.json';
 @Component({
 	selector: 'app-mission-upload',
 	templateUrl: './mission-upload.component.html',
@@ -309,8 +310,10 @@ export class MissionUploadComponent implements OnInit {
 						requiredTerrain: true
 					};
 				} else {
-					if (fileNameArray[1] in this.mC.MissionTerrains) {
-					} else {
+					const terrainFound = Terrains.find(terrain=>{
+						return terrain.class.toLowerCase() === fileNameArray[1].toLowerCase()
+					});
+					if (!terrainFound) {
 						return {
 							notAcceptedTerrain: true
 						};

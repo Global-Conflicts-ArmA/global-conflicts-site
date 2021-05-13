@@ -11,7 +11,8 @@ import { MatSelect } from '@angular/material/select';
 import { ITerrain, MissionConstants } from '@app/constants/missionConstants';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { SharedService } from '@app/services/shared';
-
+// @ts-ignore
+import Terrains from '../../../assets/terrains.json';
 @Component({
 	selector: 'app-mission-list',
 	templateUrl: './mission-list.component.html',
@@ -124,8 +125,8 @@ export class MissionListComponent implements OnInit {
 		this.refresh();
 		this.discordUser = this.userService.getUserLocally();
 		this.terrainList = [];
-		Object.values(this.mC.MissionTerrains).forEach((terrain: ITerrain) => {
-			this.terrainList.push(terrain.name);
+		Terrains.forEach((terrain)=>{
+			this.terrainList.push(terrain.display_name);
 		});
 		this.terrainList.sort();
 	}
@@ -218,7 +219,7 @@ export class MissionListComponent implements OnInit {
 			filteredData = filteredData.filter((element: IMission) => {
 				return (
 					this.missionsService.getTerrainData(element.terrain)
-						?.name === terrain
+						?.display_name === terrain
 				);
 			});
 		}
@@ -276,7 +277,7 @@ export class MissionListComponent implements OnInit {
 						.includes(searchFilter) ||
 					this.missionsService
 						.getTerrainData(element.terrain)
-						.name.toLowerCase()
+						?.display_name.toLowerCase()
 						.includes(searchFilter) ||
 					element.type.toLowerCase().includes(searchFilter) ||
 					element.timeOfDay.toLowerCase().includes(searchFilter) ||
