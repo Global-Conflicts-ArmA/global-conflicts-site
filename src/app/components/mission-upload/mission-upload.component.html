@@ -33,8 +33,13 @@
 					<form [formGroup]="missionNameGroup">
 						<ng-template matStepLabel>Mission Name</ng-template>
 						<div>
+							<div>
+								Insert only the actual name, without the version or type.<br/>
+								<div style="color: #2dab2d; font-size: 14px;">Good: Operation Boomstick</div>
+								<div style="color: orangered; font-size: 14px;">Bad: CO52_Operation_Boomstick_V1</div>
+						</div>
 							<mat-form-field>
-								<mat-label class="inset-label">Mission Name. Do not put the version here. You won't be able to edit this afterwards.</mat-label>
+								<mat-label class="inset-label">Mission Name.</mat-label>
 								<input
 									matInput
 									formControlName="missionName"
