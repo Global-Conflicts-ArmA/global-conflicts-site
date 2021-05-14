@@ -84,7 +84,7 @@ async function postDiscordNewMission(reqBody, avatarURL) {
 			}
 		)
 		.setTimestamp()
-		.setURL(`${reqBody.headers.origin}/mission-details/${reqBody.uniqueName}`)
+		.setURL(`https://globalconflicts.net//mission-details/${reqBody.uniqueName}`)
 
 	if (reqBody.ratios) {
 		let ratioStr = "";
@@ -171,7 +171,7 @@ async function postDiscordReport(report, missionData, avatarURL) {
 		.addFields({ name: "Version:", value: versionStr, inline: false })
 		.addFields({ name: "Report:", value: report.report, inline: false })
 		.setTimestamp(report.date)
-		.setURL(`globalconflicts.net/mission-details/${missionData.uniqueName}`)
+		.setURL(`https://globalconflicts.net/mission-details/${missionData.uniqueName}`)
 	if (report.log) {
 		reportEmbed.addField("Log:", `\`\`\`\n ${report.log} \n \`\`\``, false);
 	}
@@ -210,7 +210,7 @@ async function postDiscordReview(review, missionData, avatarURL) {
 		.addFields({ name: "Version:", value: versionStr, inline: false })
 		.addFields({ name: "Review:", value: review.review, inline: false })
 		.setTimestamp(review.date)
-		.setURL(`globalconflicts.net/mission-details/${missionData.uniqueName}`)
+		.setURL(`https://globalconflicts.net//mission-details/${missionData.uniqueName}`)
 	if (missionData.image) {
 		const resizedBuffer = await getImage(missionData.image);
 		let attachment = new Discord.MessageAttachment(
@@ -284,7 +284,7 @@ async function postDiscordEdit(edit, missionData, user) {
 		.setTitle(`Mission: ${missionData.name}`)
 		.setAuthor(`Author: ${author}`, user.displayAvatarURL())
 		.setTimestamp(Date.now())
-		.setURL(`globalconflicts.net/mission-details/${missionData.uniqueName}`)
+		.setURL(`https://globalconflicts.net//mission-details/${missionData.uniqueName}`)
 	if (edit.type) {
 		updateEmbed.addField("Type:", edit.type, false);
 	}
