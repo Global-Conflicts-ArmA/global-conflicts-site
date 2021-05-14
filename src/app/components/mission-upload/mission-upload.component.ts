@@ -287,7 +287,9 @@ export class MissionUploadComponent implements OnInit {
 	makeUniqueMissionMapName(missionName: string, terrain: string) {
 		const safeMissionName = missionName
 			.replaceAll(' ', '_')
-			.replaceAll(/\W/g, '');
+			.replaceAll(/\W/g, '')
+			.trim();
+
 		return safeMissionName + '_' + terrain;
 	}
 
@@ -689,7 +691,8 @@ export class MissionUploadComponent implements OnInit {
 		const safeMissionName = missionName
 			.replaceAll(' ', '_')
 			.replaceAll(/\W/g, '')
-			.toUpperCase();
+			.toUpperCase()
+			.trim();
 		const safeMissionType = this.missionTypeGroup.get('missionType')?.value
 			?.str
 			? this.missionTypeGroup.get('missionType')?.value?.str
