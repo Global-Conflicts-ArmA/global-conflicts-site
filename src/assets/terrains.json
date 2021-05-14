@@ -142,6 +142,10 @@
 	{
 		"class": "fow_map_henderson",
 		"display_name": "Handerson Airfield"
+	},
+	{
+		"class": "zargabad",
+		"display_name": "Zargabad"
 	}
 ]
 
