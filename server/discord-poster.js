@@ -16,20 +16,7 @@ async function getRemoteUser(id) {
 		});
 }
 
-async function getRemoteUserDisplayName(authorID) {
-	return await getRemoteUser(authorID)
-		.then((result) => {
-			return result.nickname
-				? result.nickname
-				: result.displayName
-				? result.displayName
-				: "error";
-		})
-		.catch((err) => {
-			console.log("err", err);
-			return "error";
-		});
-}
+
 
 function buildVersionStr(versionObj) {
 	if (versionObj.major <= -1) {
@@ -44,10 +31,9 @@ function buildVersionStr(versionObj) {
 
 async function getImage(base64Image) {
 	let parts = base64Image.split(";");
-	let mimType = parts[0].split(":")[1];
 	let imageData = parts[1].split(",")[1];
-	var img = Buffer.from(imageData, "base64");
-	const resizedBuffer = await sharp(img)
+	const img = Buffer.from(imageData, 'base64');
+	return await sharp(img)
 		.resize({
 			fit: sharp.fit.contain,
 			height: 256
@@ -56,16 +42,15 @@ async function getImage(base64Image) {
 		.catch((e) => {
 			console.log("imageError", e);
 		});
-	return resizedBuffer;
 }
 
-async function postDiscordNewMission(reqBody, avatarURL) {
-	const author = await getRemoteUserDisplayName(reqBody.authorID);
+async function postDiscordNewMission(reqBody) {
+	const author = await getRemoteUser(reqBody.authorID);
 
 	const newMissionEmbed = new Discord.MessageEmbed()
 		.setColor("#ffffff")
 		.setTitle(reqBody.fileName)
-		.setAuthor(`Author: ${author}`, avatarURL)
+		.setAuthor(`Author: ${author.displayName}`, author.user.displayAvatarURL())
 		.addFields(
 			{ name: "Description:", value: reqBody.description, inline: false },
 			{
@@ -119,17 +104,15 @@ async function postDiscordNewMission(reqBody, avatarURL) {
 }
 
 async function postDiscordMissionReady(request, mission, updateid) {
-
-
-	const author = await getRemoteUserDisplayName(mission.authorID);
+	const author = await getRemoteUser(mission.authorID);
 	const update = mission.updates.filter((updt) => updt._id.toString() === updateid)[0];
 
 	const newMissionEmbed = new Discord.MessageEmbed()
 		.setColor("#22cf26")
 		.setTitle(`${mission.name}`)
 		.setAuthor(
-			`Author: ${author}`,
-			request.discordUser.user.displayAvatarURL()
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
 		)
 		.addFields()
 		.setDescription(
@@ -139,7 +122,7 @@ async function postDiscordMissionReady(request, mission, updateid) {
 		)
 		.setTimestamp()
 		.setURL(
-			`${request.headers.origin}/mission-details/${mission.uniqueName}`
+			`https://globalconflicts.net/mission-details/${mission.uniqueName}`
 		);
 
 	discordJsClient.channels.cache
@@ -150,24 +133,14 @@ async function postDiscordMissionReady(request, mission, updateid) {
 		);
 }
 
-async function postDiscordReport(report, missionData, avatarURL) {
-	const author = await getRemoteUser(report.authorID)
-		.then((result) => {
-			return result.nickname
-				? result.nickname
-				: result.displayName
-				? result.displayName
-				: "error";
-		})
-		.catch((err) => {
-			console.log("err", err);
-			return "error";
-		});
+async function postDiscordReport(report, missionData) {
+	const author = await getRemoteUser(report.authorID);
+
 	const versionStr = buildVersionStr(report.version);
 	const reportEmbed = new Discord.MessageEmbed()
 		.setColor("#ff0000")
 		.setTitle(`Mission: ${missionData.name}`)
-		.setAuthor(`Bug Report Author: ${author}`, avatarURL)
+		.setAuthor(`Bug Report Author: ${author.displayName}`, author.user.displayAvatarURL())
 		.addFields({ name: "Version:", value: versionStr, inline: false })
 		.addFields({ name: "Report:", value: report.report, inline: false })
 		.setTimestamp(report.date)
@@ -189,24 +162,14 @@ async function postDiscordReport(report, missionData, avatarURL) {
 		.send("New bug report added", reportEmbed);
 }
 
-async function postDiscordReview(review, missionData, avatarURL) {
-	const author = await getRemoteUser(review.authorID)
-		.then((result) => {
-			return result.nickname
-				? result.nickname
-				: result.displayName
-				? result.displayName
-				: "error";
-		})
-		.catch((err) => {
-			console.log("err", err);
-			return "error";
-		});
+async function postDiscordReview(review, missionData) {
+	const author = await getRemoteUser(review.authorID);
+
 	const versionStr = buildVersionStr(review.version);
 	const reviewEmbed = new Discord.MessageEmbed()
 		.setColor("#2261cf")
 		.setTitle(`Mission: ${missionData.name}`)
-		.setAuthor(`Review Author: ${author}`, avatarURL)
+		.setAuthor(`Review Author: ${author.displayName}`, author.user.displayAvatarURL())
 		.addFields({ name: "Version:", value: versionStr, inline: false })
 		.addFields({ name: "Review:", value: review.review, inline: false })
 		.setTimestamp(review.date)
@@ -225,25 +188,15 @@ async function postDiscordReview(review, missionData, avatarURL) {
 		.send("New review added", reviewEmbed);
 }
 
-async function postDiscordUpdate(update, missionData, avatarURL) {
-	const author = await getRemoteUser(missionData.authorID)
-		.then((result) => {
-			return result.nickname
-				? result.nickname
-				: result.displayName
-				? result.displayName
-				: "error";
-		})
-		.catch((err) => {
-			console.log("err", err);
-			return "error";
-		});
+async function postDiscordUpdate(update, missionData) {
+	const author = await getRemoteUser(missionData.authorID);
+
 	const versionStr = buildVersionStr(update.version);
 	let updateEmbed;
 	updateEmbed = new Discord.MessageEmbed()
 		.setColor("#ffffff")
 		.setTitle(`Mission: ${missionData.name}`)
-		.setAuthor(`Author: ${author}`, avatarURL)
+		.setAuthor(`Author: ${author.displayName}`, author.user.displayAvatarURL())
 		.addFields({ name: "Version:", value: versionStr, inline: false })
 		.addFields({
 			name: "Changelog:",
@@ -266,23 +219,13 @@ async function postDiscordUpdate(update, missionData, avatarURL) {
 		.send("Mission updated", updateEmbed);
 }
 
-async function postDiscordEdit(edit, missionData, user) {
-	const author = await getRemoteUser(missionData.authorID)
-		.then((result) => {
-			return result.nickname
-				? result.nickname
-				: result.displayName
-				? result.displayName
-				: "error";
-		})
-		.catch((err) => {
-			console.log("err", err);
-			return "error";
-		});
+async function postDiscordEdit(edit, missionData) {
+	const author = await getRemoteUser(missionData.authorID);
+
 	const updateEmbed = new Discord.MessageEmbed()
 		.setColor("#c946ff")
 		.setTitle(`Mission: ${missionData.name}`)
-		.setAuthor(`Author: ${author}`, user.displayAvatarURL())
+		.setAuthor(`Author: ${author.displayName}`, author.user.displayAvatarURL())
 		.setTimestamp(Date.now())
 		.setURL(`https://globalconflicts.net//mission-details/${missionData.uniqueName}`)
 	if (edit.type) {
@@ -351,15 +294,15 @@ async function postDiscordEdit(edit, missionData, user) {
 }
 
 async function postMissionCopiedRemovedToServer(request, mission, updateid, serverName, action, color) {
-	const author = await getRemoteUserDisplayName(mission.authorID);
+	const author = await getRemoteUser(mission.authorID);
 	const update = mission.updates.filter((updt) => updt._id.toString() === updateid)[0];
 
 	const newMissionEmbed = new Discord.MessageEmbed()
 		.setColor(color)
 		.setTitle(`${mission.name}`)
 		.setAuthor(
-			`Author: ${author}`,
-			request.discordUser.user.displayAvatarURL()
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
 		)
 		.addFields()
 		.setDescription(
@@ -369,7 +312,7 @@ async function postMissionCopiedRemovedToServer(request, mission, updateid, serv
 		)
 		.setTimestamp()
 		.setURL(
-			`${request.headers.origin}/mission-details/${mission.uniqueName}`
+			`https://globalconflicts.net/mission-details/${mission.uniqueName}`
 		);
 
 	discordJsClient.channels.cache

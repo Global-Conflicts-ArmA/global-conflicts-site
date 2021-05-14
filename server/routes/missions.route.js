@@ -4,7 +4,6 @@ const User = require('../models/discordUser.model');
 const router = express.Router();
 const multer = require('multer');
 const fs = require('fs');
-const sharp = require('sharp');
 const { postDiscordReport, postDiscordReview, postDiscordUpdate, postDiscordEdit, postDiscordNewMission, postDiscordMissionReady, postMissionCopiedRemovedToServer } = require('../discord-poster');
 const { getDiscordUserFromCookies } = require('../misc/validate-cookies');
 
@@ -225,7 +224,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		return res.status(400).send({ missionErrors: req.missionDataErrors });
 	}
 
-	postDiscordNewMission(req.body, req.discordUser.user.displayAvatarURL());
+	postDiscordNewMission(req.body);
 
 	const firstUpdate = {
 		version: req.body.updates[0].version,
@@ -410,8 +409,7 @@ router.post('/report', uploadMulter.none(), async (req, res) => {
 			});
 			postDiscordReport(
 				report,
-				missionData,
-				req.discordUser.user.displayAvatarURL()
+				missionData
 			);
 			return res.send({ ok: true });
 		}
@@ -457,8 +455,7 @@ router.post('/review', uploadMulter.none(), async (req, res) => {
 			});
 			postDiscordReview(
 				review,
-				missionData,
-				req.discordUser.user.displayAvatarURL()
+				missionData
 			);
 			return res.send({ ok: true });
 		}
@@ -581,8 +578,7 @@ router.post('/update', updateMulter.single('fileData'), async (req, res) => {
 			});
 			postDiscordUpdate(
 				update,
-				missionData,
-				req.discordUser.user.displayAvatarURL()
+				missionData
 			);
 			return res.send({ ok: true });
 		}
@@ -632,7 +628,7 @@ router.post('/edit', updateMulter.none(), async (req, res) => {
 		if (err) {
 			console.log(err);
 		} else {
-			postDiscordEdit(edit, missionData, req.discordUser.user);
+			postDiscordEdit(edit, missionData);
 			return res.send({ ok: true });
 
 		}
