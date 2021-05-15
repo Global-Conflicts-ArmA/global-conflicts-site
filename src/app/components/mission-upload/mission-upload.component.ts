@@ -75,7 +75,7 @@ export class MissionUploadComponent implements OnInit {
 
 	readonly maxSize: number = 8388608;
 	readonly maxSizeImage: number = 2097152;
-	readonly minNameLength: number = 6;
+	readonly minNameLength: number = 3;
 	readonly maxNameLength: number = 30;
 
 	fileUploadGroup: FormGroup;
@@ -390,10 +390,10 @@ export class MissionUploadComponent implements OnInit {
 				return `A mission name is required!`;
 			}
 			if (missionName.hasError('nameMinLength')) {
-				return `Name is too short! Needs to be at least 6 characters`;
+				return `Name is too short! Needs to be at least ${this.minNameLength} characters`;
 			}
 			if (missionName.hasError('nameMaxLength')) {
-				return `Name is too long! Needs to be under 30 characters`;
+				return `Name is too long! Needs to be under ${this.maxNameLength} characters`;
 			}
 			if (missionName.hasError('nameInvalidChars')) {
 				return `Name has invalid characters in it, please only use AlphaNumerics and spaces`;
