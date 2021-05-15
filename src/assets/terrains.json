@@ -28,6 +28,10 @@
 		"display_name": "Chernarus (Winter)"
 	},
 	{
+		"class": "cup_chernarus_A3",
+		"display_name": "Chernarus 2020"
+	},
+	{
 		"class": "Desert_E",
 		"display_name": "Desert"
 	},
@@ -146,6 +150,10 @@
 	{
 		"class": "zargabad",
 		"display_name": "Zargabad"
+	},
+	{
+		"class": "APHX_Yagizlar",
+		"display_name": "Yagizlar"
 	}
 ]
 
