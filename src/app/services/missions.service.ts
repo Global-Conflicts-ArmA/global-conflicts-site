@@ -48,7 +48,7 @@ export class MissionsService {
 
 	public getTerrainData(terrainName: string | undefined) {
 		return terrainName ? Terrains.find(terrain=>{
-			return terrain.class === terrainName
+			return terrain.class.toLowerCase() === terrainName.toLowerCase()
 		}) : undefined;
 	}
 
