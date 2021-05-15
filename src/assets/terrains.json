@@ -154,6 +154,10 @@
 	{
 		"class": "APHX_Yagizlar",
 		"display_name": "Yagizlar"
+	},
+	{
+		"class": "sara",
+		"display_name": "Sahrani"
 	}
 ]
 
