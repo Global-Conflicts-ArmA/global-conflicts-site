@@ -204,7 +204,7 @@ async function postDiscordUpdate(update, missionData) {
 			inline: false
 		})
 		.setTimestamp(update.date)
-		.setURL(`globalconflicts.net/mission-details/${missionData.uniqueName}`)
+		.setURL(`https://globalconflicts.net/mission-details/${missionData.uniqueName}`)
 	if (missionData.image) {
 		const resizedBuffer = await getImage(missionData.image);
 		let attachment = new Discord.MessageAttachment(
