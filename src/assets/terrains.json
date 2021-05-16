@@ -28,6 +28,10 @@
 		"display_name": "Chernarus (Winter)"
 	},
 	{
+		"class": "chernarus_summer",
+		"display_name": "Chernarus (Summer)"
+	},
+	{
 		"class": "cup_chernarus_A3",
 		"display_name": "Chernarus 2020"
 	},
