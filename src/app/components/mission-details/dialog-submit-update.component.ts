@@ -187,12 +187,20 @@ export class DialogSubmitUpdateComponent implements OnInit {
 		const typeObject = this.mC.MissionTypes.find(
 			(e) => e.title === this.mission.type
 		);
+
+		const safeMissionName = this.mission.name
+			.replaceAll(' ', '_')
+			.replaceAll(/\W/g, '')
+			.toUpperCase()
+			.trim();
+
+
 		const safeMissionType = typeObject?.str ?? typeObject?.title;
 		const terrainObj = this.missionsService.getTerrainData(
 			this.mission.terrain
 		);
 		if(terrainObj){
-			return `${safeMissionType}${this.mission.size.max}_${this.mission.name}_V${this.versionString}.${terrainObj.class}.pbo`;
+			return `${safeMissionType}${this.mission.size.max}_${safeMissionName}_V${this.versionString}.${terrainObj.class}.pbo`;
 		}
 
 	}
