@@ -32,7 +32,7 @@ fileFilterFunction = async function (req, file, callback) {
 	if (req.authError) {
 		return callback(null, false);
 	}
-	req.missionDataErrors = validateUploadData(req.body);
+	req.missionDataErrors = validateData(req.body, true);
 	if (Object.keys(req.missionDataErrors).length > 0) {
 		callback(null, false);
 		return;
@@ -84,7 +84,8 @@ updateFileFilterFunction = async function (req, file, callback) {
 	if (req.authError) {
 		return callback(null, false);
 	}
-	console.log('req.body: ', req.body);
+	req.missionDataErrors = validateData(req.body, false);
+
 	if (file.mimetype !== 'application/octet-stream') {
 		req.missionDataErrors.file = 'File is not a .pbo.';
 		callback(null, false);
@@ -124,14 +125,15 @@ const updateMulter = multer({
 	})
 });
 
-function validateUploadData(reqBody, res) {
+function validateData(reqBody, isNewMission) {
 	const errors = {};
 	if (!reqBody.authorID) {
 		errors.authorID = 'Missing authorID.';
 	}
-	if (!reqBody.name) {
+	if (isNewMission && !reqBody.name) {
 		errors.name = 'Missing name.';
 	}
+
 	if (!reqBody.terrain) {
 		errors.terrain = 'Missing terrain.';
 	}
@@ -280,13 +282,11 @@ router.get('/', async (req, res) => {
 		req,
 		'User not allowed to list missions.'
 	);
-
 	if (req.authError) {
 		return res.status(401).send({
 			authError: req.authError
 		});
 	}
-	console.log('GET request for all missions');
 	Mission.find({}, { _id: 0 }, async (err, doc) => {
 		if (err) {
 			res.status(500).send(err);
@@ -396,7 +396,6 @@ router.post('/report', uploadMulter.none(), async (req, res) => {
 		if (err) {
 			console.log(err);
 		} else {
-			console.log('missionData.reports: ', missionData.reports);
 			if (!missionData.reports) {
 				missionData.reports = [report];
 			} else {
@@ -442,7 +441,6 @@ router.post('/review', uploadMulter.none(), async (req, res) => {
 		if (err) {
 			console.log(err);
 		} else {
-			console.log('missionData.reviews: ', missionData.reviews);
 			if (!missionData.reviews) {
 				missionData.reviews = [review];
 			} else {
@@ -566,8 +564,6 @@ router.post('/update', updateMulter.single('fileData'), async (req, res) => {
 					authError: "Not allowed."
 				});
 			}
-
-			console.log('missionData.updates: ', missionData.updates);
 			missionData.updates.push(update);
 			missionData.lastUpdate = update.date;
 			missionData.lastVersion = update.version;
