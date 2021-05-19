@@ -166,7 +166,10 @@
 	{
 		"class": "uzbin",
 		"display_name": "Uzbin Valley"
+	},
+	{
+		"class": "fapovo",
+		"display_name": "Fapovo"
 	}
-
 ]
 
