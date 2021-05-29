@@ -159,7 +159,7 @@ async function postDiscordReport(report, missionData) {
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send("New bug report added", reportEmbed);
+		.send(`New bug report added, <@&${author.user.id}>`, reportEmbed);
 }
 
 async function postDiscordReview(review, missionData) {
@@ -185,7 +185,7 @@ async function postDiscordReview(review, missionData) {
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send("New review added", reviewEmbed);
+		.send(`New review added, <@&${author.user.id}>`, reviewEmbed);
 }
 
 async function postDiscordUpdate(update, missionData) {
