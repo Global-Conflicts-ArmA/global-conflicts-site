@@ -367,6 +367,42 @@ router.get('/:uniqueName', async (req, res) => {
 		});
 });
 
+router.put('/report', uploadMulter.none(), async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to list missions.'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
+	const options = {
+		upsert: false,
+		safe: true
+	};
+
+	let query = {  };
+	if(req.discordUser.roles.cache.some(r=>["Admin", "Arma GM"].includes(r.name))){
+		query = { uniqueName: req.body.uniqueName, "reports._id": req.body.data._id };
+	}else{
+		query = { uniqueName: req.body.uniqueName, "reports._id": req.body.data._id, "reports.authorID":req.discordUser.user.id };
+	}
+
+	Mission.findOneAndUpdate(query,{
+		$set : {
+			"reports.$.report" : req.body.data.report,
+			"reports.$.version":req.body.data.version
+		}
+	}, options, (err, missionData) => {
+		if (err) {
+			return res.send({ ok: false });
+		} else {
+			return res.send({ ok: true });
+		}
+	});
+});
+
 router.post('/report', uploadMulter.none(), async (req, res) => {
 	req = await getDiscordUserFromCookies(
 		req,
@@ -410,6 +446,42 @@ router.post('/report', uploadMulter.none(), async (req, res) => {
 				report,
 				missionData
 			);
+			return res.send({ ok: true });
+		}
+	});
+});
+
+router.put('/review', uploadMulter.none(), async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to list missions.'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
+	const options = {
+		upsert: false,
+		safe: true
+	};
+
+	let query = {  };
+	if(req.discordUser.roles.cache.some(r=>["Admin", "Arma GM"].includes(r.name))){
+		 query = { uniqueName: req.body.uniqueName, "reviews._id": req.body.data._id };
+	}else{
+		 query = { uniqueName: req.body.uniqueName, "reviews._id": req.body.data._id, "reviews.authorID":req.discordUser.user.id };
+	}
+
+	Mission.findOneAndUpdate(query,    {
+		$set : {
+			"reviews.$.review" : req.body.data.review,
+			"reviews.$.version":req.body.data.version
+		}
+	}, options, (err, missionData) => {
+		if (err) {
+			return res.send({ ok: false });
+		} else {
 			return res.send({ ok: true });
 		}
 	});
@@ -598,7 +670,6 @@ router.post('/edit', updateMulter.none(), async (req, res) => {
 		new: true
 	};
 	// TODO validate body
-	const edit = req.body;
 
 
 	// TODO Allow for mission makers to customize trusted users to update their missions
@@ -615,18 +686,24 @@ router.post('/edit', updateMulter.none(), async (req, res) => {
 			authorID: req.discordUser.user.id
 		};
 	}
-	delete edit["terrain"]
-	delete edit["uniqueName"]
+	const edit = {
+		size:req.body.size,
+		type:req.body.type,
+		description:req.body.description,
+		jip:req.body.jip,
+		respawn:req.body.respawn,
+		tags:req.body.tags,
+		timeOfDay:req.body.timeOfDay,
+		era:req.body.era
+	}
 
 	Mission.findOneAndUpdate(query, {
-		"$set": edit
-	}, options, (err, missionData) => {
+		"$set": edit	}, options, (err, missionData) => {
 		if (err) {
 			console.log(err);
 		} else {
 			postDiscordEdit(edit, missionData);
 			return res.send({ ok: true });
-
 		}
 	});
 });
