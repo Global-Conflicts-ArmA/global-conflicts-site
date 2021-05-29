@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IMission } from '../models/mission';
+import {IMission, IReview} from '../models/mission';
 import { MissionConstants } from '../constants/missionConstants';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as fileSaver from 'file-saver';
@@ -30,12 +30,21 @@ export class MissionsService {
 		return this.httpClient.post(`/api/missions`, formData);
 	}
 
-	public submitReport(formData: FormData) {
-		return this.httpClient.post(`/api/missions/report`, formData);
+	public submitReport(formData: FormData, isUpdate) {
+		if(isUpdate){
+			return this.httpClient.put(`/api/missions/report`, formData);
+		}else{
+			return this.httpClient.post(`/api/missions/report`, formData);
+		}
+
 	}
 
-	public submitReview(formData: FormData) {
-		return this.httpClient.post(`/api/missions/review`, formData);
+	public submitReview(formData: FormData, isUpdate) {
+		if(isUpdate){
+			return this.httpClient.put(`/api/missions/review`, formData);
+		}else{
+			return this.httpClient.post(`/api/missions/review`, formData);
+		}
 	}
 
 	public submitUpdate(formData: FormData) {
@@ -47,16 +56,20 @@ export class MissionsService {
 	}
 
 	public getTerrainData(terrainName: string | undefined) {
-		return terrainName ? Terrains.find(terrain=>{
-			return terrain.class.toLowerCase() === terrainName.toLowerCase()
-		}) : undefined;
+		return terrainName
+			? Terrains.find((terrain) => {
+					return (
+						terrain.class.toLowerCase() ===
+						terrainName.toLowerCase()
+					);
+			  })
+			: undefined;
 	}
 
 	public getImage(mission: IMission | null) {
 		if (mission?.image) {
 			return this.sanitizer.bypassSecurityTrustResourceUrl(mission.image);
 		} else {
-
 			return '../../../assets/imgs/noImage.png';
 		}
 	}
@@ -69,9 +82,10 @@ export class MissionsService {
 	public getFileName(uniqueName: string | null): Observable<IMission> {
 		return this.httpClient.get<IMission>(`/api/missions/${uniqueName}`, {
 			headers: {
-				'Cache-Control': 'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
-				'Pragma': 'no-cache',
-				'Expires': '0'
+				'Cache-Control':
+					'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+				Pragma: 'no-cache',
+				Expires: '0'
 			}
 		});
 	}
@@ -108,20 +122,29 @@ export class MissionsService {
 			);
 	}
 
-	public removeReviewEntry(uniqueName:string, reviewID: string){
-		return this.httpClient.delete(`/api/missions/review/${uniqueName}/${reviewID}`);
+	public removeReviewEntry(uniqueName: string, reviewID: string) {
+		return this.httpClient.delete(
+			`/api/missions/review/${uniqueName}/${reviewID}`
+		);
 	}
 
-	public removeReportEntry(uniqueName:string, reportID: string){
-		return this.httpClient.delete(`/api/missions/report/${uniqueName}/${reportID}`);
+	public removeReportEntry(uniqueName: string, reportID: string) {
+		return this.httpClient.delete(
+			`/api/missions/report/${uniqueName}/${reportID}`
+		);
 	}
 
-    public missionAction(action:string, uniqueName:string,  updateId: string, filename:string,) {
-		return this.httpClient.post(`/api/missions/${uniqueName}/action`,{
-			"action":action,
-			"uniqueName":uniqueName,
-			"updateId":updateId,
-			"filename":filename
+	public missionAction(
+		action: string,
+		uniqueName: string,
+		updateId: string,
+		filename: string
+	) {
+		return this.httpClient.post(`/api/missions/${uniqueName}/action`, {
+			action: action,
+			uniqueName: uniqueName,
+			updateId: updateId,
+			filename: filename
 		});
-    }
+	}
 }

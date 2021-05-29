@@ -26,6 +26,7 @@ export interface IRatios {
 }
 
 export interface IReport {
+	_id?: string;
 	version: {
 		major: number;
 		minor?: string;
@@ -39,6 +40,7 @@ export interface IReport {
 }
 
 export interface IReview {
+	_id?: string;
 	version: {
 		major: number;
 		minor?: string;

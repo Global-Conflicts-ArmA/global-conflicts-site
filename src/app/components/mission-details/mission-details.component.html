@@ -195,100 +195,64 @@
 					<tr mat-row *matRowDef="let row; columns: updateColumns"></tr>
 				</table>
 			</div>
-			<!--Reports-->
-			<div class="mb-4">
-				<div class="table-header">
-					<div class="spacer"></div>
-					<div class="table-title">Reports</div>
-					<div class="table-button-container">
-						<button mat-flat-button class="table-button" color="accent" (click)="submitBugReport()" matTooltip="Submit a Bug Report">
-							<mat-icon>bug_report</mat-icon>
-						</button>
+
+			<div class="row">
+				<div class="col-lg-6 col-12 re-box">
+					<div class="row" style="margin-bottom: 10px;">
+						<div class="col re-box-name">Bug reports</div>
+						<div class="col re-box-add-button">		<button mat-flat-button (click)="submitBugReport()">	<mat-icon color="accent">add</mat-icon></button></div>
 					</div>
-				</div>
-				<table mat-table #reportsSort="matSort" [dataSource]="this.dataSourceReports" class="matTable" matSort style="width: 100%">
-					<ng-container matColumnDef="date">
-						<th mat-header-cell *matHeaderCellDef >Date</th>
-						<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.date) }}</td>
-					</ng-container>
-					<ng-container matColumnDef="versionStr">
-						<th mat-header-cell *matHeaderCellDef >Version</th>
-						<td mat-cell *matCellDef="let element">{{ element.versionStr }}</td>
-					</ng-container>
-					<ng-container matColumnDef="authorName">
-						<th mat-header-cell *matHeaderCellDef >Author</th>
-						<td mat-cell *matCellDef="let element">{{ element.authorName }}</td>
-					</ng-container>
-					<ng-container matColumnDef="buttons">
-							<th mat-header-cell class="table-header-action" *matHeaderCellDef >Actions</th>
-							<td mat-cell *matCellDef="let element">
-								<div class="row-btns">
-									<button mat-flat-button color="primary" matTooltip="Report" (click)="viewBugReport(element)">
-										<mat-icon>article</mat-icon>
-									</button>
-									<button mat-flat-button color="primary" matTooltip="Actions" [matMenuTriggerFor]="menu_bug_reports" *ngIf="discordUser?.role == 'Admin'">
-										<mat-icon>keyboard_arrow_right</mat-icon>
-									</button>
-									<mat-menu #menu_bug_reports="matMenu">
-										<button (click)="removeReportEntry(element)" mat-menu-item>Remove Entry</button>
-									</mat-menu>
+					<div class="re-content" *ngFor="let report of mission?.reports">
+						<div class="re-header">
+							<div>
+								{{report.authorName}} - {{report.date | date: 'shortDate'}}
+							</div>
+							<div style="display: flex">
+								V{{report.versionStr}}
+								<div *ngIf="canEditRe(report)" style="cursor: pointer" (click)="submitBugReport(report)" matTooltip="Edit Review">
+									<mat-icon style="font-size: 18px; ">edit</mat-icon>
 								</div>
-							</td>
-					</ng-container>
-					<tr mat-header-row *matHeaderRowDef="reportColumns; sticky: true"></tr>
-					<tr mat-row *matRowDef="let row; columns: reportColumns"></tr>
-					<tr class="mat-row" *matNoDataRow>
-						<td class="mat-cell" colspan="4">No Reports</td>
-					</tr>
-				</table>
-			</div>
-			<!--Reviews-->
-			<div class="mb-4">
-				<div class="table-header">
-					<div class="spacer"></div>
-					<div class="table-title">Reviews</div>
-					<div class="table-button-container">
-						<button mat-flat-button class="table-button" color="accent" (click)="submitReview()" matTooltip="Submit a Review">
-							<mat-icon>note_add</mat-icon>
-						</button>
-					</div>
-				</div>
-				<table mat-table #reviewsSort="matSort" [dataSource]="this.dataSourceReviews" class="matTable" matSort style="width: 100%">
-					<ng-container matColumnDef="date">
-						<th mat-header-cell *matHeaderCellDef >Date</th>
-						<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.date) }}</td>
-					</ng-container>
-					<ng-container matColumnDef="versionStr">
-						<th mat-header-cell *matHeaderCellDef >Version</th>
-						<td mat-cell *matCellDef="let element">{{ element.versionStr }}</td>
-					</ng-container>
-					<ng-container matColumnDef="authorName">
-						<th mat-header-cell *matHeaderCellDef >Author</th>
-						<td mat-cell *matCellDef="let element">{{ element.authorName }}</td>
-					</ng-container>
-					<ng-container matColumnDef="buttons">
-						<th mat-header-cell class="table-header-action" *matHeaderCellDef >Actions</th>
-						<td mat-cell *matCellDef="let element">
-							<div class="row-btns">
-							<button mat-flat-button matTooltip="View Review" (click)="viewReview(element)">
-								<mat-icon>article</mat-icon>
-							</button>
-							<button mat-flat-button matTooltip="Actions" [matMenuTriggerFor]="menu_reviews" *ngIf="discordUser?.role == 'Admin'">
-								<mat-icon>keyboard_arrow_right</mat-icon>
-							</button>
-							<mat-menu #menu_reviews="matMenu">
-								<button mat-menu-item (click)="removeReviewEntry(element)" >Remove Entry</button>
-							</mat-menu>
 							</div>
 
-						</td>
-					</ng-container>
-					<tr mat-header-row *matHeaderRowDef="reviewColumns; sticky: true"></tr>
-					<tr mat-row *matRowDef="let row; columns: reviewColumns"></tr>
-					<tr class="mat-row" *matNoDataRow>
-						<td class="mat-cell" colspan="4">No Reviews</td>
-					</tr>
-				</table>
+						</div>
+						<div class="re-text">
+							<div>
+								{{report.report}}
+							</div>
+						</div>
+					</div>
+					<div class="re-empty" *ngIf="mission?.reports == null">
+						No bug reports
+					</div>
+				</div>
+
+				<div class="col-lg-6 col-12 re-box">
+					<div class="row" style="margin-bottom: 10px;">
+						<div class="col re-box-name">Reviews</div>
+						<div class="col re-box-add-button"> <button mat-flat-button (click)="submitReview()"><mat-icon color="accent">add</mat-icon></button></div>
+					</div>
+					<div class="re-content" *ngFor="let review of mission?.reviews">
+						<div class="re-header">
+							<div>
+								{{review.authorName}} - {{review.date | date: 'shortDate'}}
+							</div>
+							<div style="display: flex">
+								V{{review.versionStr}}
+								<div *ngIf="canEditRe(review)" style="cursor: pointer" (click)="submitReview(review)" matTooltip="Edit Review">
+									<mat-icon style="font-size: 18px; ">edit</mat-icon>
+								</div>
+							</div>
+						</div>
+						<div class="re-text">
+							<div>
+								{{review.review}}
+							</div>
+						</div>
+					</div>
+					<div class="re-empty" *ngIf="mission?.reviews == null ">
+						No reviews
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

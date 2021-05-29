@@ -357,6 +357,7 @@ a:hover {
 
 .container {
 	margin-top: 100px;
+	margin-bottom: 100px;
 	max-width: 1200px;
 }
 
@@ -541,4 +542,24 @@ body {
 body {
 	margin: 0;
 	font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+/* width */
+::-webkit-scrollbar {
+	width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	background: colors.$primary-dark;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: colors.$primary;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: colors.$accent;
 }

@@ -142,14 +142,18 @@ export class MissionDetailsComponent implements OnInit {
 		});
 	}
 
-	public submitBugReport(mission: IMission | null = this.mission) {
+	public submitBugReport(report?: IReport) {
 		const dialogRef = this.dialog.open(DialogSubmitBugReportComponent, {
-			data: mission,
+			data: {mission:this.mission, report},
 			scrollStrategy: this.overlay.scrollStrategies.noop(),
 			minHeight: '20rem',
+			autoFocus: false,
 			minWidth: '30rem'
 		});
-		dialogRef.afterClosed().subscribe(() => {
+		dialogRef.afterClosed().subscribe((action) => {
+			if(action==="delete_report"){
+				this.removeReportEntry(report);
+			}
 			this.refresh();
 		});
 	}
@@ -165,28 +169,23 @@ export class MissionDetailsComponent implements OnInit {
 		});
 	}
 
-	public submitReview(mission: IMission | null = this.mission) {
+	public submitReview(review?:IReview) {
+		// if has review, it's an update of a review
 		const dialogRef = this.dialog.open(DialogSubmitReviewComponent, {
-			data: mission,
+			data: {mission:this.mission, review},
 			scrollStrategy: this.overlay.scrollStrategies.noop(),
 			minHeight: '20rem',
+			autoFocus: false,
 			minWidth: '30rem'
 		});
-		dialogRef.afterClosed().subscribe(() => {
+		dialogRef.afterClosed().subscribe((action) => {
+			if(action==="delete_review"){
+				this.removeReviewEntry(review);
+			}
 			this.refresh();
 		});
 	}
 
-	public viewReview(
-		review: IReview,
-		mission: IMission | null = this.mission
-	) {
-		console.log('changeLog: ', review.review);
-		const dialogRef = this.dialog.open(DialogViewReviewComponent, {
-			data: { mission, review },
-			minWidth: '20rem'
-		});
-	}
 
 	removeReviewEntry(element) {
 		if (this.mission) {
@@ -241,6 +240,13 @@ export class MissionDetailsComponent implements OnInit {
 		return (
 			this.discordUser?.role === 'Admin' ||
 			this.mission?.authorID === this.discordUser?.id
+		);
+	}
+
+	canEditRe(re: IReport | IReview) {
+		return (
+			this.discordUser?.role === 'Admin' ||
+			re?.authorID === this.discordUser?.id
 		);
 	}
 }

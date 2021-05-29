@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import {AfterViewInit, Component, Inject, OnInit} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
 	MatDialog,
@@ -9,6 +9,7 @@ import { DiscordUser } from '@app/models/discorduser';
 import { IMission, IReport, IReview } from '@app/models/mission';
 import { MissionsService } from '@app/services/missions.service';
 import { UserService } from '@app/services/user.service';
+import {MissionActions} from "@app/components/mission-details/dialog-actions/dialog-actions.component";
 
 @Component({
 	selector: 'dialog-submit-review',
@@ -18,7 +19,7 @@ export class DialogSubmitReviewComponent implements OnInit {
 	enableErrorLog = false;
 	constructor(
 		public dialogRef: MatDialogRef<DialogSubmitReviewComponent>,
-		@Inject(MAT_DIALOG_DATA) public mission: IMission,
+		@Inject(MAT_DIALOG_DATA) public data: {mission:IMission, review:IReview},
 		private formBuilder: FormBuilder,
 		public missionsService: MissionsService,
 		private userService: UserService
@@ -30,10 +31,15 @@ export class DialogSubmitReviewComponent implements OnInit {
 	ngOnInit(): void {
 		this.discordUser = this.userService.getUserLocally();
 		this.reviewGroup = this.formBuilder.group({
-			version: ['', [Validators.required]],
-			review: ['', [Validators.required]]
+			version: [this.data.review?.version??'', [Validators.required]],
+			review: [this.data.review?.review??'', [Validators.required]]
 		});
 	}
+
+	compareVersions(o1: any, o2: any) {
+		return o1.major === o2.major && o1.minor === o2.minor;
+	}
+
 
 	buildFormData(
 		formData: { append: (arg0: any, arg1: any) => void },
@@ -67,22 +73,29 @@ export class DialogSubmitReviewComponent implements OnInit {
 			date: new Date(),
 			review: this.reviewGroup.get('review')?.value ?? ''
 		};
+		if(this.data.review){
+			review._id = this.data.review._id;
+		}
 		console.log('review: ', review);
 		const request = {
 			data: review,
-			uniqueName: this.mission.uniqueName
+			uniqueName: this.data.mission.uniqueName
 		};
 		const formData: any = new FormData();
 		this.buildFormData(formData, request);
-		this.missionsService.submitReview(formData).subscribe(
+		this.missionsService.submitReview(formData, !!this.data.review ).subscribe(
 			() => {
-				console.log('upload success');
 				this.dialogRef.close();
 			},
 			(httpError) => {
-				console.log('upload error');
 				this.dialogRef.close();
 			}
 		);
+	}
+
+	removeEntry() {
+		if(confirm("ARE YOU SURE YOU WANT TO REMOVE THIS REVIEW?")) {
+			this.dialogRef.close({action:"delete_review"});
+		}
 	}
 }

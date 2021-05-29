@@ -11,7 +11,7 @@ import {
 	MAT_DIALOG_DATA
 } from '@angular/material/dialog';
 import { DiscordUser } from '@app/models/discorduser';
-import { IMission, IReport } from '@app/models/mission';
+import {IMission, IReport, IReview} from '@app/models/mission';
 import { MissionsService } from '@app/services/missions.service';
 import { UserService } from '@app/services/user.service';
 
@@ -23,7 +23,7 @@ export class DialogSubmitBugReportComponent implements OnInit {
 	enableErrorLog = false;
 	constructor(
 		public dialogRef: MatDialogRef<DialogSubmitBugReportComponent>,
-		@Inject(MAT_DIALOG_DATA) public mission: IMission,
+		@Inject(MAT_DIALOG_DATA) public data: {mission:IMission, report:IReport},
 		private formBuilder: FormBuilder,
 		public missionsService: MissionsService,
 		private userService: UserService
@@ -36,10 +36,10 @@ export class DialogSubmitBugReportComponent implements OnInit {
 		this.discordUser = this.userService.getUserLocally();
 		this.bugReportGroup = this.formBuilder.group(
 			{
-				version: ['', [Validators.required]],
-				report: ['', [Validators.required]],
-				logEnabled: [''],
-				log: ['']
+				version: [this.data.report?.version??'', [Validators.required]],
+				report: [this.data.report?.report??'', [Validators.required]],
+				logEnabled: [!!this.data.report?.log],
+				log: [this.data.report?.log??'']
 			},
 			{
 				validators: [this.checkLog]
@@ -132,6 +132,10 @@ export class DialogSubmitBugReportComponent implements OnInit {
 		}
 	}
 
+	compareVersions(o1: any, o2: any) {
+		return o1.major === o2.major && o1.minor === o2.minor;
+	}
+
 	submit() {
 		const report: IReport = {
 			version: this.bugReportGroup.get('version')?.value,
@@ -148,11 +152,14 @@ export class DialogSubmitBugReportComponent implements OnInit {
 		console.log('report: ', report);
 		const request = {
 			data: report,
-			uniqueName: this.mission.uniqueName
+			uniqueName: this.data.mission.uniqueName
 		};
+		if(this.data.report){
+			report._id = this.data.report._id;
+		}
 		const formData: any = new FormData();
 		this.buildFormData(formData, request);
-		this.missionsService.submitReport(formData).subscribe(
+		this.missionsService.submitReport(formData, !!this.data.report ).subscribe(
 			() => {
 				console.log('upload success');
 				this.dialogRef.close();
@@ -162,5 +169,11 @@ export class DialogSubmitBugReportComponent implements OnInit {
 				this.dialogRef.close();
 			}
 		);
+	}
+
+	removeEntry() {
+		if(confirm("ARE YOU SURE YOU WANT TO REMOVE THIS BUG REPORT?")) {
+			this.dialogRef.close({action:"delete_report"});
+		}
 	}
 }
