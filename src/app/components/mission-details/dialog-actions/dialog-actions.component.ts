@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
-import { DiscordUser } from "@app/models/discorduser";
+import { DatabaseUser } from "@app/models/databaseUser";
 import { IMission, IUpdate } from '@app/models/mission';
 import { MissionsService } from '@app/services/missions.service';
 
@@ -24,7 +24,7 @@ export class DialogActionsComponent implements OnInit {
 		public missionsService: MissionsService,
 
 		@Inject(MAT_DIALOG_DATA)
-		public data: { discordUser: DiscordUser; mission: IMission, update: IUpdate }
+		public data: { discordUser: DatabaseUser; mission: IMission, update: IUpdate }
 	) {}
 
 	loading = false;

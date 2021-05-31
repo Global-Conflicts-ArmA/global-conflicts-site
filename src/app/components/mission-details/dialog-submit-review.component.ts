@@ -5,7 +5,7 @@ import {
 	MatDialogRef,
 	MAT_DIALOG_DATA
 } from '@angular/material/dialog';
-import { DiscordUser } from '@app/models/discorduser';
+import { DatabaseUser } from '@app/models/databaseUser';
 import { IMission, IReport, IReview } from '@app/models/mission';
 import { MissionsService } from '@app/services/missions.service';
 import { UserService } from '@app/services/user.service';
@@ -26,7 +26,7 @@ export class DialogSubmitReviewComponent implements OnInit {
 	) {}
 
 	reviewGroup: FormGroup;
-	discordUser: DiscordUser | null;
+	discordUser: DatabaseUser | null;
 
 	ngOnInit(): void {
 		this.discordUser = this.userService.getUserLocally();

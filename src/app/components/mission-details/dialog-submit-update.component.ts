@@ -12,7 +12,7 @@ import {
 } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { MissionConstants } from '@app/constants/missionConstants';
-import { DiscordUser } from '@app/models/discorduser';
+import { DatabaseUser } from '@app/models/databaseUser';
 import { IMission, IUpdate } from '@app/models/mission';
 import { MissionsService } from '@app/services/missions.service';
 import { SharedService } from '@app/services/shared';
@@ -36,7 +36,7 @@ export class DialogSubmitUpdateComponent implements OnInit {
 	) {}
 
 	updateGroup: FormGroup;
-	discordUser: DiscordUser | null;
+	discordUser: DatabaseUser | null;
 	versionString: string;
 	missionToUpload: File | null;
 	readonly maxSize: number = 8388608;
