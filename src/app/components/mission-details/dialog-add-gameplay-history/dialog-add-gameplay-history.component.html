@@ -1,0 +1,61 @@
+<h1 mat-dialog-title>New gameplay history</h1>
+<div mat-dialog-content>
+
+	<div>
+		<div class="NgxEditor__Wrapper">
+			<ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
+			<ngx-editor
+				[editor]="editor"
+				[ngModel]="html"
+				[disabled]="false"
+				[placeholder]="'Type here...'"
+			></ngx-editor>
+		</div>
+	</div>
+
+	<div style="display: flex;">
+		<mat-form-field style="flex: 1;">
+			<mat-label>Leader discord name:</mat-label>
+			<input type="text"
+						 placeholder="Pick one"
+						 aria-label="Number"
+						 matInput
+						 [formControl]="userListControl"
+						 [matAutocomplete]="auto">
+			<mat-autocomplete (optionSelected)="onLeaderSelected($event.option)" [displayWith]="getOptionText" autoActiveFirstOption
+												#auto="matAutocomplete">
+				<mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+					{{option.displayName}}
+				</mat-option>
+			</mat-autocomplete>
+		</mat-form-field>
+	</div>
+	<div style="margin-bottom: 20px">
+		<div *ngFor="let leader of selectedLeaders" class="leader-box">
+			<div>
+				{{leader.displayName}}
+			</div>
+			<div>
+				<mat-form-field appearance="legacy">
+					<mat-label>Side:</mat-label>
+					<mat-select (selectionChange)="onSideSelected($event, leader)">
+						<mat-option style="color: #007bff" value="BLUFOR">BLUFOR</mat-option>
+						<mat-option style="color: red" value="OPFOR">OPFOR</mat-option>
+						<mat-option style="color: greenyellow"value="INDFOR">INDFOR</mat-option>
+						<mat-option style="color: #bd14bd"value="CIV">CIV</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button style="margin-left: 10px" mat-flat-button color="accent" (click)="removeLeader(leader)">
+					<mat-icon>remove</mat-icon>
+				</button>
+			</div>
+		</div>
+
+	</div>
+
+
+</div>
+<div mat-dialog-actions>
+	<button mat-button [mat-dialog-close]="">Close</button>
+	<button mat-button (click)="submitGameplayHistory()">Submit</button>
+</div>
