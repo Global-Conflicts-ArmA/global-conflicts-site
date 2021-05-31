@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MissionsService } from '@app/services/missions.service';
 import { IMission, IUpdate } from '@app/models/mission';
-import { DiscordUser } from '@app/models/discorduser';
+import { DatabaseUser } from '@app/models/databaseUser';
 import { UserService } from '@app/services/user.service';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
@@ -24,7 +24,7 @@ export class MissionListComponent implements OnInit {
 	@ViewChild(MatSort) sort: MatSort;
 
 	rowData: IMission[] = [];
-	discordUser: DiscordUser | null;
+	discordUser: DatabaseUser | null;
 	displayedColumns: string[] = [
 		'name',
 		'type',

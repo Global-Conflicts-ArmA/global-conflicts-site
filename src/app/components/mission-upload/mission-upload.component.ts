@@ -15,7 +15,7 @@ import {
 } from '@angular/forms';
 import { MissionConstants } from '@app/constants/missionConstants';
 import { MissionsService } from '@app/services/missions.service';
-import { DiscordUser } from '@app/models/discorduser';
+import { DatabaseUser } from '@app/models/databaseUser';
 import { IMission, IUpdate } from '@app/models/mission';
 import { UserService } from '@app/services/user.service';
 import { FileValidator } from 'ngx-material-file-input';
@@ -58,7 +58,7 @@ export class MissionUploadComponent implements OnInit {
 	private readonly missionDataFromDetails: IMission;
 
 	isEdit = false;
-	discordUser: DiscordUser | null;
+	discordUser: DatabaseUser | null;
 	misType = 'CO';
 	missionToUpload: File | null;
 	description: string;

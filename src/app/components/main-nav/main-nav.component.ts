@@ -1,6 +1,6 @@
 import {Component, enableProdMode, OnInit, ViewEncapsulation} from '@angular/core';
 import { UserService } from '../../services/user.service';
-import { DiscordUser } from '../../models/discorduser';
+import { DatabaseUser } from '../../models/databaseUser';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -32,7 +32,7 @@ export class MainNavComponent implements OnInit {
 		);
 	}
 
-	discordUser: DiscordUser | null;
+	discordUser: DatabaseUser | null;
 
 	isHandset$: Observable<boolean> = this.breakpointObserver
 		.observe('(max-width: 959.99px)')

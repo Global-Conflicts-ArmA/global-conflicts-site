@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MissionsService } from '@app/services/missions.service';
 import { MatDialog } from '@angular/material/dialog';
-import { DiscordUser } from '@app/models/discorduser';
+import { DatabaseUser } from '@app/models/databaseUser';
 import { UserService } from '@app/services/user.service';
 import { IMission, IReport, IReview, IUpdate } from '@app/models/mission';
 import { DialogViewUpdateComponent } from './dialog-view-update.component';
@@ -35,7 +35,7 @@ export class MissionDetailsComponent implements OnInit {
 		private router: Router
 	) {}
 
-	discordUser: DiscordUser | null;
+	discordUser: DatabaseUser | null;
 	mission: IMission | null;
 	dataSourceUpdates: MatTableDataSource<IUpdate>;
 	updateColumns = ['date', 'versionStr', 'authorName', 'status', 'buttons'];
