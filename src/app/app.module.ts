@@ -62,6 +62,10 @@ import { IConfig, NgxMaskModule } from 'ngx-mask';
 
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import * as Sentry from '@sentry/angular';
+import {MatExpansionModule} from "@angular/material/expansion";
+import { DialogAddGameplayHistoryComponent } from './components/mission-details/dialog-add-gameplay-history/dialog-add-gameplay-history.component';
+import { NgxEditorModule } from 'ngx-editor';
+
 
 const maskConfig: Partial<IConfig> = {
 	validation: false
@@ -85,7 +89,8 @@ const maskConfig: Partial<IConfig> = {
 		DialogViewReviewComponent,
 		DialogSubmitReviewComponent,
 		DialogSubmitUpdateComponent,
-		DialogActionsComponent
+		DialogActionsComponent,
+		DialogAddGameplayHistoryComponent
 	],
 	imports: [
 		CommonModule,
@@ -125,7 +130,9 @@ const maskConfig: Partial<IConfig> = {
 		BrowserAnimationsModule,
 		MarkdownModule.forRoot(),
 		MatAutocompleteModule,
-		NgxMaskModule.forRoot(maskConfig)
+		NgxMaskModule.forRoot(maskConfig),
+		MatExpansionModule,
+		NgxEditorModule
 	],
 	bootstrap: [AppComponent],
 	providers: [
