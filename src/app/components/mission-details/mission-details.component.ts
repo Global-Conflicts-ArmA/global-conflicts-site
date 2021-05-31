@@ -19,6 +19,7 @@ import {
 	MissionActions
 } from '@app/components/mission-details/dialog-actions/dialog-actions.component';
 import { MissionUploadComponent } from '@app/components/mission-upload/mission-upload.component';
+import {DialogAddGameplayHistoryComponent} from "@app/components/mission-details/dialog-add-gameplay-history/dialog-add-gameplay-history.component";
 
 @Component({
 	selector: 'app-mission-details',
@@ -248,5 +249,28 @@ export class MissionDetailsComponent implements OnInit {
 			this.discordUser?.role === 'Admin' ||
 			re?.authorID === this.discordUser?.id
 		);
+	}
+
+	canAddGameplayHistory() {
+		return this.discordUser?.role === 'Admin';
+	}
+
+	addGAmeplayHistory() {
+
+		// if has review, it's an update of a review
+		const dialogRef = this.dialog.open(DialogAddGameplayHistoryComponent, {
+			data: {mission:this.mission},
+			scrollStrategy: this.overlay.scrollStrategies.noop(),
+			minHeight: '20rem',
+			autoFocus: false,
+			minWidth: '40rem'
+		});
+		dialogRef.afterClosed().subscribe((action) => {
+
+			this.refresh();
+		});
+
+
+
 	}
 }

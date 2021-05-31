@@ -176,3 +176,35 @@ table {
 	text-align: center;
 	font-size: 11px;
 }
+
+.gh-content{
+	padding: 13px 0;
+}
+
+.gh-content:not(:last-child){
+
+	border-bottom: 2px solid #393939;
+}
+
+.gh-header{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin-bottom: 15px;
+	color: colors.$accent;
+	font-size: 1rem;
+}
+
+.gh-outcome{
+	display: flex;
+	margin-bottom: 10px;
+}
+.gh-outcome-label{
+	font-size: .9rem;
+	color: colors.$accent;
+
+}
+
+.gh-outcome-text{
+	font-size: 1.2rem;
+}

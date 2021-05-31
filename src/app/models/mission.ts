@@ -97,4 +97,18 @@ export interface IMission {
 	lastVersionStr?: string;
 	reports?: IReport[];
 	reviews?: IReview[];
+	gameplayHistory?: IHistory[];
+}
+
+export interface IHistory {
+	date: Date;
+	bluforLeader: string;
+	redforLeader: string;
+	indforLeader: string;
+	civLeader: string;
+	bluforAAR: string;
+	redforAAR: string;
+	indforAAR: string;
+	civAAR: string;
+	outcome: string;
 }
