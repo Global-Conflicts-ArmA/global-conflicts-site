@@ -34,7 +34,7 @@ export class MissionListComponent implements OnInit {
 		'era',
 		'authorName',
 		'lastVersionStr',
-		'lastUpdate',
+		'lastPlayed',
 		'uploadDate'
 	];
 	dataSource: MatTableDataSource<IMission>;
