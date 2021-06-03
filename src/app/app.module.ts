@@ -63,10 +63,11 @@ import { IConfig, NgxMaskModule } from 'ngx-mask';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import * as Sentry from '@sentry/angular';
 import {MatExpansionModule} from "@angular/material/expansion";
-import { DialogAddGameplayHistoryComponent } from './components/mission-details/dialog-add-gameplay-history/dialog-add-gameplay-history.component';
-import { DialogAddAarComponent } from './components/mission-details/dialog-add-aar/dialog-add-aar.component';
+
 import { AngularMarkdownEditorModule } from "angular-markdown-editor";
 import { DialogViewGmNotesComponent } from './components/mission-details/dialog-view-gm-notes/dialog-view-gm-notes.component';
+import { DialogAddGameplayHistoryComponent } from "@app/components/mission-details/dialog-add-gameplay-history/dialog-add-gameplay-history.component";
+import { DialogAddAarComponent } from "@app/components/mission-details/dialog-add-aar/dialog-add-aar.component";
 
 
 const maskConfig: Partial<IConfig> = {

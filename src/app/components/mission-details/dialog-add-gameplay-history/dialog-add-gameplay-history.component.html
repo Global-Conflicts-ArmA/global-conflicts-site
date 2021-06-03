@@ -35,7 +35,7 @@
 		<div>
 			<span>GM Notes (optinal): </span>
 			<angular-markdown-editor
-				rows="10"
+				[rows]=10
 				textareaId="newHistoryEditor"
 				name="markdownText" [(ngModel)]="history.gmNote">
 			</angular-markdown-editor>
@@ -105,5 +105,5 @@
 </div>
 <div mat-dialog-actions style="display: flex; justify-content: space-between">
 	<button mat-button [mat-dialog-close]="">Close</button>
-	<button mat-button [disabled]="!outcomeControl.value || !selectedLeaders.size>0" (click)="submitGameplayHistory()">Submit</button>
+	<button mat-button [disabled]="!outcomeControl.value || !(selectedLeaders.size>0)" (click)="submitGameplayHistory()">Submit</button>
 </div>

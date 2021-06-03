@@ -311,7 +311,7 @@ export class MissionDetailsComponent implements OnInit {
 
 	}
 
-	submitAAR(history: IHistory, leader: ILeader, oldAar: string) {
+	submitAAR(history: IHistory, leader: ILeader, oldAar: string|undefined) {
 		this.changeDetectorRef.detach();
 
 		const dialogRef = this.dialog.open(DialogAddAarComponent, {

@@ -301,9 +301,9 @@
 							<span class="gh-label">Outcome:&nbsp;</span>
 							<span class="gh-text">{{history.outcome}}</span>
 						</div>
-						<div   style="flex: 1; height: 30px"></div>
+						<div style="flex: 1; height: 30px"></div>
 						<div *ngIf="canEditHistory()" style="margin-right: 10px">
-							<button class="smaller-button" mat-flat-button  (click)="editHistory(history)">Edit History</button>
+							<button class="smaller-button" mat-flat-button (click)="editHistory(history)">Edit History</button>
 						</div>
 						<div style="justify-self: flex-end;" *ngIf="history.gmNote">
 							<button class="smaller-button" mat-flat-button (click)="viewGmNote(history.gmNote)">GM Notes</button>
@@ -319,8 +319,10 @@
 									<mat-panel-title>
 										<div class="gh-aar-header">
 											<div>
-												{{leader.displayName}} AAR<span>,<span *ngIf="leader.role!='took_command'" [ngClass]="leader.side"> {{leader.side}} leader</span>
-													<span *ngIf="leader.role=='took_command'" [ngClass]="leader.side">
+												{{leader.displayName}} AAR<span>,<span *ngIf="leader.role!='took_command'"
+																															 [ngClass]="leader.side?  leader.side : 'no-side'"> {{leader.side}}
+												leader</span>
+													<span *ngIf="leader.role=='took_command'" [ngClass]="leader.side?  leader.side : 'no-side'">
 													took {{leader.side}} command</span>
 												</span>
 											</div>
