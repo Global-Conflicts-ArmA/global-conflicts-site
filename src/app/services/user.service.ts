@@ -95,32 +95,32 @@ export class UserService {
 		}
 	}
 
-	public async getUserSettings(id: string): Promise<IUserSettings> {
-		return this.httpClient
-			.get<DatabaseUser>('/api/users/' + id)
-			.toPromise()
-			.then((user: DatabaseUser) => {
-				const settings = {
-					missionEditDM: true,
-					missionReportDM: true,
-					missionReviewDM: true,
-					missionRemoveDM: true,
-					missionAcceptDM: true
-				};
-				return settings;
-			})
-			.catch((err) => {
-				console.log('error: ', err);
-				const settings = {
-					missionEditDM: true,
-					missionReportDM: true,
-					missionReviewDM: true,
-					missionRemoveDM: true,
-					missionAcceptDM: true
-				};
-				return settings;
-			});
-	}
+	// public async getUserSettings(id: string): Promise<IUserSettings> {
+	// 	return this.httpClient
+	// 		.get<DatabaseUser>('/api/users/' + id)
+	// 		.toPromise()
+	// 		.then((user: DatabaseUser) => {
+	// 			const settings = {
+	// 				missionEditDM: true,
+	// 				missionReportDM: true,
+	// 				missionReviewDM: true,
+	// 				missionRemoveDM: true,
+	// 				missionAcceptDM: true
+	// 			};
+	// 			return settings;
+	// 		})
+	// 		.catch((err) => {
+	// 			console.log('error: ', err);
+	// 			const settings = {
+	// 				missionEditDM: true,
+	// 				missionReportDM: true,
+	// 				missionReviewDM: true,
+	// 				missionRemoveDM: true,
+	// 				missionAcceptDM: true
+	// 			};
+	// 			return settings;
+	// 		});
+	// }
 
 	public insertUserIds(authorId: string) {
 		const userFound = this.userCache.find((value) => {

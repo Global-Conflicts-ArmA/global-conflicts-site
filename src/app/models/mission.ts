@@ -1,3 +1,5 @@
+import { ILeader } from "@app/models/leader";
+
 export interface IUpdate {
 	version: {
 		major: number;
@@ -89,6 +91,7 @@ export interface IMission {
 	image?: string;
 	uploadDate: Date;
 	lastUpdate: Date;
+	lastPlayed?: Date;
 	updates: IUpdate[];
 	lastVersion: {
 		major: number;
@@ -97,18 +100,14 @@ export interface IMission {
 	lastVersionStr?: string;
 	reports?: IReport[];
 	reviews?: IReview[];
-	gameplayHistory?: IHistory[];
+	history?: IHistory[];
 }
 
 export interface IHistory {
-	date: Date;
-	bluforLeader: string;
-	redforLeader: string;
-	indforLeader: string;
-	civLeader: string;
-	bluforAAR: string;
-	redforAAR: string;
-	indforAAR: string;
-	civAAR: string;
-	outcome: string;
+	_id?: string,
+	date?: Date;
+	gmNote?: string;
+	outcome?: string;
+	leaders?: ILeader[];
 }
+

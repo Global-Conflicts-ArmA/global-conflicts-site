@@ -5,7 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router, RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RxReactiveFormsModule } from '@rxweb/reactive-form-validators';
 import { AppComponent } from './app.component';
@@ -54,7 +54,7 @@ import { DialogViewBugReportComponent } from './components/mission-details/dialo
 import { DialogSubmitBugReportComponent } from './components/mission-details/dialog-submit-bug-report.component';
 import { DialogViewReviewComponent } from './components/mission-details/dialog-view-review.component';
 import { DialogSubmitReviewComponent } from './components/mission-details/dialog-submit-review.component';
-import { MarkdownModule } from 'ngx-markdown';
+import { MarkdownModule, MarkedOptions, MarkedRenderer } from "ngx-markdown";
 import { DialogSubmitUpdateComponent } from './components/mission-details/dialog-submit-update.component';
 import { DialogActionsComponent } from './components/mission-details/dialog-actions/dialog-actions.component';
 
@@ -64,7 +64,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import * as Sentry from '@sentry/angular';
 import {MatExpansionModule} from "@angular/material/expansion";
 import { DialogAddGameplayHistoryComponent } from './components/mission-details/dialog-add-gameplay-history/dialog-add-gameplay-history.component';
-import { NgxEditorModule } from 'ngx-editor';
+import { DialogAddAarComponent } from './components/mission-details/dialog-add-aar/dialog-add-aar.component';
+import { AngularMarkdownEditorModule } from "angular-markdown-editor";
+import { DialogViewGmNotesComponent } from './components/mission-details/dialog-view-gm-notes/dialog-view-gm-notes.component';
 
 
 const maskConfig: Partial<IConfig> = {
@@ -90,7 +92,9 @@ const maskConfig: Partial<IConfig> = {
 		DialogSubmitReviewComponent,
 		DialogSubmitUpdateComponent,
 		DialogActionsComponent,
-		DialogAddGameplayHistoryComponent
+		DialogAddGameplayHistoryComponent,
+		DialogAddAarComponent,
+		DialogViewGmNotesComponent
 	],
 	imports: [
 		CommonModule,
@@ -128,11 +132,30 @@ const maskConfig: Partial<IConfig> = {
 		MatSnackBarModule,
 		MatProgressSpinnerModule,
 		BrowserAnimationsModule,
-		MarkdownModule.forRoot(),
+		MarkdownModule.forRoot({
+			markedOptions: {
+				provide: MarkedOptions,
+				useValue: {
+					renderer: new MarkedRenderer(),
+					gfm: true,
+					tables: true,
+					breaks: true,
+					pedantic: false,
+					sanitize: false,
+					smartLists: true,
+
+					smartypants: false,
+				},
+			},
+		}),
 		MatAutocompleteModule,
 		NgxMaskModule.forRoot(maskConfig),
 		MatExpansionModule,
-		NgxEditorModule
+		AngularMarkdownEditorModule.forRoot({
+			// add any Global Options/Config you might want
+			// to avoid passing the same options over and over in each components of your App
+			iconlibrary: 'fa'
+		})
 	],
 	bootstrap: [AppComponent],
 	providers: [
@@ -165,6 +188,7 @@ const maskConfig: Partial<IConfig> = {
 			provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
 			useValue: { appearance: 'fill' }
 		},
+		DatePipe,
 		SharedService
 	]
 })

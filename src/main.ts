@@ -6,6 +6,7 @@ import { environment } from './environments/environment';
 import * as Sentry from "@sentry/angular";
 import { Integrations } from "@sentry/tracing";
 
+
 if (environment.production) {
 	enableProdMode();
 }

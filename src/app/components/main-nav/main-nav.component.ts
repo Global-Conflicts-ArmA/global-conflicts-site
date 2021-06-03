@@ -1,4 +1,4 @@
-import {Component, enableProdMode, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import { UserService } from '../../services/user.service';
 import { DatabaseUser } from '../../models/databaseUser';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';

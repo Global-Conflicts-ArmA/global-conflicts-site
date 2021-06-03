@@ -115,12 +115,12 @@
 					<td mat-cell *matCellDef="let element">{{ element.lastVersionStr }}</td>
 				</ng-container>
 				<ng-container matColumnDef="lastUpdate">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header>Last Updated</th>
-					<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.lastUpdate) }}</td>
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Last Played</th>
+					<td mat-cell *matCellDef="let element">{{ element.lastPlayed? ( element.lastPlayed | date: 'longDate') : '--'   }}</td>
 				</ng-container>
 				<ng-container matColumnDef="uploadDate">
 					<th mat-header-cell *matHeaderCellDef mat-sort-header>First Uploaded</th>
-					<td mat-cell *matCellDef="let element">{{ missionsService.getDate(element.uploadDate) }}</td>
+					<td mat-cell *matCellDef="let element">{{ element.uploadDate | date: 'longDate' }}</td>
 				</ng-container>
 				<tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
 				<tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="onActivate(row)"></tr>

@@ -1,36 +1,74 @@
 <h1 mat-dialog-title>New gameplay history</h1>
 <div mat-dialog-content>
 
+
 	<div>
-		<div class="NgxEditor__Wrapper">
-			<ngx-editor-menu [editor]="editor"> </ngx-editor-menu>
-			<ngx-editor
-				[editor]="editor"
-				[ngModel]="html"
-				[disabled]="false"
-				[placeholder]="'Type here...'"
-			></ngx-editor>
+
+		<mat-form-field  class="full-width" appearance="fill">
+			<mat-label>Date (mm/dd/yyyy)</mat-label>
+			<input matInput  mask="M0/d0/0000" [leadZeroDateTime]="true" [(ngModel)]="historyDateString" />
+		</mat-form-field>
+
+		<mat-form-field class="full-width">
+			<mat-label>Outcome: (Open ended)</mat-label>
+			<input type="text"
+						 placeholder="Outcome"
+						 matInput
+						 [formControl]="outcomeControl"
+						 [matAutocomplete]="auto">
+			<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+				<mat-option *ngFor="let option of filtredOutcomes | async" [value]="option">
+					{{option}}
+				</mat-option>
+			</mat-autocomplete>
+		</mat-form-field>
+
+
+		<div class="markdown-buttons">
+			<mat-slide-toggle [(ngModel)]="showNotePreview">Show note preview</mat-slide-toggle>
+			<a mat-flat-button href="https://www.markdownguide.org/cheat-sheet//" target="_blank">Markdown guide</a>
 		</div>
+
+
+
+
+		<div>
+			<span>GM Notes (optinal): </span>
+			<angular-markdown-editor
+				rows="10"
+				textareaId="newHistoryEditor"
+				name="markdownText" [(ngModel)]="history.gmNote">
+			</angular-markdown-editor>
+		</div>
+
+
+		<markdown *ngIf="showNotePreview" [data]="history.gmNote" style="margin-bottom: 18px"></markdown>
+
+
 	</div>
 
-	<div style="display: flex;">
-		<mat-form-field style="flex: 1;">
-			<mat-label>Leader discord name:</mat-label>
+	<mat-divider></mat-divider>
+	<p style="margin-top: 18px">Type the name of the leaders and select it to confirm.</p>
+	<div style="display: flex; margin-top: 10px">
+		<mat-form-field style="flex: 1;" >
+			<mat-label>Leader Discord name:</mat-label>
 			<input type="text"
 						 placeholder="Pick one"
-						 aria-label="Number"
 						 matInput
 						 [formControl]="userListControl"
-						 [matAutocomplete]="auto">
-			<mat-autocomplete (optionSelected)="onLeaderSelected($event.option)" [displayWith]="getOptionText" autoActiveFirstOption
-												#auto="matAutocomplete">
-				<mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+						 [matAutocomplete]="leaderAuto">
+			<mat-autocomplete (optionSelected)="onLeaderSelected($event.option)" [displayWith]="getOptionText"
+												autoActiveFirstOption
+												#leaderAuto="matAutocomplete">
+				<mat-option *ngFor="let option of filtredDiscordUsers | async" [value]="option">
 					{{option.displayName}}
 				</mat-option>
 			</mat-autocomplete>
 		</mat-form-field>
 	</div>
+
 	<div style="margin-bottom: 20px">
+
 		<div *ngFor="let leader of selectedLeaders" class="leader-box">
 			<div>
 				{{leader.displayName}}
@@ -41,11 +79,11 @@
 					<mat-select (selectionChange)="onSideSelected($event, leader)">
 						<mat-option style="color: #007bff" value="BLUFOR">BLUFOR</mat-option>
 						<mat-option style="color: red" value="OPFOR">OPFOR</mat-option>
-						<mat-option style="color: greenyellow"value="INDFOR">INDFOR</mat-option>
-						<mat-option style="color: #bd14bd"value="CIV">CIV</mat-option>
+						<mat-option style="color: greenyellow" value="INDFOR">INDFOR</mat-option>
+						<mat-option style="color: #bd14bd" value="CIV">CIV</mat-option>
 					</mat-select>
 				</mat-form-field>
-				<button style="margin-left: 10px" mat-flat-button color="accent" (click)="removeLeader(leader)">
+				<button matTooltip="Remove" style="margin-left: 15px" mat-flat-button color="accent" (click)="removeLeader(leader)">
 					<mat-icon>remove</mat-icon>
 				</button>
 			</div>
@@ -55,7 +93,7 @@
 
 
 </div>
-<div mat-dialog-actions>
+<div mat-dialog-actions style="display: flex; justify-content: space-between">
 	<button mat-button [mat-dialog-close]="">Close</button>
 	<button mat-button (click)="submitGameplayHistory()">Submit</button>
 </div>

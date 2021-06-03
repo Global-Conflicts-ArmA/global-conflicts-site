@@ -287,7 +287,7 @@ router.get('/', async (req, res) => {
 			authError: req.authError
 		});
 	}
-	Mission.find({}, { _id: 0 }, async (err, doc) => {
+	Mission.find({}, { _id: 0, image:0 }, async (err, doc) => {
 		if (err) {
 			res.status(500).send(err);
 		} else {
@@ -862,5 +862,60 @@ router.get('/download/:filename', async (req, res) => {
 		}
 	);
 });
+
+
+router.post('/:uniqueName/history', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+	if(req.authError || !req.discordUser.roles.cache.some(r=>["Admin", "Arma GM"].includes(r.name))){
+		res.status(401).send({
+			authError: 'User not allowed to interact with missions'
+		});
+	}
+
+	const history = req.body;
+	Mission.findOne({uniqueName:req.params.uniqueName}, (err, mission) => {
+		mission.lastPlayed = history.date
+		mission.history.push(history);
+		mission.save();
+		res.send("ok");
+	})
+
+});
+
+router.post('/:uniqueName/history/aar', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+
+	if(req.authError){
+		return	res.status(401).send({
+			authError: 'User not allowed to interact with missions'
+		});
+
+	}
+
+	const leader = req.body.leader;
+	if(leader.discordID !== req.discordUser.user.id){
+		return res.status(401).send({
+			authError: 'User is not the leader'
+		});
+	}
+	const historyID = req.body.historyID;
+	const aar = req.body.aar;
+
+
+	Mission.findOne({uniqueName:req.params.uniqueName}, (err, mission) => {
+		mission.history.id(historyID).leaders.id(leader._id).aar = aar.trim()
+		mission.save()
+		return res.send()
+	})
+
+});
+
+
 
 module.exports = router;

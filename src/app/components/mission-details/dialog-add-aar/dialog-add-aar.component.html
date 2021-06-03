@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>{{data.oldAar ? "Edit AAR" : "New AAR"}}</h1>
+<div mat-dialog-content>
+
+	<div>
+		<div class="markdown-buttons">
+			<a mat-flat-button href="https://www.markdownguide.org/cheat-sheet//" target="_blank">Markdown guide</a>
+		</div>
+		<angular-markdown-editor
+			textareaId="AAREditor" rows="20"
+			name="markdownText" [(ngModel)]="aarText">
+		</angular-markdown-editor>
+	</div>
+</div>
+
+
+<div mat-dialog-actions style="display: flex; justify-content: space-between">
+	<button mat-button [mat-dialog-close]="">Close</button>
+	<button mat-button (click)="submitAAR()">Submit</button>
+</div>

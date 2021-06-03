@@ -1,15 +1,14 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from '@angular/router';
 import { MissionsService } from '@app/services/missions.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DatabaseUser } from '@app/models/databaseUser';
 import { UserService } from '@app/services/user.service';
-import { IMission, IReport, IReview, IUpdate } from '@app/models/mission';
+import { IHistory, IMission, IReport, IReview, IUpdate } from "@app/models/mission";
 import { DialogViewUpdateComponent } from './dialog-view-update.component';
 import { DialogViewBugReportComponent } from './dialog-view-bug-report.component';
 import { DialogSubmitBugReportComponent } from './dialog-submit-bug-report.component';
 import { DialogSubmitReviewComponent } from './dialog-submit-review.component';
-import { DialogViewReviewComponent } from './dialog-view-review.component';
 import { DialogSubmitUpdateComponent } from './dialog-submit-update.component';
 import { Overlay } from '@angular/cdk/overlay';
 import { MatTableDataSource } from '@angular/material/table';
@@ -20,6 +19,10 @@ import {
 } from '@app/components/mission-details/dialog-actions/dialog-actions.component';
 import { MissionUploadComponent } from '@app/components/mission-upload/mission-upload.component';
 import {DialogAddGameplayHistoryComponent} from "@app/components/mission-details/dialog-add-gameplay-history/dialog-add-gameplay-history.component";
+import { ILeader } from "@app/models/leader";
+import { DialogAddAarComponent } from "@app/components/mission-details/dialog-add-aar/dialog-add-aar.component";
+import { MatAccordion } from "@angular/material/expansion";
+import { DialogViewGmNotesComponent } from "@app/components/mission-details/dialog-view-gm-notes/dialog-view-gm-notes.component";
 
 @Component({
 	selector: 'app-mission-details',
@@ -33,19 +36,17 @@ export class MissionDetailsComponent implements OnInit {
 		private route: ActivatedRoute,
 		public dialog: MatDialog,
 		public overlay: Overlay,
-		private router: Router
+		private router: Router,
+		private changeDetectorRef: ChangeDetectorRef
 	) {}
 
 	discordUser: DatabaseUser | null;
 	mission: IMission | null;
 	dataSourceUpdates: MatTableDataSource<IUpdate>;
 	updateColumns = ['date', 'versionStr', 'authorName', 'status', 'buttons'];
-	dataSourceReports: MatTableDataSource<IReport>;
-	reportColumns = ['date', 'versionStr', 'authorName', 'buttons'];
-	dataSourceReviews: MatTableDataSource<IReview>;
-	reviewColumns = ['date', 'versionStr', 'authorName', 'buttons'];
 	uniqueName: string | null;
 	doneLoading = false;
+
 
 	public innerWidth;
 	@ViewChild(MatSort) sort: MatSort;
@@ -62,9 +63,8 @@ export class MissionDetailsComponent implements OnInit {
 	}
 
 	refresh() {
-		this.missionsService
-			.getFileName(this.uniqueName)
-			.subscribe(async (mission) => {
+		this.missionsService.getFileName(this.uniqueName).subscribe(
+			async (mission) => {
 				mission.authorName = await this.userService.getDiscordUsername(
 					mission.authorID
 				);
@@ -96,17 +96,23 @@ export class MissionDetailsComponent implements OnInit {
 				this.dataSourceUpdates = new MatTableDataSource<IUpdate>(
 					mission.updates
 				);
-				this.dataSourceReports = new MatTableDataSource<IReport>(
-					mission.reports
-				);
-				this.dataSourceReviews = new MatTableDataSource<IReview>(
-					mission.reviews
-				);
+
+				mission.history?.map(async (history: IHistory) => {
+					history.leaders?.map(async (leader) => {
+						if (leader.discordID) {
+							leader.displayName = await this.userService.getDiscordUsername(
+								leader.discordID
+							);
+						}
+					});
+				});
 
 				this.doneLoading = true;
-			}, error => {
-			console.log("error")
-		});
+			},
+			(error) => {
+				console.log('error');
+			}
+		);
 	}
 
 	public viewUpdate(
@@ -145,14 +151,14 @@ export class MissionDetailsComponent implements OnInit {
 
 	public submitBugReport(report?: IReport) {
 		const dialogRef = this.dialog.open(DialogSubmitBugReportComponent, {
-			data: {mission:this.mission, report},
+			data: { mission: this.mission, report },
 			scrollStrategy: this.overlay.scrollStrategies.noop(),
 			minHeight: '20rem',
 			autoFocus: false,
 			minWidth: '30rem'
 		});
 		dialogRef.afterClosed().subscribe((action) => {
-			if(action==="delete_report"){
+			if (action === 'delete_report') {
 				this.removeReportEntry(report);
 			}
 			this.refresh();
@@ -170,23 +176,22 @@ export class MissionDetailsComponent implements OnInit {
 		});
 	}
 
-	public submitReview(review?:IReview) {
+	public submitReview(review?: IReview) {
 		// if has review, it's an update of a review
 		const dialogRef = this.dialog.open(DialogSubmitReviewComponent, {
-			data: {mission:this.mission, review},
+			data: { mission: this.mission, review },
 			scrollStrategy: this.overlay.scrollStrategies.noop(),
 			minHeight: '20rem',
 			autoFocus: false,
 			minWidth: '30rem'
 		});
 		dialogRef.afterClosed().subscribe((action) => {
-			if(action==="delete_review"){
+			if (action === 'delete_review') {
 				this.removeReviewEntry(review);
 			}
 			this.refresh();
 		});
 	}
-
 
 	removeReviewEntry(element) {
 		if (this.mission) {
@@ -229,10 +234,7 @@ export class MissionDetailsComponent implements OnInit {
 		});
 		dialogRef.afterClosed().subscribe((result) => {
 			if (result === MissionActions.REMOVE_ARCHIVE) {
-				this.router.navigate([
-					`mission-list`
-				]);
-
+				this.router.navigate([`mission-list`]);
 			}
 		});
 	}
@@ -256,21 +258,69 @@ export class MissionDetailsComponent implements OnInit {
 	}
 
 	addGAmeplayHistory() {
-
-		// if has review, it's an update of a review
 		const dialogRef = this.dialog.open(DialogAddGameplayHistoryComponent, {
-			data: {mission:this.mission},
+			data: { mission: this.mission },
 			scrollStrategy: this.overlay.scrollStrategies.noop(),
 			minHeight: '20rem',
 			autoFocus: false,
 			minWidth: '40rem'
 		});
-		dialogRef.afterClosed().subscribe((action) => {
-
-			this.refresh();
+		dialogRef.afterClosed().subscribe((history) => {
+			if (history && this.mission) {
+				this.missionsService
+					.addMissionHistory(this.mission, history)
+					.subscribe(
+						(value) => {
+							this.refresh();
+						},
+						(error) => {
+							// todo show error
+						}
+					);
+			}
 		});
+	}
 
+	submitAAR(history: IHistory, leader: ILeader, oldAar: string) {
+		this.changeDetectorRef.detach();
 
+		const dialogRef = this.dialog.open(DialogAddAarComponent, {
+			data: { mission: this.mission, history, leader, oldAar },
+			scrollStrategy: this.overlay.scrollStrategies.noop(),
+			minHeight: '20rem',
+			autoFocus: false,
+			minWidth: '60rem'
+		});
+		dialogRef.afterClosed().subscribe((aar: string) => {
+			this.changeDetectorRef.reattach();
+			if (aar && aar.length > 0 && this.mission) {
+				console.log(aar);
+				if (history._id) {
+					this.missionsService
+						.submitAar(this.mission, history._id, aar, leader)
+						.subscribe((value) => {
+							leader.aar = aar;
+							document.getElementById(leader._id??'')?.click();
+						});
+				}
+			}
+		});
+	}
 
+	getSide(leader: ILeader): string {
+		if (leader.side) {
+			return '' + leader.side;
+		} else {
+			return 'no-side';
+		}
+	}
+
+	viewGmNote(gmNote: string) {
+		  this.dialog.open(DialogViewGmNotesComponent, {
+			data: gmNote,
+
+			autoFocus: false,
+			minWidth: '60rem'
+		});
 	}
 }
