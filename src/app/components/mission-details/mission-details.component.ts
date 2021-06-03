@@ -256,6 +256,11 @@ export class MissionDetailsComponent implements OnInit {
 	canAddGameplayHistory() {
 		return this.discordUser?.role === 'Admin';
 	}
+	canEditHistory() {
+		return (
+			this.discordUser?.role === 'Admin'
+		);
+	}
 
 	addGAmeplayHistory() {
 		const dialogRef = this.dialog.open(DialogAddGameplayHistoryComponent, {
@@ -263,22 +268,47 @@ export class MissionDetailsComponent implements OnInit {
 			scrollStrategy: this.overlay.scrollStrategies.noop(),
 			minHeight: '20rem',
 			autoFocus: false,
-			minWidth: '40rem'
+			minWidth: '70rem'
 		});
 		dialogRef.afterClosed().subscribe((history) => {
 			if (history && this.mission) {
 				this.missionsService
-					.addMissionHistory(this.mission, history)
+					.submitGameplayHistory(this.mission, history)
 					.subscribe(
 						(value) => {
 							this.refresh();
 						},
 						(error) => {
-							// todo show error
+							console.log(error);
 						}
 					);
 			}
 		});
+	}
+
+	editHistory(oldHistory: IHistory) {
+		const dialogRef = this.dialog.open(DialogAddGameplayHistoryComponent, {
+			data: { mission: this.mission, oldHistory },
+			scrollStrategy: this.overlay.scrollStrategies.noop(),
+			minHeight: '20rem',
+			autoFocus: false,
+			minWidth: '70rem'
+		});
+		dialogRef.afterClosed().subscribe((editedHistory) => {
+			if (editedHistory && this.mission) {
+				this.missionsService
+					.submitGameplayHistory(this.mission, editedHistory)
+					.subscribe(
+						(value) => {
+							this.refresh();
+						},
+						(error) => {
+							console.log(error);
+						}
+					);
+			}
+		});
+
 	}
 
 	submitAAR(history: IHistory, leader: ILeader, oldAar: string) {
@@ -323,4 +353,8 @@ export class MissionDetailsComponent implements OnInit {
 			minWidth: '60rem'
 		});
 	}
+
+
+
+
 }

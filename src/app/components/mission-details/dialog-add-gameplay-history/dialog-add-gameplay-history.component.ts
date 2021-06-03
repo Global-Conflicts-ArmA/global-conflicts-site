@@ -28,6 +28,7 @@ export class DialogAddGameplayHistoryComponent implements OnInit {
 			discordUser: DiscordUser;
 			mission: IMission;
 			update: IUpdate;
+			oldHistory: IHistory;
 		}
 	) {}
 
@@ -111,13 +112,24 @@ export class DialogAddGameplayHistoryComponent implements OnInit {
 		this.userService.listDiscordUsers().subscribe((value) => {
 			this.discordUsers = value;
 		});
+
+		if (this.data.oldHistory) {
+			this.history = this.data.oldHistory;
+			this.outcomeControl.setValue(this.history.outcome);
+			this.selectedLeaders = new Set(this.history.leaders);
+			this.historyDateString = this.datePipe.transform(
+				this.history.date,
+				'MM/dd/yyyy'
+			);
+		}
 	}
 
 	onLeaderSelected(option: any) {
 		this.userListControl.setValue('');
 		this.selectedLeaders.add({
 			displayName: option.value.displayName,
-			discordID: option.value.userID
+			discordID: option.value.userID,
+			role: 'leader'
 		});
 	}
 
@@ -127,6 +139,10 @@ export class DialogAddGameplayHistoryComponent implements OnInit {
 
 	onSideSelected(option, leader: ILeader) {
 		leader.side = option.value;
+	}
+
+	onRoleSelected(option, leader: ILeader) {
+		leader.role = option.value;
 	}
 
 	submitGameplayHistory() {

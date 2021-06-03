@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {IMission, IReview} from '../models/mission';
+import { IHistory, IMission, IReview } from "../models/mission";
 import { MissionConstants } from '../constants/missionConstants';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as fileSaver from 'file-saver';
@@ -162,7 +162,7 @@ export class MissionsService {
 		});
 	}
 
-	public addMissionHistory(mission: IMission, history: any) {
+	public submitGameplayHistory(mission: IMission, history: IHistory) {
 		return this.httpClient.post(
 			`/api/missions/${mission.uniqueName}/history`,
 			history

@@ -10,7 +10,7 @@
 
 .markdown-buttons{
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-end;
 	margin-bottom: 10px;
 }
 textarea{
@@ -18,3 +18,6 @@ textarea{
 	resize: vertical;
 }
 
+.leader-select-inputs > * {
+	margin-left: 10px;
+}

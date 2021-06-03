@@ -876,11 +876,16 @@ router.post('/:uniqueName/history', async (req, res) => {
 	}
 
 	const history = req.body;
+
 	Mission.findOne({uniqueName:req.params.uniqueName}, (err, mission) => {
 		mission.lastPlayed = history.date
-		mission.history.push(history);
+		if(history._id){
+			mission.history.id(history._id).set(history);
+		}else{
+			mission.history.push(history);
+		}
 		mission.save();
-		res.send("ok");
+		return res.send({"ok":true}, 200);
 	})
 
 });

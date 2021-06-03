@@ -288,7 +288,7 @@
 
 
 						<div *ngIf="history.leaders" class="gh-label">{{history.leaders.length > 1 ? 'Leaders' : 'Leader'}}:
-							<span class="gh-text"  [ngClass]="getSide(leader)" *ngFor="let leader of history.leaders;let isLast=last">
+							<span class="gh-text" [ngClass]="getSide(leader)" *ngFor="let leader of history.leaders;let isLast=last">
 								{{leader.displayName}}<span style="color:white">{{isLast ? '' : ', '}}</span>
 							</span>
 						</div>
@@ -301,10 +301,15 @@
 							<span class="gh-label">Outcome:&nbsp;</span>
 							<span class="gh-text">{{history.outcome}}</span>
 						</div>
-						<div *ngIf="!history.outcome" style="flex: 1; height: 30px"></div>
-						<div style="justify-self: flex-end;" *ngIf="history.gmNote" >
+						<div   style="flex: 1; height: 30px"></div>
+						<div *ngIf="canEditHistory()" style="margin-right: 10px">
+							<button class="smaller-button" mat-flat-button  (click)="editHistory(history)">Edit History</button>
+						</div>
+						<div style="justify-self: flex-end;" *ngIf="history.gmNote">
 							<button class="smaller-button" mat-flat-button (click)="viewGmNote(history.gmNote)">GM Notes</button>
 						</div>
+
+
 					</div>
 
 					<div *ngIf="history.leaders">
@@ -314,12 +319,17 @@
 									<mat-panel-title>
 										<div class="gh-aar-header">
 											<div>
-												{{leader.displayName}} AAR<span *ngIf="leader.side">, <span
-												[ngClass]="leader.side">{{leader.side}}
-												leader</span></span>
+												{{leader.displayName}} AAR<span>,<span *ngIf="leader.role!='took_command'" [ngClass]="leader.side"> {{leader.side}} leader</span>
+													<span *ngIf="leader.role=='took_command'" [ngClass]="leader.side">
+													took {{leader.side}} command</span>
+												</span>
 											</div>
-											<button style="margin-left: 20px; height: 30px" *ngIf="leader.discordID==discordUser?.id" mat-raised-button
-															color="accent" class="smaller-button" (click)="submitAAR(history, leader, leader.aar)">{{leader.aar? "Edit AAR" : "Submit AAR"}}</button>
+
+
+											<button style="margin-left: 20px; height: 30px" *ngIf="leader.discordID==discordUser?.id"
+															mat-raised-button
+															color="accent" class="smaller-button"
+															(click)="submitAAR(history, leader, leader.aar)">{{leader.aar ? "Edit AAR" : "Submit AAR"}}</button>
 										</div>
 
 									</mat-panel-title>

@@ -39,7 +39,6 @@
     "@types/jquery": "^3.5.1",
     "@types/mongoose": "^5.7.36",
     "@types/prismjs": "^1.16.2",
-    "ace-builds": "^1.4.12",
     "angular-datatables": "^4.4.1",
     "angular-markdown-editor": "^2.0.2",
     "angular-material": "^1.2.1",

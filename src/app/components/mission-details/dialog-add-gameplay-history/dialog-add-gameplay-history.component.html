@@ -6,7 +6,7 @@
 
 		<mat-form-field  class="full-width" appearance="fill">
 			<mat-label>Date (mm/dd/yyyy)</mat-label>
-			<input matInput  mask="M0/d0/0000" [leadZeroDateTime]="true" [(ngModel)]="historyDateString" />
+			<input matInput  mask="M0/d0/0000" [leadZeroDateTime]="true" [dropSpecialCharacters]="false" [(ngModel)]="historyDateString" [validation]="true" />
 		</mat-form-field>
 
 		<mat-form-field class="full-width">
@@ -25,7 +25,7 @@
 
 
 		<div class="markdown-buttons">
-			<mat-slide-toggle [(ngModel)]="showNotePreview">Show note preview</mat-slide-toggle>
+
 			<a mat-flat-button href="https://www.markdownguide.org/cheat-sheet//" target="_blank">Markdown guide</a>
 		</div>
 
@@ -73,16 +73,26 @@
 			<div>
 				{{leader.displayName}}
 			</div>
-			<div>
+			<div class="leader-select-inputs">
+
 				<mat-form-field appearance="legacy">
 					<mat-label>Side:</mat-label>
-					<mat-select (selectionChange)="onSideSelected($event, leader)">
+					<mat-select [(value)]="leader.side">
 						<mat-option style="color: #007bff" value="BLUFOR">BLUFOR</mat-option>
 						<mat-option style="color: red" value="OPFOR">OPFOR</mat-option>
 						<mat-option style="color: greenyellow" value="INDFOR">INDFOR</mat-option>
 						<mat-option style="color: #bd14bd" value="CIV">CIV</mat-option>
 					</mat-select>
 				</mat-form-field>
+
+				<mat-form-field appearance="legacy">
+					<mat-label>Role:</mat-label>
+					<mat-select [(value)]="leader.role"  >
+						<mat-option style="color: white" value="leader">Leader</mat-option>
+						<mat-option style="color: white" value="took_command">Took command</mat-option>
+					</mat-select>
+				</mat-form-field>
+
 				<button matTooltip="Remove" style="margin-left: 15px" mat-flat-button color="accent" (click)="removeLeader(leader)">
 					<mat-icon>remove</mat-icon>
 				</button>
@@ -95,5 +105,5 @@
 </div>
 <div mat-dialog-actions style="display: flex; justify-content: space-between">
 	<button mat-button [mat-dialog-close]="">Close</button>
-	<button mat-button (click)="submitGameplayHistory()">Submit</button>
+	<button mat-button [disabled]="!outcomeControl.value || !selectedLeaders.size>0" (click)="submitGameplayHistory()">Submit</button>
 </div>

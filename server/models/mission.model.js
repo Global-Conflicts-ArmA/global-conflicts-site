@@ -158,6 +158,10 @@ const MissionSchema = new Schema(
 							type: String,
 							required: false
 						},
+						role:{
+							type: String,
+							required: false
+						},
 						aar: {
 							type: String,
 							required: false
