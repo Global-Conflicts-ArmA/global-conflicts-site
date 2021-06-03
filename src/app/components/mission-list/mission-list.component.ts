@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MissionsService } from '@app/services/missions.service';
 import { IMission, IUpdate } from '@app/models/mission';
-import { DiscordUser } from '@app/models/discorduser';
+import { DatabaseUser } from '@app/models/databaseUser';
 import { UserService } from '@app/services/user.service';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
@@ -11,7 +11,8 @@ import { MatSelect } from '@angular/material/select';
 import { ITerrain, MissionConstants } from '@app/constants/missionConstants';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { SharedService } from '@app/services/shared';
-
+// @ts-ignore
+import Terrains from '../../../assets/terrains.json';
 @Component({
 	selector: 'app-mission-list',
 	templateUrl: './mission-list.component.html',
@@ -23,7 +24,7 @@ export class MissionListComponent implements OnInit {
 	@ViewChild(MatSort) sort: MatSort;
 
 	rowData: IMission[] = [];
-	discordUser: DiscordUser | null;
+	discordUser: DatabaseUser | null;
 	displayedColumns: string[] = [
 		'name',
 		'type',
@@ -33,7 +34,7 @@ export class MissionListComponent implements OnInit {
 		'era',
 		'authorName',
 		'lastVersionStr',
-		'lastUpdate',
+		'lastPlayed',
 		'uploadDate'
 	];
 	dataSource: MatTableDataSource<IMission>;
@@ -55,14 +56,16 @@ export class MissionListComponent implements OnInit {
 		this.missionsService.list().subscribe(  (value) => {
 			this.userList = [];
 
-
 			value.map((mission: IMission) => {
 				const lastUpdate =
 					mission.updates[mission.updates.length - 1];
 				mission.lastVersionStr = this.missionsService.buildVersionStr(
 					mission.lastVersion
 				);
-				this.userService.insertUserIds(lastUpdate.authorID);
+				if(lastUpdate){
+					this.userService.insertUserIds(lastUpdate.authorID);
+				}
+
 			});
 			// iterate the list of users, and get the names of those who doesn't have a name yet
 			 this.userService.getAuthorsName().then(usersOnCache => {
@@ -93,6 +96,8 @@ export class MissionListComponent implements OnInit {
 			};
 			this.dataSource.sort = this.sort;
 			this.doneLoading = true;
+		},  error => {
+			console.log("error")
 		});
 	}
 
@@ -120,8 +125,8 @@ export class MissionListComponent implements OnInit {
 		this.refresh();
 		this.discordUser = this.userService.getUserLocally();
 		this.terrainList = [];
-		Object.values(this.mC.MissionTerrains).forEach((terrain: ITerrain) => {
-			this.terrainList.push(terrain.name);
+		Terrains.forEach((terrain)=>{
+			this.terrainList.push(terrain.display_name);
 		});
 		this.terrainList.sort();
 	}
@@ -214,7 +219,7 @@ export class MissionListComponent implements OnInit {
 			filteredData = filteredData.filter((element: IMission) => {
 				return (
 					this.missionsService.getTerrainData(element.terrain)
-						?.name === terrain
+						?.display_name === terrain
 				);
 			});
 		}
@@ -272,7 +277,7 @@ export class MissionListComponent implements OnInit {
 						.includes(searchFilter) ||
 					this.missionsService
 						.getTerrainData(element.terrain)
-						.name.toLowerCase()
+						?.display_name.toLowerCase()
 						.includes(searchFilter) ||
 					element.type.toLowerCase().includes(searchFilter) ||
 					element.timeOfDay.toLowerCase().includes(searchFilter) ||

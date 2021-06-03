@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Mission File Actions</h1>
+<h3 mat-dialog-title>Mission File Actions</h3>
 <div mat-dialog-content>
 
 
@@ -7,10 +7,10 @@
 			class="text">For adding missions the server must not be in the mission selection screen, else it will crash.
 		</div>
 		<div class="buttons">
-			<button *ngIf="canCopyToMainServer()" (click)="doAction(COPY_TO_MAIN)" color="accent"
+			<button *ngIf="canCopyToMainServer()" [disabled]="loading" (click)="doAction(getActionType.COPY_TO_MAIN)" color="accent"
 					mat-raised-button>Copy to Main Server
 			</button>
-			<button *ngIf="canCopyToTestServer()" (click)="doAction(COPY_TO_TEST)" color="accent"
+			<button *ngIf="canCopyToTestServer()" [disabled]="loading" (click)="doAction(getActionType.COPY_TO_TEST)" color="accent"
 					mat-raised-button>Copy to Test Server
 			</button>
 		</div>
@@ -20,10 +20,10 @@
 		<hr>
 		<div class="text">For removal the server must not have the missions loaded in memory.</div>
 		<div class="buttons">
-			<button *ngIf="canRemoveFromMainServer()" (click)="doAction(REMOVE_FROM_MAIN)" color="accent"
+			<button *ngIf="canRemoveFromMainServer()" [disabled]="loading" (click)="doAction(getActionType.REMOVE_FROM_MAIN)" color="accent"
 					mat-raised-button>Remove from Main server
 			</button>
-			<button *ngIf="canRemoveFromTestServer()" (click)="doAction(REMOVE_FROM_TEST)" color="accent"
+			<button *ngIf="canRemoveFromTestServer()" [disabled]="loading" (click)="doAction(getActionType.REMOVE_FROM_TEST)" color="accent"
 					mat-raised-button>Remove from Test server
 			</button>
 		</div>
@@ -34,7 +34,7 @@
 		<div class="text">For new missions or major updates, review it with another person before marking it as ready.
 		</div>
 		<div class="buttons">
-			<button *ngIf="canMarkAsReady()" (click)="doAction(MARK_AS_READY)" color="accent"
+			<button *ngIf="canMarkAsReady()" [disabled]="loading" (click)="doAction(getActionType.MARK_AS_READY)" color="accent"
 					mat-raised-button>Mark as ready
 			</button>
 

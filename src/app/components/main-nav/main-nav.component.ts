@@ -1,12 +1,13 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import { UserService } from '../../services/user.service';
-import { DiscordUser } from '../../models/discorduser';
+import { DatabaseUser } from '../../models/databaseUser';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import {environment} from '../../../environments/environment';
 
 @Component({
 	selector: 'app-main-nav',
@@ -31,7 +32,7 @@ export class MainNavComponent implements OnInit {
 		);
 	}
 
-	discordUser: DiscordUser | null;
+	discordUser: DatabaseUser | null;
 
 	isHandset$: Observable<boolean> = this.breakpointObserver
 		.observe('(max-width: 959.99px)')
@@ -61,5 +62,12 @@ export class MainNavComponent implements OnInit {
 		this.router.navigate([
 			`mission-upload`
 		]);
+	}
+	getDiscordHref(){
+		if (environment.production) {
+			return "https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=https%3A%2F%2Fglobalconflicts.net%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds";
+		}else{
+			return "https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds";
+		}
 	}
 }

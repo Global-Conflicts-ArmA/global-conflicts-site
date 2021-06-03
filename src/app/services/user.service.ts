@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
-import { DiscordUser } from '../models/discorduser';
+import { DatabaseUser } from '../models/databaseUser';
 import { RemoteDiscordUser } from '../models/remoteDiscordUser';
+import {DiscordUser} from "@app/models/discordUser";
 
 @Injectable({
 	providedIn: 'root'
@@ -23,7 +24,7 @@ export class UserService {
 		});
 	}
 
-	public getUserLocally(): DiscordUser | null {
+	public getUserLocally(): DatabaseUser | null {
 		const id = this.cookieService.get('id');
 		const token = this.cookieService.get('token');
 		const username = this.cookieService.get('username');
@@ -36,7 +37,7 @@ export class UserService {
 			this.cookieService.get('avatar') +
 			'.png';
 		if (token) {
-			return new DiscordUser(
+			return new DatabaseUser(
 				id,
 				token,
 				username,
@@ -49,8 +50,11 @@ export class UserService {
 		}
 	}
 
-	public list(): Observable<DiscordUser[]> {
-		return this.httpClient.get<DiscordUser[]>('/api/users');
+	public list(): Observable<DatabaseUser[]> {
+		return this.httpClient.get<DatabaseUser[]>('/api/users');
+	}
+	public listDiscordUsers(): Observable<DiscordUser[]> {
+		return this.httpClient.get<DiscordUser[]>('/api/users/discord_users');
 	}
 
 	public async getDiscordUsername(id: string): Promise<string> {
@@ -91,32 +95,32 @@ export class UserService {
 		}
 	}
 
-	public async getUserSettings(id: string): Promise<IUserSettings> {
-		return this.httpClient
-			.get<DiscordUser>('/api/users/' + id)
-			.toPromise()
-			.then((user: DiscordUser) => {
-				const settings = {
-					missionEditDM: true,
-					missionReportDM: true,
-					missionReviewDM: true,
-					missionRemoveDM: true,
-					missionAcceptDM: true
-				};
-				return settings;
-			})
-			.catch((err) => {
-				console.log('error: ', err);
-				const settings = {
-					missionEditDM: true,
-					missionReportDM: true,
-					missionReviewDM: true,
-					missionRemoveDM: true,
-					missionAcceptDM: true
-				};
-				return settings;
-			});
-	}
+	// public async getUserSettings(id: string): Promise<IUserSettings> {
+	// 	return this.httpClient
+	// 		.get<DatabaseUser>('/api/users/' + id)
+	// 		.toPromise()
+	// 		.then((user: DatabaseUser) => {
+	// 			const settings = {
+	// 				missionEditDM: true,
+	// 				missionReportDM: true,
+	// 				missionReviewDM: true,
+	// 				missionRemoveDM: true,
+	// 				missionAcceptDM: true
+	// 			};
+	// 			return settings;
+	// 		})
+	// 		.catch((err) => {
+	// 			console.log('error: ', err);
+	// 			const settings = {
+	// 				missionEditDM: true,
+	// 				missionReportDM: true,
+	// 				missionReviewDM: true,
+	// 				missionRemoveDM: true,
+	// 				missionAcceptDM: true
+	// 			};
+	// 			return settings;
+	// 		});
+	// }
 
 	public insertUserIds(authorId: string) {
 		const userFound = this.userCache.find((value) => {

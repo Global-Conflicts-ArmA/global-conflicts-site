@@ -2,7 +2,7 @@
 	<div style="position: relative">
 		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">You must join our Discord server and complete the welcoming process to upload missions!</div>
 		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
-			<mat-vertical-stepper class="field-container" [linear]="false" #stepper>
+			<mat-vertical-stepper class="field-container" [linear]="true" #stepper>
 				<mat-step *ngIf="isEdit==false" [stepControl]="fileUploadGroup">
 					<form [formGroup]="fileUploadGroup">
 						<ng-template matStepLabel>Mission File</ng-template>
@@ -33,8 +33,13 @@
 					<form [formGroup]="missionNameGroup">
 						<ng-template matStepLabel>Mission Name</ng-template>
 						<div>
+							<div>
+								Insert only the actual name, without the version or type.<br/>
+								<div style="color: #2dab2d; font-size: 14px;">Good: Operation Boomstick</div>
+								<div style="color: orangered; font-size: 14px;">Bad: CO52_Operation_Boomstick_V1</div>
+						</div>
 							<mat-form-field>
-								<mat-label class="inset-label">Mission Name. Do not put the version here. You won't be able to edit this afterwards.</mat-label>
+								<mat-label class="inset-label">Mission Name.</mat-label>
 								<input
 									matInput
 									formControlName="missionName"
@@ -166,7 +171,7 @@
 									placeholder="USMC raids ammo depot | Defenders chooses weather"
 									type="string"
 									#misDescription
-									maxlength="100"
+									maxlength="600"
 									id="misDescription"
 									(ngModelChange)="buildMissionDesc()"
 								></textarea>

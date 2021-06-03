@@ -6,6 +6,7 @@ import { environment } from './environments/environment';
 import * as Sentry from "@sentry/angular";
 import { Integrations } from "@sentry/tracing";
 
+
 if (environment.production) {
 	enableProdMode();
 }
@@ -14,7 +15,7 @@ Sentry.init({
 	dsn: "https://6d793abce48248c8ba67927a9da0654d@o614507.ingest.sentry.io/5749688",
 	integrations: [
 		new Integrations.BrowserTracing({
-			tracingOrigins: ["localhost", "https://yourserver.io/api"],
+
 			routingInstrumentation: Sentry.routingInstrumentation,
 		}),
 	],

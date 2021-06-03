@@ -4,8 +4,7 @@ const User = require('../models/discordUser.model');
 const router = express.Router();
 const multer = require('multer');
 const fs = require('fs');
-const sharp = require('sharp');
-const { postDiscordReport, postDiscordReview, postDiscordUpdate, postDiscordEdit, postDiscordNewMission, postDiscordMissionReady, postMissionCopiedRemovedToServer } = require('../discord-poster');
+const { postDiscordReport, postDiscordReview, postDiscordUpdate, postDiscordEdit, postDiscordNewMission, postDiscordMissionReady, postMissionCopiedRemovedToServer, postNewMissionHistory, postNewAAR } = require('../discord-poster');
 const { getDiscordUserFromCookies } = require('../misc/validate-cookies');
 
 
@@ -23,11 +22,17 @@ fileFilterFunction = async function (req, file, callback) {
 		req,
 		'User is not allowed to upload missions.'
 	);
+	const canUpload = req.discordUser._roles.find(value=>value===process.env.DISCORD_MISSION_MAKER_ID)
+	if(!canUpload){
+		req.authError = 'User is not allowed to upload missions.';
+		return callback(null, false);
+
+	}
 
 	if (req.authError) {
 		return callback(null, false);
 	}
-	req.missionDataErrors = validateUploadData(req.body);
+	req.missionDataErrors = validateData(req.body, true);
 	if (Object.keys(req.missionDataErrors).length > 0) {
 		callback(null, false);
 		return;
@@ -79,7 +84,8 @@ updateFileFilterFunction = async function (req, file, callback) {
 	if (req.authError) {
 		return callback(null, false);
 	}
-	console.log('req.body: ', req.body);
+	req.missionDataErrors = validateData(req.body, false);
+
 	if (file.mimetype !== 'application/octet-stream') {
 		req.missionDataErrors.file = 'File is not a .pbo.';
 		callback(null, false);
@@ -119,14 +125,15 @@ const updateMulter = multer({
 	})
 });
 
-function validateUploadData(reqBody, res) {
+function validateData(reqBody, isNewMission) {
 	const errors = {};
 	if (!reqBody.authorID) {
 		errors.authorID = 'Missing authorID.';
 	}
-	if (!reqBody.name) {
+	if (isNewMission && !reqBody.name) {
 		errors.name = 'Missing name.';
 	}
+
 	if (!reqBody.terrain) {
 		errors.terrain = 'Missing terrain.';
 	}
@@ -219,7 +226,7 @@ router.post('/', uploadMulter.single('fileData'), (req, res) => {
 		return res.status(400).send({ missionErrors: req.missionDataErrors });
 	}
 
-	postDiscordNewMission(req.body, req.discordUser.user.displayAvatarURL());
+	postDiscordNewMission(req.body);
 
 	const firstUpdate = {
 		version: req.body.updates[0].version,
@@ -275,14 +282,12 @@ router.get('/', async (req, res) => {
 		req,
 		'User not allowed to list missions.'
 	);
-
 	if (req.authError) {
 		return res.status(401).send({
 			authError: req.authError
 		});
 	}
-	console.log('GET request for all missions');
-	Mission.find({}, { _id: 0 }, async (err, doc) => {
+	Mission.find({}, { _id: 0, image:0 }, async (err, doc) => {
 		if (err) {
 			res.status(500).send(err);
 		} else {
@@ -317,7 +322,10 @@ router.get('/', async (req, res) => {
 
 //get mission by uniqueName
 router.get('/:uniqueName', async (req, res) => {
-	console.log("test")
+	res.header('ETag', null);
+	res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+	res.header('Expires', '-1');
+	res.header('Pragma', 'no-cache');
 	req = await getDiscordUserFromCookies(
 		req,
 		'User not allowed to list missions.'
@@ -359,6 +367,42 @@ router.get('/:uniqueName', async (req, res) => {
 		});
 });
 
+router.put('/report', uploadMulter.none(), async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to list missions.'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
+	const options = {
+		upsert: false,
+		safe: true
+	};
+
+	let query = {  };
+	if(req.discordUser.roles.cache.some(r=>["Admin", "Arma GM"].includes(r.name))){
+		query = { uniqueName: req.body.uniqueName, "reports._id": req.body.data._id };
+	}else{
+		query = { uniqueName: req.body.uniqueName, "reports._id": req.body.data._id, "reports.authorID":req.discordUser.user.id };
+	}
+
+	Mission.findOneAndUpdate(query,{
+		$set : {
+			"reports.$.report" : req.body.data.report,
+			"reports.$.version":req.body.data.version
+		}
+	}, options, (err, missionData) => {
+		if (err) {
+			return res.send({ ok: false });
+		} else {
+			return res.send({ ok: true });
+		}
+	});
+});
+
 router.post('/report', uploadMulter.none(), async (req, res) => {
 	req = await getDiscordUserFromCookies(
 		req,
@@ -388,7 +432,6 @@ router.post('/report', uploadMulter.none(), async (req, res) => {
 		if (err) {
 			console.log(err);
 		} else {
-			console.log('missionData.reports: ', missionData.reports);
 			if (!missionData.reports) {
 				missionData.reports = [report];
 			} else {
@@ -401,9 +444,44 @@ router.post('/report', uploadMulter.none(), async (req, res) => {
 			});
 			postDiscordReport(
 				report,
-				missionData,
-				req.discordUser.user.displayAvatarURL()
+				missionData
 			);
+			return res.send({ ok: true });
+		}
+	});
+});
+
+router.put('/review', uploadMulter.none(), async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to list missions.'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: req.authError
+		});
+	}
+	const options = {
+		upsert: false,
+		safe: true
+	};
+
+	let query = {  };
+	if(req.discordUser.roles.cache.some(r=>["Admin", "Arma GM"].includes(r.name))){
+		 query = { uniqueName: req.body.uniqueName, "reviews._id": req.body.data._id };
+	}else{
+		 query = { uniqueName: req.body.uniqueName, "reviews._id": req.body.data._id, "reviews.authorID":req.discordUser.user.id };
+	}
+
+	Mission.findOneAndUpdate(query,    {
+		$set : {
+			"reviews.$.review" : req.body.data.review,
+			"reviews.$.version":req.body.data.version
+		}
+	}, options, (err, missionData) => {
+		if (err) {
+			return res.send({ ok: false });
+		} else {
 			return res.send({ ok: true });
 		}
 	});
@@ -435,7 +513,6 @@ router.post('/review', uploadMulter.none(), async (req, res) => {
 		if (err) {
 			console.log(err);
 		} else {
-			console.log('missionData.reviews: ', missionData.reviews);
 			if (!missionData.reviews) {
 				missionData.reviews = [review];
 			} else {
@@ -448,8 +525,7 @@ router.post('/review', uploadMulter.none(), async (req, res) => {
 			});
 			postDiscordReview(
 				review,
-				missionData,
-				req.discordUser.user.displayAvatarURL()
+				missionData
 			);
 			return res.send({ ok: true });
 		}
@@ -535,11 +611,7 @@ router.post('/update', updateMulter.single('fileData'), async (req, res) => {
 		changeLog: req.body.changeLog,
 		fileName: req.body.fileName
 	};
-	const options = {
-		upsert: true,
-		safe: true,
-		new: true
-	};
+
 	// TODO Allow for mission makers to customize trusted users to update their missions
 	let query;
 	if (
@@ -554,7 +626,7 @@ router.post('/update', updateMulter.single('fileData'), async (req, res) => {
 			authorID: req.discordUser.user.id
 		};
 	}
-	Mission.findOne(query,  options, (err, missionData) => {
+	Mission.findOne(query, (err, missionData) => {
 		if (err) {
 			console.log(err);
 		} else {
@@ -564,8 +636,6 @@ router.post('/update', updateMulter.single('fileData'), async (req, res) => {
 					authError: "Not allowed."
 				});
 			}
-
-			console.log('missionData.updates: ', missionData.updates);
 			missionData.updates.push(update);
 			missionData.lastUpdate = update.date;
 			missionData.lastVersion = update.version;
@@ -576,8 +646,7 @@ router.post('/update', updateMulter.single('fileData'), async (req, res) => {
 			});
 			postDiscordUpdate(
 				update,
-				missionData,
-				req.discordUser.user.displayAvatarURL()
+				missionData
 			);
 			return res.send({ ok: true });
 		}
@@ -601,7 +670,6 @@ router.post('/edit', updateMulter.none(), async (req, res) => {
 		new: true
 	};
 	// TODO validate body
-	const edit = req.body;
 
 
 	// TODO Allow for mission makers to customize trusted users to update their missions
@@ -618,18 +686,24 @@ router.post('/edit', updateMulter.none(), async (req, res) => {
 			authorID: req.discordUser.user.id
 		};
 	}
-	delete edit["terrain"]
-	delete edit["uniqueName"]
+	const edit = {
+		size:req.body.size,
+		type:req.body.type,
+		description:req.body.description,
+		jip:req.body.jip,
+		respawn:req.body.respawn,
+		tags:req.body.tags,
+		timeOfDay:req.body.timeOfDay,
+		era:req.body.era
+	}
 
-	Mission.updateOne(query, {
-		"$set": edit
-	}, options, (err, missionData) => {
+	Mission.findOneAndUpdate(query, {
+		"$set": edit	}, options, (err, missionData) => {
 		if (err) {
 			console.log(err);
 		} else {
-			postDiscordEdit(edit, missionData, req.discordUser.user);
+			postDiscordEdit(edit, missionData);
 			return res.send({ ok: true });
-
 		}
 	});
 });
@@ -788,5 +862,68 @@ router.get('/download/:filename', async (req, res) => {
 		}
 	);
 });
+
+
+router.post('/:uniqueName/history', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+	if(req.authError || !req.discordUser.roles.cache.some(r=>["Admin", "Arma GM"].includes(r.name))){
+		res.status(401).send({
+			authError: 'User not allowed to interact with missions'
+		});
+	}
+
+	const history = req.body;
+
+	Mission.findOne({uniqueName:req.params.uniqueName}, (err, mission) => {
+		mission.lastPlayed = history.date
+		if(history._id){
+			mission.history.id(history._id).set(history);
+			postNewMissionHistory(req, mission, history, false);
+		}else{
+			mission.history.push(history);
+			postNewMissionHistory(req, mission, history, true);
+		}
+		mission.save();
+		return res.send({"ok":true}, 200);
+	})
+
+});
+
+router.post('/:uniqueName/history/aar', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+
+	if(req.authError){
+		return	res.status(401).send({
+			authError: 'User not allowed to interact with missions'
+		});
+
+	}
+
+	const leader = req.body.leader;
+	if(leader.discordID !== req.discordUser.user.id){
+		return res.status(401).send({
+			authError: 'User is not the leader'
+		});
+	}
+	const historyID = req.body.historyID;
+	const aar = req.body.aar;
+
+	Mission.findOne({uniqueName:req.params.uniqueName}, (err, mission) => {
+		let history = mission.history.id(historyID);
+		history.leaders.id(leader._id).aar = aar.trim()
+		postNewAAR(req, mission, history.outcome, leader, aar.trim())
+		mission.save()
+		return res.send()
+	})
+
+});
+
+
 
 module.exports = router;

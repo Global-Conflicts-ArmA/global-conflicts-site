@@ -1,6 +1,6 @@
 const sharp = require('sharp');
 
-const { discordJsClient, Discord } = require("./config/discord-bot");
+const { discordJsClient, Discord } = require('./config/discord-bot');
 
 async function getRemoteUser(id) {
 	const guild = discordJsClient.guilds.cache.get(
@@ -16,24 +16,9 @@ async function getRemoteUser(id) {
 		});
 }
 
-async function getRemoteUserDisplayName(authorID) {
-	return await getRemoteUser(authorID)
-		.then((result) => {
-			return result.nickname
-				? result.nickname
-				: result.displayName
-				? result.displayName
-				: "error";
-		})
-		.catch((err) => {
-			console.log("err", err);
-			return "error";
-		});
-}
-
 function buildVersionStr(versionObj) {
 	if (versionObj.major <= -1) {
-		return "General";
+		return 'General';
 	}
 	let versionStr = versionObj.major.toString();
 	if (versionObj.minor) {
@@ -43,52 +28,54 @@ function buildVersionStr(versionObj) {
 }
 
 async function getImage(base64Image) {
-	let parts = base64Image.split(";");
-	let mimType = parts[0].split(":")[1];
-	let imageData = parts[1].split(",")[1];
-	var img = Buffer.from(imageData, "base64");
-	const resizedBuffer = await sharp(img)
+	let parts = base64Image.split(';');
+	let imageData = parts[1].split(',')[1];
+	const img = Buffer.from(imageData, 'base64');
+	return await sharp(img)
 		.resize({
 			fit: sharp.fit.contain,
 			height: 256
 		})
 		.toBuffer()
 		.catch((e) => {
-			console.log("imageError", e);
+			console.log('imageError', e);
 		});
-	return resizedBuffer;
 }
 
-async function postDiscordNewMission(reqBody, avatarURL) {
-	const author = await getRemoteUserDisplayName(reqBody.authorID);
+async function postDiscordNewMission(reqBody) {
+	const author = await getRemoteUser(reqBody.authorID);
 
 	const newMissionEmbed = new Discord.MessageEmbed()
-		.setColor("#ffffff")
+		.setColor('#ffffff')
 		.setTitle(reqBody.fileName)
-		.setAuthor(`Author: ${author}`, avatarURL)
+		.setAuthor(
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
+		)
 		.addFields(
-			{ name: "Description:", value: reqBody.description, inline: false },
+			{ name: 'Description:', value: reqBody.description, inline: false },
 			{
-				name: "Player Count:",
+				name: 'Player Count:',
 				value: `**Min:** ${reqBody.size.min} **Max:** ${reqBody.size.max}`,
 				inline: true
 			},
-			{ name: "Type:", value: reqBody.type, inline: true },
-			{ name: "Terrain:", value: reqBody.terrain, inline: true },
-			{ name: "Time of Day:", value: reqBody.timeOfDay, inline: true },
-			{ name: "Era:", value: reqBody.era, inline: true },
+			{ name: 'Type:', value: reqBody.type, inline: true },
+			{ name: 'Terrain:', value: reqBody.terrain, inline: true },
+			{ name: 'Time of Day:', value: reqBody.timeOfDay, inline: true },
+			{ name: 'Era:', value: reqBody.era, inline: true },
 			{
-				name: "Tags:",
-				value: reqBody.tags.join(", "),
+				name: 'Tags:',
+				value: reqBody.tags.join(', '),
 				inline: false
 			}
 		)
 		.setTimestamp()
-		.setURL("")
-		.setFooter("\u3000".repeat(10 /*any big number works too*/) + "|");
+		.setURL(
+			`https://globalconflicts.net//mission-details/${reqBody.uniqueName}`
+		);
 
 	if (reqBody.ratios) {
-		let ratioStr = "";
+		let ratioStr = '';
 		if (reqBody.ratios.blufor) {
 			ratioStr = ratioStr + `**Blufor:** ${reqBody.ratios.blufor} `;
 		}
@@ -101,36 +88,36 @@ async function postDiscordNewMission(reqBody, avatarURL) {
 		if (reqBody.ratios.civ) {
 			ratioStr = ratioStr + `**Civ:** ${reqBody.ratios.civ} `;
 		}
-		newMissionEmbed.addField("Ratios:", ratioStr, false);
+		newMissionEmbed.addField('Ratios:', ratioStr, false);
 	}
 
 	if (reqBody.image) {
 		const resizedBuffer = await getImage(reqBody.image);
 		let attachment = new Discord.MessageAttachment(
 			resizedBuffer,
-			"img.png"
+			'img.png'
 		);
 		newMissionEmbed.attachFiles([attachment]);
-		newMissionEmbed.setImage("attachment://img.png");
+		newMissionEmbed.setImage('attachment://img.png');
 	}
 
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send("New mission uploaded", newMissionEmbed);
+		.send('New mission uploaded', newMissionEmbed);
 }
 
 async function postDiscordMissionReady(request, mission, updateid) {
-
-
-	const author = await getRemoteUserDisplayName(request.discordUser.user.id);
-	const update = mission.updates.filter((updt) => updt._id.toString() === updateid)[0];
+	const author = await getRemoteUser(mission.authorID);
+	const update = mission.updates.filter(
+		(updt) => updt._id.toString() === updateid
+	)[0];
 
 	const newMissionEmbed = new Discord.MessageEmbed()
-		.setColor("#22cf26")
+		.setColor('#22cf26')
 		.setTitle(`${mission.name}`)
 		.setAuthor(
-			`Author: ${author}`,
-			request.discordUser.user.displayAvatarURL()
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
 		)
 		.addFields()
 		.setDescription(
@@ -140,7 +127,7 @@ async function postDiscordMissionReady(request, mission, updateid) {
 		)
 		.setTimestamp()
 		.setURL(
-			`${request.headers.origin}/mission-details/${mission.uniqueName}`
+			`https://globalconflicts.net/mission-details/${mission.uniqueName}`
 		);
 
 	discordJsClient.channels.cache
@@ -151,150 +138,126 @@ async function postDiscordMissionReady(request, mission, updateid) {
 		);
 }
 
-async function postDiscordReport(report, missionData, avatarURL) {
-	const author = await getRemoteUser(report.authorID)
-		.then((result) => {
-			return result.nickname
-				? result.nickname
-				: result.displayName
-				? result.displayName
-				: "error";
-		})
-		.catch((err) => {
-			console.log("err", err);
-			return "error";
-		});
+async function postDiscordReport(report, missionData) {
+	const author = await getRemoteUser(report.authorID);
+
 	const versionStr = buildVersionStr(report.version);
 	const reportEmbed = new Discord.MessageEmbed()
-		.setColor("#ff0000")
+		.setColor('#ff0000')
 		.setTitle(`Mission: ${missionData.name}`)
-		.setAuthor(`Author: ${author}`, avatarURL)
-		.addFields({ name: "Version:", value: versionStr, inline: false })
-		.addFields({ name: "Report:", value: report.report, inline: false })
+		.setAuthor(
+			`Bug Report Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
+		)
+		.addFields({ name: 'Version:', value: versionStr, inline: false })
+		.addFields({ name: 'Report:', value: report.report, inline: false })
 		.setTimestamp(report.date)
-		.setURL("")
-		.setFooter("\u3000".repeat(10 /*any big number works too*/) + "|");
+		.setURL(
+			`https://globalconflicts.net/mission-details/${missionData.uniqueName}`
+		);
 	if (report.log) {
-		reportEmbed.addField("Log:", `\`\`\`\n ${report.log} \n \`\`\``, false);
+		reportEmbed.addField('Log:', `\`\`\`\n ${report.log} \n \`\`\``, false);
 	}
 	if (missionData.image) {
 		const resizedBuffer = await getImage(missionData.image);
 		let attachment = new Discord.MessageAttachment(
 			resizedBuffer,
-			"img.png"
+			'img.png'
 		);
 		reportEmbed.attachFiles([attachment]);
-		reportEmbed.setImage("attachment://img.png");
+		reportEmbed.setImage('attachment://img.png');
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send("New report added", reportEmbed);
+		.send(`New bug report added, <@&${author.user.id}>`, reportEmbed);
 }
 
-async function postDiscordReview(review, missionData, avatarURL) {
-	const author = await getRemoteUser(review.authorID)
-		.then((result) => {
-			return result.nickname
-				? result.nickname
-				: result.displayName
-				? result.displayName
-				: "error";
-		})
-		.catch((err) => {
-			console.log("err", err);
-			return "error";
-		});
+async function postDiscordReview(review, missionData) {
+	const author = await getRemoteUser(review.authorID);
+
 	const versionStr = buildVersionStr(review.version);
 	const reviewEmbed = new Discord.MessageEmbed()
-		.setColor("#2261cf")
+		.setColor('#2261cf')
 		.setTitle(`Mission: ${missionData.name}`)
-		.setAuthor(`Author: ${author}`, avatarURL)
-		.addFields({ name: "Version:", value: versionStr, inline: false })
-		.addFields({ name: "Review:", value: review.review, inline: false })
+		.setAuthor(
+			`Review Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
+		)
+		.addFields({ name: 'Version:', value: versionStr, inline: false })
+		.addFields({ name: 'Review:', value: review.review, inline: false })
 		.setTimestamp(review.date)
-		.setURL("")
-		.setFooter("\u3000".repeat(10 /*any big number works too*/) + "|");
+		.setURL(
+			`https://globalconflicts.net//mission-details/${missionData.uniqueName}`
+		);
 	if (missionData.image) {
 		const resizedBuffer = await getImage(missionData.image);
 		let attachment = new Discord.MessageAttachment(
 			resizedBuffer,
-			"img.png"
+			'img.png'
 		);
 		reviewEmbed.attachFiles([attachment]);
-		reviewEmbed.setImage("attachment://img.png");
+		reviewEmbed.setImage('attachment://img.png');
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send("New review added", reviewEmbed);
+		.send(`New review added, <@&${author.user.id}>`, reviewEmbed);
 }
 
-async function postDiscordUpdate(update, missionData, avatarURL) {
-	const author = await getRemoteUser(update.authorID)
-		.then((result) => {
-			return result.nickname
-				? result.nickname
-				: result.displayName
-				? result.displayName
-				: "error";
-		})
-		.catch((err) => {
-			console.log("err", err);
-			return "error";
-		});
+async function postDiscordUpdate(update, missionData) {
+	const author = await getRemoteUser(missionData.authorID);
+
 	const versionStr = buildVersionStr(update.version);
 	let updateEmbed;
 	updateEmbed = new Discord.MessageEmbed()
-		.setColor("#ffffff")
+		.setColor('#ffffff')
 		.setTitle(`Mission: ${missionData.name}`)
-		.setAuthor(`Author: ${author}`, avatarURL)
-		.addFields({ name: "Version:", value: versionStr, inline: false })
+		.setAuthor(
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
+		)
+		.addFields({ name: 'Version:', value: versionStr, inline: false })
 		.addFields({
-			name: "Changelog:",
+			name: 'Changelog:',
 			value: `\`\`\`\n ${update.changeLog} \n \`\`\``,
 			inline: false
 		})
 		.setTimestamp(update.date)
-		.setURL("")
-		.setFooter("\u3000".repeat(10 /*any big number works too*/) + "|");
+		.setURL(
+			`https://globalconflicts.net/mission-details/${missionData.uniqueName}`
+		);
 	if (missionData.image) {
 		const resizedBuffer = await getImage(missionData.image);
 		let attachment = new Discord.MessageAttachment(
 			resizedBuffer,
-			"img.png"
+			'img.png'
 		);
 		updateEmbed.attachFiles([attachment]);
-		updateEmbed.setImage("attachment://img.png");
+		updateEmbed.setImage('attachment://img.png');
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send("Mission updated", updateEmbed);
+		.send('Mission updated', updateEmbed);
 }
 
-async function postDiscordEdit(edit, missionData, user) {
-	const author = await getRemoteUser(user.id)
-		.then((result) => {
-			return result.nickname
-				? result.nickname
-				: result.displayName
-				? result.displayName
-				: "error";
-		})
-		.catch((err) => {
-			console.log("err", err);
-			return "error";
-		});
+async function postDiscordEdit(edit, missionData) {
+	const author = await getRemoteUser(missionData.authorID);
+
 	const updateEmbed = new Discord.MessageEmbed()
-		.setColor("#c946ff")
+		.setColor('#c946ff')
 		.setTitle(`Mission: ${missionData.name}`)
-		.setAuthor(`Author: ${author}`, user.displayAvatarURL())
+		.setAuthor(
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
+		)
 		.setTimestamp(Date.now())
-		.setURL("")
-		.setFooter("\u3000".repeat(10 /*any big number works too*/) + "|");
+		.setURL(
+			`https://globalconflicts.net//mission-details/${missionData.uniqueName}`
+		);
 	if (edit.type) {
-		updateEmbed.addField("Type:", edit.type, false);
+		updateEmbed.addField('Type:', edit.type, false);
 	}
 	if (edit.ratios) {
-		let ratioStr = "";
+		let ratioStr = '';
 		if (edit.ratios.blufor) {
 			ratioStr = ratioStr + `**Blufor:** ${edit.ratios.blufor} `;
 		}
@@ -307,66 +270,74 @@ async function postDiscordEdit(edit, missionData, user) {
 		if (edit.ratios.civ) {
 			ratioStr = ratioStr + `**Civ:** ${edit.ratios.civ} `;
 		}
-		updateEmbed.addField("Ratios:", ratioStr, false);
+		updateEmbed.addField('Ratios:', ratioStr, false);
 	}
 	if (edit.size) {
 		updateEmbed.addField(
-			"Player Count:",
+			'Player Count:',
 			`**Min:** ${edit.size.min} **Max:** ${edit.size.max}`,
 			false
 		);
 	}
 	if (edit.description) {
-		updateEmbed.addField("Description:", edit.description, false);
+		updateEmbed.addField('Description:', edit.description, false);
 	}
 	if (edit.jip) {
-		updateEmbed.addField("JiP:", edit.jip, false);
+		updateEmbed.addField('JIP:', edit.jip ? 'YES' : 'NO', false);
 	}
 	if (edit.respawn) {
-		updateEmbed.addField("Respawn:", edit.respawn, false);
+		updateEmbed.addField('Respawn:', edit.respawn ? 'YES' : 'NO', false);
 	}
 	if (edit.tags) {
-		updateEmbed.addField("Tags:", edit.tags.join(", "), false);
+		updateEmbed.addField('Tags:', edit.tags.join(', '), false);
 	}
 	if (edit.timeOfDay) {
-		updateEmbed.addField("Time of Day:", edit.timeOfDay, false);
+		updateEmbed.addField('Time of Day:', edit.timeOfDay, false);
 	}
 	if (edit.era) {
-		updateEmbed.addField("Era:", edit.era, false);
+		updateEmbed.addField('Era:', edit.era, false);
 	}
 	if (edit.image) {
-		if (edit.image === "remove") {
-			updateEmbed.addField("Image:", "Image Removed", false);
+		if (edit.image === 'remove') {
+			updateEmbed.addField('Image:', 'Image Removed', false);
 		} else {
-			updateEmbed.addField("Image:", "Image Added", false);
+			updateEmbed.addField('Image:', 'Image Added', false);
 		}
 	}
 	if (missionData.image) {
 		const resizedBuffer = await getImage(missionData.image);
 		let attachment = new Discord.MessageAttachment(
 			resizedBuffer,
-			"img.png"
+			'img.png'
 		);
 		updateEmbed.attachFiles([attachment]);
-		updateEmbed.setImage("attachment://img.png");
+		updateEmbed.setImage('attachment://img.png');
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send("Mission details edited", updateEmbed);
+		.send('Mission details edited', updateEmbed);
 }
 
-async function postMissionCopiedRemovedToServer(request, mission, updateid, serverName, action, color) {
-	const author = await getRemoteUserDisplayName(request.discordUser.user.id);
-	const update = mission.updates.filter((updt) => updt._id.toString() === updateid)[0];
+async function postMissionCopiedRemovedToServer(
+	request,
+	mission,
+	updateid,
+	serverName,
+	action,
+	color
+) {
+	const author = await getRemoteUser(mission.authorID);
+	const update = mission.updates.filter(
+		(updt) => updt._id.toString() === updateid
+	)[0];
 
 	const newMissionEmbed = new Discord.MessageEmbed()
 		.setColor(color)
 		.setTitle(`${mission.name}`)
 		.setAuthor(
-			`Author: ${author}`,
-			request.discordUser.user.displayAvatarURL()
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
 		)
-		.addFields()
 		.setDescription(
 			`${mission.name} V${buildVersionStr(
 				update.version
@@ -374,7 +345,7 @@ async function postMissionCopiedRemovedToServer(request, mission, updateid, serv
 		)
 		.setTimestamp()
 		.setURL(
-			`${request.headers.origin}/mission-details/${mission.uniqueName}`
+			`https://globalconflicts.net/mission-details/${mission.uniqueName}`
 		);
 
 	discordJsClient.channels.cache
@@ -385,6 +356,95 @@ async function postMissionCopiedRemovedToServer(request, mission, updateid, serv
 		);
 }
 
+async function postNewMissionHistory(request, mission, history, isNew) {
+	const author = await getRemoteUser(mission.authorID);
+
+	let leadersDescriptionText;
+	let leadersFieldText;
+
+	leadersDescriptionText = history.leaders
+		.map(function (elem) {
+			return `<@${elem.discordID}>`;
+		})
+		.join(', ');
+
+	leadersFieldText = history.leaders
+		.map(function (elem) {
+			return `<@${elem.discordID}>`;
+		})
+		.join('\n');
+
+	let leaderText = 'Leader:';
+	if (history.leaders.length > 1) {
+		leaderText = 'Leaders:';
+	}
+	let sendText = `New mission history recorded!\n${leadersDescriptionText}: please consider giving your AAR at the website.`;
+	if (!isNew) {
+		sendText = `A mission history was edited. \n${leadersDescriptionText}: Check it out.`;
+	}
+
+	const gameplayHistoryEmbed = new Discord.MessageEmbed()
+		.setTitle(`${mission.name}`)
+		.setDescription(mission.description)
+		.setAuthor(
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
+		)
+		.addField('Outcome:', history.outcome)
+		.setURL(
+			`https://globalconflicts.net/mission-details/${mission.uniqueName}`
+		);
+
+	if (history.gmNote) {
+		gameplayHistoryEmbed.addField('GM Notes:', history.gmNote);
+	}
+	gameplayHistoryEmbed.addField(leaderText, leadersFieldText);
+
+	discordJsClient.channels.cache
+		.get(process.env.DISCORD_BOT_AAR_CHANNEL)
+		.send(sendText, gameplayHistoryEmbed);
+}
+
+async function postNewAAR(request, mission, outcome, leader, aarText) {
+	const author = await getRemoteUser(mission.authorID);
+
+
+	let sendText = `New AAR submited!\n <@${mission.authorID}>, this is your mission, take a look at the AAR.`;
+
+	let sidePositionString;
+
+	if (leader.role === 'took_command') {
+		sidePositionString = `Took ${leader.side} command`;
+	} else {
+		sidePositionString = `${leader.side} leader`;
+	}
+	if (aarText.length > 300) {
+		aarText = aarText.substring(0, 300) + '...';
+	}
+
+
+	aarText = [
+		`<@${leader.discordID}>, **${sidePositionString} AAR**:\n` + aarText
+		].join("")
+
+
+	const aarEmbed = new Discord.MessageEmbed()
+		.setTitle(`${mission.name}`)
+		.setDescription(aarText)
+		.setAuthor(
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
+		)
+		.addField('Outcome:', outcome)
+		.setURL(
+			`https://globalconflicts.net/mission-details/${mission.uniqueName}`
+		);
+
+	discordJsClient.channels.cache
+		.get(process.env.DISCORD_BOT_AAR_CHANNEL)
+		.send(sendText, aarEmbed);
+}
+
 module.exports = {
 	postDiscordNewMission,
 	postDiscordReport,
@@ -392,5 +452,7 @@ module.exports = {
 	postDiscordUpdate,
 	postDiscordEdit,
 	postDiscordMissionReady,
-	postMissionCopiedRemovedToServer
+	postMissionCopiedRemovedToServer,
+	postNewMissionHistory,
+	postNewAAR
 };

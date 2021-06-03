@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IMission, IReport, IReview } from '../models/mission';
-import { MissionConstants, ITerrain } from '../constants/missionConstants';
+import { IHistory, IMission, IReview } from "../models/mission";
+import { MissionConstants } from '../constants/missionConstants';
 import { DomSanitizer } from '@angular/platform-browser';
-import { DiscordUser } from '@app/models/discorduser';
 import * as fileSaver from 'file-saver';
+// @ts-ignore
+import Terrains from '../../assets/terrains.json';
+import { ILeader } from "@app/models/leader";
+import { DatePipe } from "@angular/common";
 
 @Injectable({
 	providedIn: 'root'
@@ -14,7 +17,8 @@ export class MissionsService {
 	constructor(
 		private httpClient: HttpClient,
 		private mC: MissionConstants,
-		private sanitizer: DomSanitizer
+		private sanitizer: DomSanitizer,
+		private datePipe: DatePipe,
 	) {}
 
 	public list(): Observable<IMission[]> {
@@ -29,12 +33,20 @@ export class MissionsService {
 		return this.httpClient.post(`/api/missions`, formData);
 	}
 
-	public submitReport(formData: FormData) {
-		return this.httpClient.post(`/api/missions/report`, formData);
+	public submitReport(formData: FormData, isUpdate) {
+		if (isUpdate) {
+			return this.httpClient.put(`/api/missions/report`, formData);
+		} else {
+			return this.httpClient.post(`/api/missions/report`, formData);
+		}
 	}
 
-	public submitReview(formData: FormData) {
-		return this.httpClient.post(`/api/missions/review`, formData);
+	public submitReview(formData: FormData, isUpdate) {
+		if (isUpdate) {
+			return this.httpClient.put(`/api/missions/review`, formData);
+		} else {
+			return this.httpClient.post(`/api/missions/review`, formData);
+		}
 	}
 
 	public submitUpdate(formData: FormData) {
@@ -46,15 +58,21 @@ export class MissionsService {
 	}
 
 	public getTerrainData(terrainName: string | undefined) {
-		return terrainName ? this.mC.MissionTerrains[terrainName] : undefined;
+		return terrainName
+			? Terrains.find((terrain) => {
+					return (
+						terrain.class.toLowerCase() ===
+						terrainName.toLowerCase()
+					);
+			  })
+			: undefined;
 	}
 
 	public getImage(mission: IMission | null) {
 		if (mission?.image) {
 			return this.sanitizer.bypassSecurityTrustResourceUrl(mission.image);
 		} else {
-			const terrain = this.getTerrainData(mission?.terrain);
-			return terrain?.defaultImage ?? '../../../assets/imgs/noImage.png';
+			return '../../../assets/imgs/noImage.png';
 		}
 	}
 
@@ -63,8 +81,27 @@ export class MissionsService {
 		return date.toISOString().split('T')[0];
 	}
 
+	public getLastPlayedDate(mission:IMission){
+		if(mission.history){
+			return this.datePipe.transform(
+				mission.history.reverse()[0].date,
+				'MM/dd/yyyy'
+			);
+		}else{
+			return "--"
+		}
+
+	}
+
 	public getFileName(uniqueName: string | null): Observable<IMission> {
-		return this.httpClient.get<IMission>(`/api/missions/${uniqueName}`);
+		return this.httpClient.get<IMission>(`/api/missions/${uniqueName}`, {
+			headers: {
+				'Cache-Control':
+					'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+				Pragma: 'no-cache',
+				Expires: '0'
+			}
+		});
 	}
 
 	public buildVersionStr(versionObj: {
@@ -99,20 +136,47 @@ export class MissionsService {
 			);
 	}
 
-	public removeReviewEntry(uniqueName:string, reviewID: string){
-		return this.httpClient.delete(`/api/missions/review/${uniqueName}/${reviewID}`);
+	public removeReviewEntry(uniqueName: string, reviewID: string) {
+		return this.httpClient.delete(
+			`/api/missions/review/${uniqueName}/${reviewID}`
+		);
 	}
 
-	public removeReportEntry(uniqueName:string, reportID: string){
-		return this.httpClient.delete(`/api/missions/report/${uniqueName}/${reportID}`);
+	public removeReportEntry(uniqueName: string, reportID: string) {
+		return this.httpClient.delete(
+			`/api/missions/report/${uniqueName}/${reportID}`
+		);
 	}
 
-    public missionAction(action:string, uniqueName:string,  updateId: string, filename:string,) {
-		return this.httpClient.post(`/api/missions/${uniqueName}/action`,{
-			"action":action,
-			"uniqueName":uniqueName,
-			"updateId":updateId,
-			"filename":filename
+	public missionAction(
+		action: string,
+		uniqueName: string,
+		updateId: string,
+		filename: string
+	) {
+		return this.httpClient.post(`/api/missions/${uniqueName}/action`, {
+			action,
+			uniqueName,
+			updateId,
+			filename
 		});
-    }
+	}
+
+	public submitGameplayHistory(mission: IMission, history: IHistory) {
+		return this.httpClient.post(
+			`/api/missions/${mission.uniqueName}/history`,
+			history
+		);
+	}
+	public submitAar(
+		mission: IMission,
+		historyID: string,
+		aar: string,
+		leader: ILeader
+	) {
+		return this.httpClient.post(
+			`/api/missions/${mission.uniqueName}/history/aar`,
+			{ historyID, aar, leader }
+		);
+	}
 }

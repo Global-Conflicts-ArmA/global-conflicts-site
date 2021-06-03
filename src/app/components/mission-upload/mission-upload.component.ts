@@ -15,8 +15,8 @@ import {
 } from '@angular/forms';
 import { MissionConstants } from '@app/constants/missionConstants';
 import { MissionsService } from '@app/services/missions.service';
-import { DiscordUser } from '@app/models/discorduser';
-import { IMission, IRatios, IUpdate } from '@app/models/mission';
+import { DatabaseUser } from '@app/models/databaseUser';
+import { IMission, IUpdate } from '@app/models/mission';
 import { UserService } from '@app/services/user.service';
 import { FileValidator } from 'ngx-material-file-input';
 import { SharedService } from '@app/services/shared';
@@ -27,7 +27,8 @@ import {
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-
+// @ts-ignore
+import Terrains from '../../../assets/terrains.json';
 @Component({
 	selector: 'app-mission-upload',
 	templateUrl: './mission-upload.component.html',
@@ -57,7 +58,7 @@ export class MissionUploadComponent implements OnInit {
 	private readonly missionDataFromDetails: IMission;
 
 	isEdit = false;
-	discordUser: DiscordUser | null;
+	discordUser: DatabaseUser | null;
 	misType = 'CO';
 	missionToUpload: File | null;
 	description: string;
@@ -74,7 +75,7 @@ export class MissionUploadComponent implements OnInit {
 
 	readonly maxSize: number = 8388608;
 	readonly maxSizeImage: number = 2097152;
-	readonly minNameLength: number = 6;
+	readonly minNameLength: number = 3;
 	readonly maxNameLength: number = 30;
 
 	fileUploadGroup: FormGroup;
@@ -285,8 +286,10 @@ export class MissionUploadComponent implements OnInit {
 
 	makeUniqueMissionMapName(missionName: string, terrain: string) {
 		const safeMissionName = missionName
-			.replace(' ', '_')
-			.replace(/\W/g, '');
+			.replaceAll(' ', '_')
+			.replaceAll(/\W/g, '')
+			.trim();
+
 		return safeMissionName + '_' + terrain;
 	}
 
@@ -309,8 +312,10 @@ export class MissionUploadComponent implements OnInit {
 						requiredTerrain: true
 					};
 				} else {
-					if (fileNameArray[1] in this.mC.MissionTerrains) {
-					} else {
+					const terrainFound = Terrains.find(terrain=>{
+						return terrain.class.toLowerCase() === fileNameArray[1].toLowerCase()
+					});
+					if (!terrainFound) {
 						return {
 							notAcceptedTerrain: true
 						};
@@ -385,10 +390,10 @@ export class MissionUploadComponent implements OnInit {
 				return `A mission name is required!`;
 			}
 			if (missionName.hasError('nameMinLength')) {
-				return `Name is too short! Needs to be at least 6 characters`;
+				return `Name is too short! Needs to be at least ${this.minNameLength} characters`;
 			}
 			if (missionName.hasError('nameMaxLength')) {
-				return `Name is too long! Needs to be under 30 characters`;
+				return `Name is too long! Needs to be under ${this.maxNameLength} characters`;
 			}
 			if (missionName.hasError('nameInvalidChars')) {
 				return `Name has invalid characters in it, please only use AlphaNumerics and spaces`;
@@ -684,9 +689,10 @@ export class MissionUploadComponent implements OnInit {
 	buildMissionFileName() {
 		const missionName = this.missionNameGroup.get('missionName')?.value;
 		const safeMissionName = missionName
-			.replace(' ', '_')
-			.replace(/\W/g, '')
-			.toUpperCase();
+			.replaceAll(' ', '_')
+			.replaceAll(/\W/g, '')
+			.toUpperCase()
+			.trim();
 		const safeMissionType = this.missionTypeGroup.get('missionType')?.value
 			?.str
 			? this.missionTypeGroup.get('missionType')?.value?.str
@@ -730,6 +736,8 @@ export class MissionUploadComponent implements OnInit {
 					this.sharedService.uploadingState = 'not-found'; // database error, should never happen
 				}
 			}
+		}, error => {
+			console.log("error")
 		});
 	}
 
@@ -849,19 +857,22 @@ export class MissionUploadComponent implements OnInit {
 			);
 		} else {
 			this.missionsService.upload(formData).subscribe(
-				() => {
+				  () => {
 					this.sharedService.uploadingState = 'success';
 					this.authError = null;
 					this.router.routeReuseStrategy.shouldReuseRoute = () =>
 						false;
 					this.router.onSameUrlNavigation = 'reload';
 					this._snackBar.open('Mission uploaded', '', {
-						duration: 5000
+						duration: 6000
 					});
 
-					this.router.navigate([
-						`/mission-details/${mission.uniqueName}`
-					]);
+					setTimeout(()=>{
+						  this.router.navigate([
+							`/mission-list`
+						]);
+					}, 2000)
+
 				},
 				(httpError) => {
 					this.missionErrors = httpError.error.missionErrors ?? {};

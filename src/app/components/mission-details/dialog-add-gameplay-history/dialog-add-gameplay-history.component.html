@@ -1,0 +1,109 @@
+<h3 mat-dialog-title>{{data.oldHistory? "Edit gameplay history" : "New gameplay history"}}</h3>
+<div mat-dialog-content>
+
+
+	<div>
+
+		<mat-form-field  class="full-width" appearance="fill">
+			<mat-label>Date (mm/dd/yyyy)</mat-label>
+			<input matInput  mask="M0/d0/0000" [leadZeroDateTime]="true" [dropSpecialCharacters]="false" [(ngModel)]="historyDateString" [validation]="true" />
+		</mat-form-field>
+
+		<mat-form-field class="full-width">
+			<mat-label>Outcome: (Open ended)</mat-label>
+			<input type="text"
+						 placeholder="Outcome"
+						 matInput
+						 [formControl]="outcomeControl"
+						 [matAutocomplete]="auto">
+			<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+				<mat-option *ngFor="let option of filtredOutcomes | async" [value]="option">
+					{{option}}
+				</mat-option>
+			</mat-autocomplete>
+		</mat-form-field>
+
+
+		<div class="markdown-buttons">
+
+			<a mat-flat-button href="https://www.markdownguide.org/cheat-sheet//" target="_blank">Markdown guide</a>
+		</div>
+
+
+
+
+		<div>
+			<span>GM Notes (optinal): </span>
+			<angular-markdown-editor
+				rows="10"
+				textareaId="newHistoryEditor"
+				name="markdownText" [(ngModel)]="history.gmNote">
+			</angular-markdown-editor>
+		</div>
+
+
+		<markdown *ngIf="showNotePreview" [data]="history.gmNote" style="margin-bottom: 18px"></markdown>
+
+
+	</div>
+
+	<mat-divider></mat-divider>
+	<p style="margin-top: 18px">Type the name of the leaders and select it to confirm.</p>
+	<div style="display: flex; margin-top: 10px">
+		<mat-form-field style="flex: 1;" >
+			<mat-label>Leader Discord name:</mat-label>
+			<input type="text"
+						 placeholder="Pick one"
+						 matInput
+						 [formControl]="userListControl"
+						 [matAutocomplete]="leaderAuto">
+			<mat-autocomplete (optionSelected)="onLeaderSelected($event.option)" [displayWith]="getOptionText"
+												autoActiveFirstOption
+												#leaderAuto="matAutocomplete">
+				<mat-option *ngFor="let option of filtredDiscordUsers | async" [value]="option">
+					{{option.displayName}}
+				</mat-option>
+			</mat-autocomplete>
+		</mat-form-field>
+	</div>
+
+	<div style="margin-bottom: 20px">
+
+		<div *ngFor="let leader of selectedLeaders" class="leader-box">
+			<div>
+				{{leader.displayName}}
+			</div>
+			<div class="leader-select-inputs">
+
+				<mat-form-field appearance="legacy">
+					<mat-label>Side:</mat-label>
+					<mat-select [(value)]="leader.side">
+						<mat-option style="color: #007bff" value="BLUFOR">BLUFOR</mat-option>
+						<mat-option style="color: red" value="OPFOR">OPFOR</mat-option>
+						<mat-option style="color: greenyellow" value="INDFOR">INDFOR</mat-option>
+						<mat-option style="color: #bd14bd" value="CIV">CIV</mat-option>
+					</mat-select>
+				</mat-form-field>
+
+				<mat-form-field appearance="legacy">
+					<mat-label>Role:</mat-label>
+					<mat-select [(value)]="leader.role"  >
+						<mat-option style="color: white" value="leader">Leader</mat-option>
+						<mat-option style="color: white" value="took_command">Took command</mat-option>
+					</mat-select>
+				</mat-form-field>
+
+				<button matTooltip="Remove" style="margin-left: 15px" mat-flat-button color="accent" (click)="removeLeader(leader)">
+					<mat-icon>remove</mat-icon>
+				</button>
+			</div>
+		</div>
+
+	</div>
+
+
+</div>
+<div mat-dialog-actions style="display: flex; justify-content: space-between">
+	<button mat-button [mat-dialog-close]="">Close</button>
+	<button mat-button [disabled]="!outcomeControl.value || !selectedLeaders.size>0" (click)="submitGameplayHistory()">Submit</button>
+</div>
