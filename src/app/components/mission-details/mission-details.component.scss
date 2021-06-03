@@ -176,3 +176,62 @@ table {
 	text-align: center;
 	font-size: 11px;
 }
+
+.gh-content{
+	padding: 13px 0;
+
+	.BLUFOR{
+		color:#4173ff;
+	}
+	.OPFOR{
+		color:#ff4153;
+	}
+	.INDFOR{
+		color:#41ff73;
+	}
+	.CIV{
+		color:#b84eda;
+	}
+	.no-side{
+		color: white;
+	}
+}
+
+.gh-content:not(:last-child){
+
+	border-bottom: 2px solid #393939;
+}
+
+.gh-header{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin-bottom: 15px;
+	color: colors.$accent;
+	font-size: 1rem;
+}
+
+.gh-outcome{
+	display: flex;
+	margin-bottom: 10px;
+}
+.gh-label{
+	font-size: .9rem;
+	color: colors.$accent;
+
+}
+
+.gh-text{
+	font-size: 1.2rem;
+}
+.gh-noaar{
+	display: flex;
+	align-items: center;
+}
+
+.gh-aar-header{
+	display: flex;
+	justify-content: space-between;
+	flex: 1;
+	align-items: center;
+}

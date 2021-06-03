@@ -1,8 +1,8 @@
-<h1 *ngIf="!data.report" mat-dialog-title>Submit a bug report for {{data.mission.name}}</h1>
+<h3 *ngIf="!data.report" mat-dialog-title>Submit a bug report for {{data.mission.name}}</h3>
 
 
 <div *ngIf="data.report" style="display: flex; justify-content: space-between; padding: 10px 0" >
-	<h1 mat-dialog-title>Update bug report</h1>
+	<h3 mat-dialog-title>Update bug report</h3>
 	<button mat-flat-button  color="warn" (click)="removeEntry()">Remove entry</button>
 </div>
 

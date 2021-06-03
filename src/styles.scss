@@ -19,9 +19,9 @@ $fontConfig: (
 	display-3: mat-typography-level(56px, 56px, 400, 'Roboto', -0.0089em),
 	display-2: mat-typography-level(45px, 48px, 400, 'Roboto', 0em),
 	display-1: mat-typography-level(34px, 40px, 400, 'Roboto', 0.0074em),
-	headline: mat-typography-level(24px, 32px, 400, 'Roboto', 0em),
-	title: mat-typography-level(20px, 32px, 500, 'Roboto', 0.0075em),
-	subheading-2: mat-typography-level(16px, 28px, 400, 'Roboto', 0.0094em),
+	headline: mat-typography-level(40px, 40px, 600, 'Roboto', 0em),
+	title: mat-typography-level(34px, 34px, 500, 'Roboto', 0.0075em),
+	subheading-2: mat-typography-level(25px, 25px, 400, 'Roboto', 0.0094em),
 	subheading-1: mat-typography-level(15px, 24px, 500, 'Roboto', 0.0067em),
 	body-2: mat-typography-level(14px, 24px, 500, 'Roboto', 0.0179em),
 	body-1: mat-typography-level(14px, 20px, 400, 'Roboto', 0.0179em),
@@ -525,10 +525,6 @@ input,
 	background-position: center;
 }
 
-ul {
-	list-style-type: none;
-	padding-left: 0px;
-}
 
 .explain {
 	font-size: 11px;
@@ -563,3 +559,51 @@ body {
 ::-webkit-scrollbar-thumb:hover {
 	background: colors.$accent;
 }
+
+.md-editor{
+	background: colors.$primary !important;
+	border-color: colors.$accent !important;
+	box-shadow: none !important;
+	.active{
+		outline: 0 !important;
+	}
+	> textarea{
+		border: none !important;
+		background: colors.$primary !important;
+		padding: 10px !important;
+		color: white !important;
+	}
+}
+.md-header > *:last-child{
+		display: none !important;
+}
+.md-header > * {
+	margin-left: 10px;
+}
+.md-header{
+	background: colors.$primary !important;
+	border-color: colors.$accent !important;
+	display: flex !important;
+}
+.md-preview{
+	border: none !important;
+	background: colors.$primary !important;
+	padding: 10px !important;
+
+}
+.md-control-fullscreen{
+	display: none !important;
+}
+.smaller-button{
+	height: 25px !important;
+	line-height: 25px !important;
+
+}
+
+blockquote{
+	margin: 0 0 1rem;
+	padding-left: 20px;
+	border-left: 10px solid #92753d;
+}
+
+

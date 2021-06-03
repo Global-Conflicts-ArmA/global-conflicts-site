@@ -4,7 +4,7 @@ const User = require('../models/discordUser.model');
 const router = express.Router();
 const multer = require('multer');
 const fs = require('fs');
-const { postDiscordReport, postDiscordReview, postDiscordUpdate, postDiscordEdit, postDiscordNewMission, postDiscordMissionReady, postMissionCopiedRemovedToServer } = require('../discord-poster');
+const { postDiscordReport, postDiscordReview, postDiscordUpdate, postDiscordEdit, postDiscordNewMission, postDiscordMissionReady, postMissionCopiedRemovedToServer, postNewMissionHistory, postNewAAR } = require('../discord-poster');
 const { getDiscordUserFromCookies } = require('../misc/validate-cookies');
 
 
@@ -287,7 +287,7 @@ router.get('/', async (req, res) => {
 			authError: req.authError
 		});
 	}
-	Mission.find({}, { _id: 0 }, async (err, doc) => {
+	Mission.find({}, { _id: 0, image:0 }, async (err, doc) => {
 		if (err) {
 			res.status(500).send(err);
 		} else {
@@ -862,5 +862,68 @@ router.get('/download/:filename', async (req, res) => {
 		}
 	);
 });
+
+
+router.post('/:uniqueName/history', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+	if(req.authError || !req.discordUser.roles.cache.some(r=>["Admin", "Arma GM"].includes(r.name))){
+		res.status(401).send({
+			authError: 'User not allowed to interact with missions'
+		});
+	}
+
+	const history = req.body;
+
+	Mission.findOne({uniqueName:req.params.uniqueName}, (err, mission) => {
+		mission.lastPlayed = history.date
+		if(history._id){
+			mission.history.id(history._id).set(history);
+			postNewMissionHistory(req, mission, history, false);
+		}else{
+			mission.history.push(history);
+			postNewMissionHistory(req, mission, history, true);
+		}
+		mission.save();
+		return res.send({"ok":true}, 200);
+	})
+
+});
+
+router.post('/:uniqueName/history/aar', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+
+	if(req.authError){
+		return	res.status(401).send({
+			authError: 'User not allowed to interact with missions'
+		});
+
+	}
+
+	const leader = req.body.leader;
+	if(leader.discordID !== req.discordUser.user.id){
+		return res.status(401).send({
+			authError: 'User is not the leader'
+		});
+	}
+	const historyID = req.body.historyID;
+	const aar = req.body.aar;
+
+	Mission.findOne({uniqueName:req.params.uniqueName}, (err, mission) => {
+		let history = mission.history.id(historyID);
+		history.leaders.id(leader._id).aar = aar.trim()
+		postNewAAR(req, mission, history.outcome, leader, aar.trim())
+		mission.save()
+		return res.send()
+	})
+
+});
+
+
 
 module.exports = router;

@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {IMission, IReview} from '../models/mission';
+import { IHistory, IMission, IReview } from "../models/mission";
 import { MissionConstants } from '../constants/missionConstants';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as fileSaver from 'file-saver';
 // @ts-ignore
 import Terrains from '../../assets/terrains.json';
+import { ILeader } from "@app/models/leader";
+import { DatePipe } from "@angular/common";
 
 @Injectable({
 	providedIn: 'root'
@@ -15,7 +17,8 @@ export class MissionsService {
 	constructor(
 		private httpClient: HttpClient,
 		private mC: MissionConstants,
-		private sanitizer: DomSanitizer
+		private sanitizer: DomSanitizer,
+		private datePipe: DatePipe,
 	) {}
 
 	public list(): Observable<IMission[]> {
@@ -31,18 +34,17 @@ export class MissionsService {
 	}
 
 	public submitReport(formData: FormData, isUpdate) {
-		if(isUpdate){
+		if (isUpdate) {
 			return this.httpClient.put(`/api/missions/report`, formData);
-		}else{
+		} else {
 			return this.httpClient.post(`/api/missions/report`, formData);
 		}
-
 	}
 
 	public submitReview(formData: FormData, isUpdate) {
-		if(isUpdate){
+		if (isUpdate) {
 			return this.httpClient.put(`/api/missions/review`, formData);
-		}else{
+		} else {
 			return this.httpClient.post(`/api/missions/review`, formData);
 		}
 	}
@@ -77,6 +79,18 @@ export class MissionsService {
 	public getDate(dateString: string) {
 		const date = new Date(Date.parse(dateString));
 		return date.toISOString().split('T')[0];
+	}
+
+	public getLastPlayedDate(mission:IMission){
+		if(mission.history){
+			return this.datePipe.transform(
+				mission.history.reverse()[0].date,
+				'MM/dd/yyyy'
+			);
+		}else{
+			return "--"
+		}
+
 	}
 
 	public getFileName(uniqueName: string | null): Observable<IMission> {
@@ -141,10 +155,28 @@ export class MissionsService {
 		filename: string
 	) {
 		return this.httpClient.post(`/api/missions/${uniqueName}/action`, {
-			action: action,
-			uniqueName: uniqueName,
-			updateId: updateId,
-			filename: filename
+			action,
+			uniqueName,
+			updateId,
+			filename
 		});
+	}
+
+	public submitGameplayHistory(mission: IMission, history: IHistory) {
+		return this.httpClient.post(
+			`/api/missions/${mission.uniqueName}/history`,
+			history
+		);
+	}
+	public submitAar(
+		mission: IMission,
+		historyID: string,
+		aar: string,
+		leader: ILeader
+	) {
+		return this.httpClient.post(
+			`/api/missions/${mission.uniqueName}/history/aar`,
+			{ historyID, aar, leader }
+		);
 	}
 }

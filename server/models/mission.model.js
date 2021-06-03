@@ -130,6 +130,47 @@ const MissionSchema = new Schema(
 				required: false
 			}
 		},
+		lastPlayed:  {
+			type: Date,
+			required: false
+		},
+		history:[
+			{
+				date:  {
+					type: Date,
+					required: true
+				},
+				outcome: {
+					type: String,
+					required: false
+				},
+				gmNote:{
+					type: String,
+					required: false
+				},
+				leaders: [
+					{
+						discordID:{
+							type: String,
+							required: true
+						},
+						side:{
+							type: String,
+							required: false
+						},
+						role:{
+							type: String,
+							required: false
+						},
+						aar: {
+							type: String,
+							required: false
+						},
+					}
+				]
+
+			}
+		],
 		reports: [
 			{
 				date: {

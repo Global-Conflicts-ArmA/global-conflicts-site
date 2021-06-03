@@ -1,0 +1,23 @@
+.leader-box {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+}
+.leader-box:not(:last-child){
+	border-bottom: 2px solid #393939;
+}
+
+.markdown-buttons{
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 10px;
+}
+textarea{
+	max-height: 500px;
+	resize: vertical;
+}
+
+.leader-select-inputs > * {
+	margin-left: 10px;
+}

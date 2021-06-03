@@ -3,13 +3,16 @@
 		<div class="center" *ngIf="!doneLoading">
 			<mat-progress-spinner diameter="100" mode="indeterminate" color="accent">Loading</mat-progress-spinner>
 		</div>
-		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser?.role)">You must join our Discord server and complete the welcoming process to upload missions!</div>
+		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser?.role)">You must join our Discord server and
+			complete the welcoming process to upload missions!
+		</div>
 		<div [class.not-allowed-overlay]="!doneLoading" *ngIf="!!mission">
 			<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser?.role)">
 				<div class="mission-title-container">
 					<div class="mission-spacer"></div>
 					<div class="mission-title">{{ mission?.name }}</div>
-					<button *ngIf="canUpdateMission()" mat-flat-button class="mission-button" color="accent" matTooltip="Edit mission" (click)="editMission()">
+					<button *ngIf="canUpdateMission()" mat-flat-button class="mission-button" color="accent"
+									matTooltip="Edit mission" (click)="editMission()">
 						<mat-icon>build</mat-icon>
 					</button>
 				</div>
@@ -54,7 +57,7 @@
 										<mat-icon class="green-icon">check</mat-icon>
 									</div>
 									<div *ngSwitchDefault>
-										<mat-icon class='red-icon'>close</mat-icon>
+										<mat-icon class="red-icon">close</mat-icon>
 									</div>
 								</div>
 							</div>
@@ -65,7 +68,7 @@
 										<mat-icon class="green-icon">check</mat-icon>
 									</div>
 									<div *ngSwitchDefault>
-										<mat-icon class='red-icon'>close</mat-icon>
+										<mat-icon class="red-icon">close</mat-icon>
 									</div>
 								</div>
 							</div>
@@ -102,26 +105,29 @@
 					<div class="spacer"></div>
 					<div class="table-title">Updates</div>
 					<div class="table-button-container">
-						<button *ngIf="canUpdateMission()" mat-flat-button class="table-button" color="accent" (click)="updateMission()" matTooltip="Update mission">
+						<button *ngIf="canUpdateMission()" mat-flat-button class="table-button" color="accent"
+										(click)="updateMission()" matTooltip="Update mission">
 							<mat-icon>upload_file</mat-icon>
 						</button>
 					</div>
 				</div>
-				<table mat-table #updatesSort="matSort" [dataSource]="this.dataSourceUpdates" class="matTable" matSort style="width: 100%">
+				<table mat-table #updatesSort="matSort" [dataSource]="this.dataSourceUpdates" class="matTable" matSort
+							 style="width: 100%">
 					<ng-container matColumnDef="date">
-						<th  [hidden]="innerWidth < 1200" mat-header-cell *matHeaderCellDef >Date</th>
-						<td  [hidden]="innerWidth < 1200" mat-cell *matCellDef="let element">{{ missionsService.getDate(element.date) }}</td>
+						<th [hidden]="innerWidth < 1200" mat-header-cell *matHeaderCellDef>Date</th>
+						<td [hidden]="innerWidth < 1200" mat-cell
+								*matCellDef="let element">{{ missionsService.getDate(element.date) }}</td>
 					</ng-container>
 					<ng-container matColumnDef="versionStr">
-						<th mat-header-cell *matHeaderCellDef >Version</th>
+						<th mat-header-cell *matHeaderCellDef>Version</th>
 						<td mat-cell *matCellDef="let element">{{ element.versionStr }}</td>
 					</ng-container>
 					<ng-container matColumnDef="authorName">
-						<th [hidden]="innerWidth < 597" mat-header-cell *matHeaderCellDef >Author</th>
+						<th [hidden]="innerWidth < 597" mat-header-cell *matHeaderCellDef>Author</th>
 						<td [hidden]="innerWidth < 597" mat-cell *matCellDef="let element">{{ element.authorName }}</td>
 					</ng-container>
 					<ng-container matColumnDef="status">
-						<th mat-header-cell *matHeaderCellDef >Status</th>
+						<th mat-header-cell *matHeaderCellDef>Status</th>
 						<td mat-cell *matCellDef="let element">
 							<div class="row" style="justify-content: center;">
 								<div class="col-2">
@@ -173,17 +179,19 @@
 						</td>
 					</ng-container>
 					<ng-container matColumnDef="buttons">
-						<th mat-header-cell class="table-header-action" *matHeaderCellDef >Actions</th>
+						<th mat-header-cell class="table-header-action" *matHeaderCellDef>Actions</th>
 						<!--TODO: update action funcs -->
 						<td mat-cell *matCellDef="let element">
 							<div class="row-btns">
-								<button mat-flat-button color="primary" [disabled]="!element.archive" matTooltip="Download" (click)="missionsService.downloadFile(element.fileName)">
+								<button mat-flat-button color="primary" [disabled]="!element.archive" matTooltip="Download"
+												(click)="missionsService.downloadFile(element.fileName)">
 									<mat-icon>download</mat-icon>
 								</button>
 								<button mat-flat-button color="primary" matTooltip="Changelog" (click)="viewUpdate(element)">
 									<mat-icon>article</mat-icon>
 								</button>
-								<button mat-flat-button color="primary" matTooltip="Actions"  (click)="openActions(element)"  *ngIf="hasActions()" >
+								<button mat-flat-button color="primary" matTooltip="Actions" (click)="openActions(element)"
+												*ngIf="hasActions()">
 									<mat-icon>keyboard_arrow_right</mat-icon>
 								</button>
 
@@ -195,12 +203,16 @@
 					<tr mat-row *matRowDef="let row; columns: updateColumns"></tr>
 				</table>
 			</div>
-
+			<!--bug reports/ reviews-->
 			<div class="row">
 				<div class="col-lg-6 col-12 re-box">
 					<div class="row" style="margin-bottom: 10px;">
 						<div class="col re-box-name">Bug reports</div>
-						<div class="col re-box-add-button">		<button mat-flat-button (click)="submitBugReport()">	<mat-icon color="accent">add</mat-icon></button></div>
+						<div class="col re-box-add-button">
+							<button mat-flat-button (click)="submitBugReport()">
+								<mat-icon color="accent">add</mat-icon>
+							</button>
+						</div>
 					</div>
 					<div class="re-content" *ngFor="let report of mission?.reports">
 						<div class="re-header">
@@ -209,7 +221,8 @@
 							</div>
 							<div style="display: flex">
 								V{{report.versionStr}}
-								<div *ngIf="canEditRe(report)" style="cursor: pointer" (click)="submitBugReport(report)" matTooltip="Edit Review">
+								<div *ngIf="canEditRe(report)" style="cursor: pointer" (click)="submitBugReport(report)"
+										 matTooltip="Edit Review">
 									<mat-icon style="font-size: 18px; ">edit</mat-icon>
 								</div>
 							</div>
@@ -229,7 +242,11 @@
 				<div class="col-lg-6 col-12 re-box">
 					<div class="row" style="margin-bottom: 10px;">
 						<div class="col re-box-name">Reviews</div>
-						<div class="col re-box-add-button"> <button mat-flat-button (click)="submitReview()"><mat-icon color="accent">add</mat-icon></button></div>
+						<div class="col re-box-add-button">
+							<button mat-flat-button (click)="submitReview()">
+								<mat-icon color="accent">add</mat-icon>
+							</button>
+						</div>
 					</div>
 					<div class="re-content" *ngFor="let review of mission?.reviews">
 						<div class="re-header">
@@ -238,7 +255,8 @@
 							</div>
 							<div style="display: flex">
 								V{{review.versionStr}}
-								<div *ngIf="canEditRe(review)" style="cursor: pointer" (click)="submitReview(review)" matTooltip="Edit Review">
+								<div *ngIf="canEditRe(review)" style="cursor: pointer" (click)="submitReview(review)"
+										 matTooltip="Edit Review">
 									<mat-icon style="font-size: 18px; ">edit</mat-icon>
 								</div>
 							</div>
@@ -254,6 +272,80 @@
 					</div>
 				</div>
 			</div>
+			<mat-divider style="margin: 40px 0"></mat-divider>
+			<!--Gameplay history-->
+			<div>
+				<div class="row" style="margin-bottom: 10px;">
+					<div class="col re-box-name">Gameplay history</div>
+					<div class="col re-box-add-button" *ngIf="canAddGameplayHistory()">
+						<button mat-flat-button (click)="addGAmeplayHistory()">
+							<mat-icon color="accent">add</mat-icon>
+						</button>
+					</div>
+				</div>
+				<div class="gh-content" *ngFor="let history of mission.history? mission.history.reverse() : [] ">
+					<div class="gh-header">
+
+
+						<div *ngIf="history.leaders" class="gh-label">{{history.leaders.length > 1 ? 'Leaders' : 'Leader'}}:
+							<span class="gh-text" [ngClass]="getSide(leader)" *ngFor="let leader of history.leaders;let isLast=last">
+								{{leader.displayName}}<span style="color:white">{{isLast ? '' : ', '}}</span>
+							</span>
+						</div>
+
+						<div>{{history.date | date: 'longDate' }}</div>
+
+					</div>
+					<div style="display: flex; justify-content: space-between; padding-bottom: 5px;">
+						<div class="gh-outcome" *ngIf="history.outcome">
+							<span class="gh-label">Outcome:&nbsp;</span>
+							<span class="gh-text">{{history.outcome}}</span>
+						</div>
+						<div   style="flex: 1; height: 30px"></div>
+						<div *ngIf="canEditHistory()" style="margin-right: 10px">
+							<button class="smaller-button" mat-flat-button  (click)="editHistory(history)">Edit History</button>
+						</div>
+						<div style="justify-self: flex-end;" *ngIf="history.gmNote">
+							<button class="smaller-button" mat-flat-button (click)="viewGmNote(history.gmNote)">GM Notes</button>
+						</div>
+
+
+					</div>
+
+					<div *ngIf="history.leaders">
+						<mat-accordion>
+							<mat-expansion-panel *ngFor="let leader of history.leaders" id="{{leader._id}}">
+								<mat-expansion-panel-header>
+									<mat-panel-title>
+										<div class="gh-aar-header">
+											<div>
+												{{leader.displayName}} AAR<span>,<span *ngIf="leader.role!='took_command'" [ngClass]="leader.side"> {{leader.side}} leader</span>
+													<span *ngIf="leader.role=='took_command'" [ngClass]="leader.side">
+													took {{leader.side}} command</span>
+												</span>
+											</div>
+
+
+											<button style="margin-left: 20px; height: 30px" *ngIf="leader.discordID==discordUser?.id"
+															mat-raised-button
+															color="accent" class="smaller-button"
+															(click)="submitAAR(history, leader, leader.aar)">{{leader.aar ? "Edit AAR" : "Submit AAR"}}</button>
+										</div>
+
+									</mat-panel-title>
+								</mat-expansion-panel-header>
+								<markdown *ngIf="leader.aar">{{leader.aar }}</markdown>
+								<div *ngIf="!leader.aar" class="gh-noaar">
+									<span>No AAR submitted yet.</span>
+
+								</div>
+							</mat-expansion-panel>
+						</mat-accordion>
+					</div>
+				</div>
+			</div>
+
+
 		</div>
 	</div>
 </div>

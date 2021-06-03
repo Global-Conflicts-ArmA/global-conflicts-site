@@ -2,9 +2,9 @@
 
 
 
-<h1 *ngIf="!data.review" mat-dialog-title>Submit a review for {{data.mission.name}}</h1>
+<h3 *ngIf="!data.review" mat-dialog-title>Submit a review for {{data.mission.name}}</h3>
 <div *ngIf="data.review" style="display: flex; justify-content: space-between; padding: 10px 0" >
-	<h1 mat-dialog-title>Update review</h1>
+	<h3 mat-dialog-title>Update review</h3>
 	<button mat-flat-button  color="warn" (click)="removeEntry()">Remove entry</button>
 </div>
 
