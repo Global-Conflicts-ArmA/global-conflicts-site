@@ -8,6 +8,7 @@ import { WikiComponent } from './components/wiki/wiki.component';
 import { AARComponent } from './components/aar/aar.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
+import { VotedMissionsComponent } from "@app/components/voted-missions/voted-missions.component";
 
 const routes: Routes = [
 	{ path: '', component: HomeComponent },
@@ -17,6 +18,7 @@ const routes: Routes = [
 		component: MissionDetailsComponent
 	},
 	{ path: 'mission-list', component: MissionListComponent },
+	{ path: 'top-voted-missions', component: VotedMissionsComponent },
 	{ path: 'user-settings', component: UserSettingsComponent },
 	{ path: 'wiki', component: WikiComponent },
 	{ path: 'aar', component: AARComponent },

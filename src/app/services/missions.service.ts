@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IHistory, IMission, IReview } from "../models/mission";
+import { IHistory, IMission, IReview } from '../models/mission';
 import { MissionConstants } from '../constants/missionConstants';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as fileSaver from 'file-saver';
 // @ts-ignore
 import Terrains from '../../assets/terrains.json';
-import { ILeader } from "@app/models/leader";
-import { DatePipe } from "@angular/common";
+import { ILeader } from '@app/models/leader';
+import { DatePipe } from '@angular/common';
 
 @Injectable({
 	providedIn: 'root'
@@ -18,7 +18,7 @@ export class MissionsService {
 		private httpClient: HttpClient,
 		private mC: MissionConstants,
 		private sanitizer: DomSanitizer,
-		private datePipe: DatePipe,
+		private datePipe: DatePipe
 	) {}
 
 	public list(): Observable<IMission[]> {
@@ -81,16 +81,15 @@ export class MissionsService {
 		return date.toISOString().split('T')[0];
 	}
 
-	public getLastPlayedDate(mission:IMission){
-		if(mission.history){
+	public getLastPlayedDate(mission: IMission) {
+		if (mission.history) {
 			return this.datePipe.transform(
 				mission.history.reverse()[0].date,
 				'MM/dd/yyyy'
 			);
-		}else{
-			return "--"
+		} else {
+			return '--';
 		}
-
 	}
 
 	public getFileName(uniqueName: string | null): Observable<IMission> {
@@ -168,6 +167,7 @@ export class MissionsService {
 			history
 		);
 	}
+
 	public submitAar(
 		mission: IMission,
 		historyID: string,
@@ -177,6 +177,34 @@ export class MissionsService {
 		return this.httpClient.post(
 			`/api/missions/${mission.uniqueName}/history/aar`,
 			{ historyID, aar, leader }
+		);
+	}
+
+	public submitVote(mission: IMission) {
+		return this.httpClient.put(`/api/missions/${mission.uniqueName}/votes`, null);
+	}
+
+
+	public getUserVotes(){
+		return this.httpClient.get('/api/missions/votes/vote_count');
+	}
+
+
+	public retractVote(mission: IMission) {
+		return this.httpClient.delete(
+			`/api/missions/${mission.uniqueName}/votes/`
+		);
+	}
+
+	public getVotedMissions(): Observable<IMission[]>  {
+		return this.httpClient.get<IMission[]>(
+			`/api/missions/votes/voted_missions`
+		);
+	}
+
+	public resetVotes() {
+		return this.httpClient.get(
+			`/api/missions/votes/reset_votes`
 		);
 	}
 }

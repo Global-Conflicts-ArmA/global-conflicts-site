@@ -31,6 +31,7 @@
 			<span class="spacer"></span>
 			<ng-container *ngIf="!(isHandset$ | async)">
 				<a mat-menu-item class="nav-main-link accent-color" routerLinkActive="active" routerLink="" href="">Home</a>
+				<a mat-menu-item class="nav-main-link accent-color" routerLinkActive="active" routerLink="top-voted-missions" href="">Top voted missions</a>
 				<mat-menu #missionMenu="matMenu">
 					<button mat-menu-item class="nav-main-link" routerLinkActive="active" (click)="openMissionList()">List</button>
 					<button mat-menu-item class="nav-main-link" routerLinkActive="active" (click)="openUploadForm()">Upload</button>

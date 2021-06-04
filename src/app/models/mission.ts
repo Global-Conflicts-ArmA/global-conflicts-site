@@ -86,6 +86,7 @@ export interface IMission {
 	jip: boolean;
 	respawn: boolean;
 	tags: string[];
+	votes?: string[];
 	timeOfDay: string;
 	era: string;
 	image?: string;

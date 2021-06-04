@@ -12,6 +12,8 @@ import {DiscordUser} from "@app/models/discordUser";
 export class UserService {
 	userCache: RemoteDiscordUser[] = [];
 
+
+
 	constructor(
 		private httpClient: HttpClient,
 		private cookieService: CookieService
@@ -154,6 +156,7 @@ export class UserService {
 
 		return this.userCache;
 	}
+
 }
 
 export interface IUserSettings {

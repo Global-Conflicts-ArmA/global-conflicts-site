@@ -25,6 +25,10 @@ const discordUserSchema = new Schema(
 			type: Array,
 			required: false
 		},
+		votes: {
+			type: Array,
+			required: false
+		},
 		reviews: {
 			type: Array,
 			required: false
