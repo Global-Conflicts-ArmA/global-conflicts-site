@@ -133,7 +133,7 @@ async function postDiscordMissionReady(request, mission, updateid) {
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
 		.send(
-			`<@&${process.env.DISCORD_ADMIN_ROLE_ID}>, a mission marked as ready.`,
+			`<@&${process.env.DISCORD_MISSION_SANITIZERS_ROLE_ID}>, a mission marked as ready.`,
 			newMissionEmbed
 		);
 }
@@ -169,7 +169,7 @@ async function postDiscordReport(report, missionData) {
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send(`New bug report added, <@&${author.user.id}>`, reportEmbed);
+		.send(`New bug report added, <@${author.user.id}>`, reportEmbed);
 }
 
 async function postDiscordReview(review, missionData) {
