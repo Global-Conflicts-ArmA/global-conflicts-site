@@ -15,10 +15,10 @@
 						<div class="mission-vote-btn">
 							<span>You have {{4-userVotesCount}} votes left</span>
 
-							<button [disabled]="loadingVote || (!mission.votes?.includes(discordUser.id) && userVotesCount>=4) " style="width: 108px;" mat-flat-button class="mission-button" color="accent"
-											matTooltip=" {{ mission.votes?.includes(discordUser.id)   ? 'Retract vote' : 'Vote for this mission to be played on the next session'}} "
+							<button [disabled]="isVotingDisabled(mission) " style="width: 108px;" mat-flat-button class="mission-button" color="accent"
+											matTooltip=" {{ getVotingTooltip(mission) }} "
 											(click)="vote()">
-								{{ mission.votes?.includes(discordUser.id)  ? 'Retract vote' : 'Vote'}}
+								{{ getVotingBtnText(mission) }}
 							</button>
 						</div>
 

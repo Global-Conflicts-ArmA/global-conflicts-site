@@ -91,10 +91,49 @@ export class VotedMissionsComponent implements OnInit {
 	}
 
 	resetVotes() {
-		this.missionsService.resetVotes().subscribe((value) => {
-			this.getVotedMissions();
-		}, error => {
-			console.log(error);
-		});
+		this.missionsService.resetVotes().subscribe(
+			(value) => {
+				this.getVotedMissions();
+			},
+			(error) => {
+				console.log(error);
+			}
+		);
+	}
+
+	isVotingDisabled(mission: IMission) {
+		if (this.loadingVote) {
+			return true;
+		}
+		if (
+			this.discordUser &&
+			mission.votes?.includes(this.discordUser.id) &&
+			this.userVotesCount >= 4
+		) {
+			return true;
+		}
+		return false;
+	}
+
+	getVotingTooltip(mission: IMission) {
+		if (this.discordUser) {
+			if (mission.votes?.includes(this.discordUser.id)) {
+				return 'Retract vote';
+			} else {
+				return 'Vote for this mission to be played on the next session';
+			}
+		}
+		return '';
+	}
+
+	getVotingBtnText(mission: IMission) {
+		if (this.discordUser) {
+			if (mission.votes?.includes(this.discordUser.id)) {
+				return 'Retract vote';
+			} else {
+				return 'Vote';
+			}
+		}
+		return 'Vote';
 	}
 }
