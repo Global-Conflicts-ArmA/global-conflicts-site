@@ -117,10 +117,27 @@ const updateMulter = multer({
 	fileFilter: updateFileFilterFunction,
 	storage: multer.diskStorage({
 		destination: function (req, file, cb) {
-			cb(null, `${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}`);
+			console.log("COPYING MISSION UPDATE | destination METHOD");
+			console.log(req.body.fileName)
+			try {
+				cb(null, `${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}`);
+			}catch (e){
+				console.log("ERROR: ")
+				console.log(e);
+
+			}
+
 		},
 		filename: function (req, file, cb) {
-			cb(null, req.body.fileName);
+			console.log("COPYING MISSION UPDATE | destination METHOD")
+			console.log(req.body.fileName)
+			try {
+				cb(null, req.body.fileName);
+			}catch (e){
+				console.log("ERROR: ")
+				console.log(e);
+			}
+
 		}
 	})
 });
