@@ -960,6 +960,10 @@ router.put('/:uniqueName/votes/', async (req, res) => {
 
 
 router.delete('/:uniqueName/votes/', async (req, res) => {
+	res.header('ETag', null);
+	res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+	res.header('Expires', '-1');
+	res.header('Pragma', 'no-cache');
 	req = await getDiscordUserFromCookies(
 		req,
 		'User not allowed to interact with missions'
@@ -991,6 +995,10 @@ router.delete('/:uniqueName/votes/', async (req, res) => {
 });
 
 router.get('/votes/vote_count',   async (req, res) => {
+	res.header('ETag', null);
+	res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+	res.header('Expires', '-1');
+	res.header('Pragma', 'no-cache');
 	req = await getDiscordUserFromCookies(
 		req,
 		'User not allowed to interact with missions'
@@ -1008,6 +1016,10 @@ router.get('/votes/vote_count',   async (req, res) => {
 
 
 router.get('/votes/voted_missions', async (req, res) => {
+	res.header('ETag', null);
+	res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+	res.header('Expires', '-1');
+	res.header('Pragma', 'no-cache');
 	req = await getDiscordUserFromCookies(
 		req,
 		'User not allowed to interact with missions'

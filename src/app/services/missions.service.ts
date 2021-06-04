@@ -186,7 +186,15 @@ export class MissionsService {
 
 
 	public getUserVotes(){
-		return this.httpClient.get('/api/missions/votes/vote_count');
+		return this.httpClient.get('/api/missions/votes/vote_count',{
+				headers: {
+					'Cache-Control':
+						'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+					Pragma: 'no-cache',
+					Expires: '0'
+				}
+			}
+		);
 	}
 
 
@@ -198,7 +206,14 @@ export class MissionsService {
 
 	public getVotedMissions(): Observable<IMission[]>  {
 		return this.httpClient.get<IMission[]>(
-			`/api/missions/votes/voted_missions`
+			`/api/missions/votes/voted_missions`,{
+				headers: {
+					'Cache-Control':
+						'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+					Pragma: 'no-cache',
+					Expires: '0'
+				}
+			}
 		);
 	}
 
