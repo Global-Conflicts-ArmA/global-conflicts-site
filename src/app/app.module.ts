@@ -68,6 +68,7 @@ import { AngularMarkdownEditorModule } from "angular-markdown-editor";
 import { DialogViewGmNotesComponent } from './components/mission-details/dialog-view-gm-notes/dialog-view-gm-notes.component';
 import { DialogAddGameplayHistoryComponent } from "@app/components/mission-details/dialog-add-gameplay-history/dialog-add-gameplay-history.component";
 import { DialogAddAarComponent } from "@app/components/mission-details/dialog-add-aar/dialog-add-aar.component";
+import { VotedMissionsComponent } from './components/voted-missions/voted-missions.component';
 
 
 const maskConfig: Partial<IConfig> = {
@@ -95,7 +96,8 @@ const maskConfig: Partial<IConfig> = {
 		DialogActionsComponent,
 		DialogAddGameplayHistoryComponent,
 		DialogAddAarComponent,
-		DialogViewGmNotesComponent
+		DialogViewGmNotesComponent,
+		VotedMissionsComponent
 	],
 	imports: [
 		CommonModule,

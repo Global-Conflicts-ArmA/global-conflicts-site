@@ -23,6 +23,22 @@
 	display: flex;
 	flex-direction: row;
 	padding: 0.5rem 0 !important;
+	justify-content: center;
+	position: relative;
+	height: 72px;
+	align-items: center;
+
+	.mission-vote-btn {
+		display: flex;
+		flex-flow: column;
+		align-items: center;
+		>span{
+			font-size: small;
+			font-weight: 400;
+			color: #92753d;
+		}
+	}
+
 	.mission-spacer {
 		flex: 0.25;
 	}
@@ -34,9 +50,14 @@
 		color: colors.$accent !important;
 		font-size: 32px;
 	}
-	.mission-button {
-		flex: 0.25;
+	.mission-buttons {
+		position: absolute;
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
+
 }
 
 ::ng-deep .mat-cell{
@@ -235,3 +256,4 @@ table {
 	flex: 1;
 	align-items: center;
 }
+

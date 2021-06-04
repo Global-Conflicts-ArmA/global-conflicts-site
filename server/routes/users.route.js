@@ -22,6 +22,9 @@ async function getRemoteUser(id) {
 		});
 }
 
+
+
+
 router.get('/discord_users', async (req, res) => {
 	req = await getDiscordUserFromCookies(
 		req,
@@ -78,7 +81,7 @@ router.get('/fetch/:id', async (req, res) => {
 	}
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id/', (req, res) => {
 	console.log('GET request for single user');
 	User.findOne({ discordId: req.params.id }).exec((err, user) => {
 		if (err) {
@@ -109,5 +112,7 @@ router.post('/', (req, res) => {
 		}
 	});
 });
+
+
 
 module.exports = router;

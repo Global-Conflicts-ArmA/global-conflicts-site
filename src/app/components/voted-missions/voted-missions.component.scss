@@ -1,0 +1,129 @@
+@use "../../../colors";
+
+
+.image {
+	max-width: 400px;
+	width: 100%;
+	height: auto;
+	background-color: #393939;
+	padding: 0.5rem;
+}
+
+.mission {
+	display: flex;
+	min-height: 270px;
+	align-items: flex-start;
+}
+
+.mission:not(:last-child) {
+	border-bottom: 2px solid #393939;
+}
+
+.mission-image {
+	width: 400px;
+	display: flex;
+	justify-content: center;
+
+	> img {
+		object-fit: contain;
+		max-width: 400px;
+		max-height: 250px;
+		background-color: #393939;
+		padding: 0.5rem;
+		margin: auto;
+		display: flex;
+	}
+
+}
+
+.author-votes-btn {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+
+.mission-vote-btn {
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+	padding-left: 10px;
+	margin-left: 10px;
+	border-left: 2px solid #393939;
+
+
+	> span {
+		font-size: small;
+		font-weight: 400;
+		color: #92753d;
+	}
+}
+
+.vote-area {
+	display: flex;
+	align-items: stretch;
+
+	> div {
+		display: flex;
+		flex-flow: column;
+		justify-content: space-between;
+	}
+
+	.votes {
+		font-size: small;
+		display: flex;
+		flex-flow: column;
+
+		> span {
+			color: colors.$accent;
+			margin-left: 5px;
+			font-weight: bold;
+			font-size: medium;
+		}
+
+	}
+}
+
+.author {
+	margin-bottom: 0;
+	display: flex;
+	align-items: center;
+}
+
+
+.mission-details {
+	margin-left: 20px;
+	flex: 1;
+
+
+	.description {
+		margin-bottom: 10px;
+	}
+
+	.detail-row {
+		display: flex;
+		justify-content: flex-start;
+		flex-flow: row;
+
+		> div:not(:first-child) {
+			padding: 0 10px;
+			border-left: 2px solid #393939;
+		}
+
+		> div:first-child {
+			padding-right: 10px;
+
+		}
+
+		&:last-child {
+			margin-bottom: 20px;
+		}
+	}
+
+	.details-label {
+		font-size: small;
+		color: colors.$accent;
+		font-family: Roboto, serif;
+		font-weight: 400;
+
+	}
+}

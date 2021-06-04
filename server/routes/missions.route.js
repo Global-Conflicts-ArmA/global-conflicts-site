@@ -925,5 +925,151 @@ router.post('/:uniqueName/history/aar', async (req, res) => {
 });
 
 
+router.put('/:uniqueName/votes/', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+
+	if (req.authError) {
+		return res.status(401).send({
+			authError: 'User not allowed to interact with missions'
+		});
+	}
+
+	await Mission.findOneAndUpdate(
+		{ uniqueName: req.params.uniqueName },
+		{
+			$addToSet: {
+				votes: req.discordUser.user.id
+			}
+		}
+	).exec();
+	const user = await User.findOneAndUpdate(
+		{ discordId: req.discordUser.user.id },
+		{
+			$addToSet: {
+				votes: req.params.uniqueName
+			}
+		},
+		{upsert:true}
+	).exec();
+	console.log(user);
+	return res.send({"ok":true});
+});
+
+
+router.delete('/:uniqueName/votes/', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+
+	if (req.authError) {
+		return res.status(401).send({
+			authError: 'User not allowed to interact with missions'
+		});
+	}
+
+	await Mission.findOneAndUpdate(
+		{ uniqueName: req.params.uniqueName },
+		{
+			$pull: {
+				votes: req.discordUser.user.id
+			}
+		}
+	).exec();
+	await User.findOneAndUpdate(
+		{ discordId: req.discordUser.user.id },
+		{
+			$pull: {
+				votes: req.params.uniqueName
+			}
+		}
+	).exec();
+	return res.send({"ok":true});
+});
+
+router.get('/votes/vote_count',   async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: 'User not allowed to interact with missions'
+		});
+	}
+
+	const userWithVotes = await User.findOne({ discordId: req.discordUser.user.id }, { votes: 1 }).exec();
+	console.log(userWithVotes);
+	return res.send(userWithVotes);
+});
+
+
+router.get('/votes/voted_missions', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+	if (req.authError) {
+		return res.status(401).send({
+			authError: 'User not allowed to interact with missions'
+		});
+	}
+
+	const votedMissions = await Mission
+		.find({ votes: { $exists: true, $type: 'array', $ne: [] } }).sort('votes')
+		.exec();
+
+	return res.send(votedMissions);
+});
+
+
+router.get('/votes/reset_votes', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+
+	if (
+		req.authError ||
+		!req.discordUser.roles.cache.some((r) =>
+			['Admin', 'Arma GM'].includes(r.name)
+		)
+	) {
+		res.status(401).send({
+			authError: 'User not allowed to reset votes'
+		});
+	}
+
+
+	await User.updateMany(
+		{
+			votes: { $exists: true, $type: 'array', $ne: [] }
+		},
+		{
+			$set: {
+				votes: []
+			}
+		}
+	).exec();
+
+
+	await Mission.updateMany(
+		{
+			votes: { $exists: true, $type: 'array', $ne: [] }
+		},
+		{
+			$set: {
+				votes: []
+			}
+		}
+	).exec();
+
+	return res.send({"ok":true});
+
+});
+
 
 module.exports = router;

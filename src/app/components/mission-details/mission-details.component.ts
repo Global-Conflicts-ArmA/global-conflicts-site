@@ -1,10 +1,22 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild } from "@angular/core";
+import {
+	ChangeDetectorRef,
+	Component,
+	HostListener,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MissionsService } from '@app/services/missions.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DatabaseUser } from '@app/models/databaseUser';
 import { UserService } from '@app/services/user.service';
-import { IHistory, IMission, IReport, IReview, IUpdate } from "@app/models/mission";
+import {
+	IHistory,
+	IMission,
+	IReport,
+	IReview,
+	IUpdate
+} from '@app/models/mission';
 import { DialogViewUpdateComponent } from './dialog-view-update.component';
 import { DialogViewBugReportComponent } from './dialog-view-bug-report.component';
 import { DialogSubmitBugReportComponent } from './dialog-submit-bug-report.component';
@@ -18,11 +30,11 @@ import {
 	MissionActions
 } from '@app/components/mission-details/dialog-actions/dialog-actions.component';
 import { MissionUploadComponent } from '@app/components/mission-upload/mission-upload.component';
-import {DialogAddGameplayHistoryComponent} from "@app/components/mission-details/dialog-add-gameplay-history/dialog-add-gameplay-history.component";
-import { ILeader } from "@app/models/leader";
-import { DialogAddAarComponent } from "@app/components/mission-details/dialog-add-aar/dialog-add-aar.component";
-import { MatAccordion } from "@angular/material/expansion";
-import { DialogViewGmNotesComponent } from "@app/components/mission-details/dialog-view-gm-notes/dialog-view-gm-notes.component";
+import { DialogAddGameplayHistoryComponent } from '@app/components/mission-details/dialog-add-gameplay-history/dialog-add-gameplay-history.component';
+import { ILeader } from '@app/models/leader';
+import { DialogAddAarComponent } from '@app/components/mission-details/dialog-add-aar/dialog-add-aar.component';
+import { MatAccordion } from '@angular/material/expansion';
+import { DialogViewGmNotesComponent } from '@app/components/mission-details/dialog-view-gm-notes/dialog-view-gm-notes.component';
 
 @Component({
 	selector: 'app-mission-details',
@@ -46,7 +58,9 @@ export class MissionDetailsComponent implements OnInit {
 	updateColumns = ['date', 'versionStr', 'authorName', 'status', 'buttons'];
 	uniqueName: string | null;
 	doneLoading = false;
+	loadingVote = false;
 
+	userVotesCount = 0;
 
 	public innerWidth;
 	@ViewChild(MatSort) sort: MatSort;
@@ -56,10 +70,17 @@ export class MissionDetailsComponent implements OnInit {
 		this.innerWidth = window.innerWidth;
 	}
 
+
 	ngOnInit(): void {
 		this.discordUser = this.userService.getUserLocally();
 		this.uniqueName = this.route.snapshot.paramMap.get('id');
 		this.refresh();
+		this.missionsService.getUserVotes().subscribe(value => {
+			if(value['votes']){
+				this.userVotesCount = value['votes'].length;
+			}
+
+		})
 	}
 
 	refresh() {
@@ -136,7 +157,6 @@ export class MissionDetailsComponent implements OnInit {
 		});
 	}
 
-	// TODO: make edit mission details dialog
 	public editMission(mission: IMission | null = this.mission) {
 		const dialogRef = this.dialog.open(MissionUploadComponent, {
 			data: mission,
@@ -256,10 +276,9 @@ export class MissionDetailsComponent implements OnInit {
 	canAddGameplayHistory() {
 		return this.discordUser?.role === 'Admin';
 	}
+
 	canEditHistory() {
-		return (
-			this.discordUser?.role === 'Admin'
-		);
+		return this.discordUser?.role === 'Admin';
 	}
 
 	addGAmeplayHistory() {
@@ -308,10 +327,9 @@ export class MissionDetailsComponent implements OnInit {
 					);
 			}
 		});
-
 	}
 
-	submitAAR(history: IHistory, leader: ILeader, oldAar: string|undefined) {
+	submitAAR(history: IHistory, leader: ILeader, oldAar: string | undefined) {
 		this.changeDetectorRef.detach();
 
 		const dialogRef = this.dialog.open(DialogAddAarComponent, {
@@ -330,7 +348,7 @@ export class MissionDetailsComponent implements OnInit {
 						.submitAar(this.mission, history._id, aar, leader)
 						.subscribe((value) => {
 							leader.aar = aar;
-							document.getElementById(leader._id??'')?.click();
+							document.getElementById(leader._id ?? '')?.click();
 						});
 				}
 			}
@@ -346,7 +364,7 @@ export class MissionDetailsComponent implements OnInit {
 	}
 
 	viewGmNote(gmNote: string) {
-		  this.dialog.open(DialogViewGmNotesComponent, {
+		this.dialog.open(DialogViewGmNotesComponent, {
 			data: gmNote,
 
 			autoFocus: false,
@@ -354,7 +372,49 @@ export class MissionDetailsComponent implements OnInit {
 		});
 	}
 
-
+	vote() {
+		if (this.mission && this.discordUser) {
+			this.loadingVote = true;
+			if (
+				!this.mission.votes ||
+				!this.mission.votes?.includes(this.discordUser.id) ||
+				this.userVotesCount >= 4
+			) {
+				this.missionsService
+					.submitVote(this.mission)
+					.subscribe((value) => {
+						if (this.mission && this.discordUser) {
+							if(!this.mission.votes){
+								this.mission.votes = []
+							}
+							this.mission.votes?.push(this.discordUser.id);
+							this.userVotesCount += 1;
+							this.loadingVote = false;
+						}
+					});
+			} else {
+				this.missionsService
+					.retractVote(this.mission)
+					.subscribe((value) => {
+						if (
+							this.mission &&
+							this.mission.votes &&
+							this.discordUser
+						) {
+							this.loadingVote = false;
+							const index = this.mission.votes.indexOf(
+								this.discordUser.id,
+								0
+							);
+							if (index > -1) {
+								this.mission.votes.splice(index, 1);
+								this.userVotesCount -= 1;
+							}
+						}
+					});
+			}
+		}
+	}
 
 
 }

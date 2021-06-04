@@ -226,7 +226,8 @@ const MissionSchema = new Schema(
 					}
 				},
 			}
-		]
+		],
+		votes: [String] // unique array of discordIDs. Is reseted every monday.
 	},
 	{
 		versionKey: false

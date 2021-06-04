@@ -9,12 +9,24 @@
 		<div [class.not-allowed-overlay]="!doneLoading" *ngIf="!!mission">
 			<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser?.role)">
 				<div class="mission-title-container">
-					<div class="mission-spacer"></div>
 					<div class="mission-title">{{ mission?.name }}</div>
-					<button *ngIf="canUpdateMission()" mat-flat-button class="mission-button" color="accent"
-									matTooltip="Edit mission" (click)="editMission()">
-						<mat-icon>build</mat-icon>
-					</button>
+					<div class="mission-buttons">
+
+						<div class="mission-vote-btn">
+							<span>You have {{4-userVotesCount}} votes left</span>
+
+							<button [disabled]="loadingVote || (!mission.votes?.includes(discordUser.id) && userVotesCount>=4) " style="width: 108px;" mat-flat-button class="mission-button" color="accent"
+											matTooltip=" {{ mission.votes?.includes(discordUser.id)   ? 'Retract vote' : 'Vote for this mission to be played on the next session'}} "
+											(click)="vote()">
+								{{ mission.votes?.includes(discordUser.id)  ? 'Retract vote' : 'Vote'}}
+							</button>
+						</div>
+
+						<button *ngIf="canUpdateMission()" mat-flat-button class="mission-button" color="accent"
+										matTooltip="Edit mission" (click)="editMission()">
+							<mat-icon>build</mat-icon>
+						</button>
+					</div>
 				</div>
 				<div class="row mb-4" style="align-items: center;">
 					<div class="col-lg-6 d-none d-lg-block d-xl-block">
