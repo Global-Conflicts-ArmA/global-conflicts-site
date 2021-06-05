@@ -77,23 +77,31 @@ const uploadMulter = multer({
 });
 
 updateFileFilterFunction = async function (req, file, callback) {
+	console.log("update file 1");
 	req = await getDiscordUserFromCookies(
 		req,
 		'User is not allowed to upload missions.'
 	);
+	console.log("update file 2");
 	if (req.authError) {
+		console.log("update file 3");
 		return callback(null, false);
 	}
+	console.log("update file 4");
 	req.missionDataErrors = validateData(req.body, false);
-
+	console.log("update file 5");
 	if (file.mimetype !== 'application/octet-stream') {
+		console.log("update file 6");
 		req.missionDataErrors.file = 'File is not a .pbo.';
 		callback(null, false);
 		return;
 	} else {
+		console.log("update file 7");
 		const originalNameArray = file.originalname.split('.');
 		const format = originalNameArray[originalNameArray.length - 1];
+		console.log("update file 8");
 		if (format !== 'pbo') {
+			console.log("update file 9");
 			req.missionDataErrors.file = 'File is not a pbo.';
 			callback(null, false);
 			return;
@@ -102,12 +110,15 @@ updateFileFilterFunction = async function (req, file, callback) {
 				`${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}/${file.originalname}`
 			)
 		) {
+			console.log("update file 10");
 			req.missionDataErrors.misc =
 				'A mission with this filename already exists.';
 			callback(null, false);
 			return;
 		}
+		console.log("update file 11");
 	}
+	console.log("update file 12");
 	req.file = file;
 	callback(null, true);
 };
