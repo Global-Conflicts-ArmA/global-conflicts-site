@@ -111,6 +111,7 @@ updateFileFilterFunction = async function (req, file, callback) {
 			)
 		) {
 			console.log("update file 10");
+			console.log(file.originalname);
 			req.missionDataErrors.misc =
 				'A mission with this filename already exists.';
 			callback(null, false);
