@@ -107,7 +107,7 @@ updateFileFilterFunction = async function (req, file, callback) {
 			return;
 		} else if (
 			fs.existsSync(
-				`${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}/${file.originalname}`
+				`${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}/${file.fileName}`
 			)
 		) {
 			console.log("update file 10");
