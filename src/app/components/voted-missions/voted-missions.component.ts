@@ -102,17 +102,24 @@ export class VotedMissionsComponent implements OnInit {
 	}
 
 	isVotingDisabled(mission: IMission) {
+		if (!this.discordUser) {
+			return true;
+		}
 		if (this.loadingVote) {
 			return true;
 		}
-		if (
-			this.discordUser &&
-			mission.votes?.includes(this.discordUser.id) &&
-			this.userVotesCount >= 4
-		) {
+		if (this.missionHasMyVote(mission) && this.userVotesCount >= 4) {
+			return false;
+		}
+		if (!this.missionHasMyVote(mission) && this.userVotesCount >= 4) {
 			return true;
 		}
-		return false;
+	}
+
+	private missionHasMyVote(mission: IMission) {
+		if(this.discordUser){
+			return mission.votes?.includes(this.discordUser.id);
+		}
 	}
 
 	getVotingTooltip(mission: IMission) {
