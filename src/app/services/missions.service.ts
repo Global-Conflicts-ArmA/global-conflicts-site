@@ -225,7 +225,7 @@ export class MissionsService {
 
 	public resetMyVotes() {
 		return this.httpClient.get(
-			`/api/missions/votes/reset_votes`
+			`/api/missions/votes/reset_my_votes`
 		);
 	}
 }
