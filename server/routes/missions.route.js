@@ -1067,7 +1067,7 @@ router.get('/votes/reset_votes', async (req, res) => {
 			['Admin', 'Arma GM'].includes(r.name)
 		)
 	) {
-		res.status(401).send({
+		return res.status(401).send({
 			authError: 'User not allowed to reset votes'
 		});
 	}
@@ -1108,7 +1108,7 @@ router.get('/votes/reset_my_votes', async (req, res) => {
 	);
 
 	if (req.authError) {
-		res.status(401).send({
+		return res.status(401).send({
 			authError: 'User not allowed to reset votes'
 		});
 	}
