@@ -169,7 +169,7 @@ async function postDiscordReport(report, missionData) {
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send(`New bug report added, <@${author.user.id}>`, reportEmbed);
+		.send(`New bug report added, <@${report.authorID}>`, reportEmbed);
 }
 
 async function postDiscordReview(review, missionData) {
@@ -187,7 +187,7 @@ async function postDiscordReview(review, missionData) {
 		.addFields({ name: 'Review:', value: review.review, inline: false })
 		.setTimestamp(review.date)
 		.setURL(
-			`https://globalconflicts.net//mission-details/${missionData.uniqueName}`
+			`https://globalconflicts.net/mission-details/${missionData.uniqueName}`
 		);
 	if (missionData.image) {
 		const resizedBuffer = await getImage(missionData.image);
@@ -200,7 +200,7 @@ async function postDiscordReview(review, missionData) {
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send(`New review added, <@&${author.user.id}>`, reviewEmbed);
+		.send(`New review added, <@${review.authorID}>`, reviewEmbed);
 }
 
 async function postDiscordUpdate(update, missionData) {
