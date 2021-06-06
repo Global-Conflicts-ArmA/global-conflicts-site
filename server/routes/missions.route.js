@@ -1027,7 +1027,9 @@ router.get('/votes/vote_count',   async (req, res) => {
 	}
 
 	const userWithVotes = await User.findOne({ discordId: req.discordUser.user.id }, { votes: 1 }).exec();
-	console.log(userWithVotes);
+	if (userWithVotes==null){
+		return res.send({"votes":[]});
+	}
 	return res.send(userWithVotes);
 });
 
@@ -1108,7 +1110,7 @@ router.get('/votes/reset_my_votes', async (req, res) => {
 	);
 
 	if (req.authError) {
-		return res.status(401).send({
+		return 																																																																																																															res.status(401).send({
 			authError: 'User not allowed to reset votes'
 		});
 	}
