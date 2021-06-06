@@ -77,31 +77,23 @@ const uploadMulter = multer({
 });
 
 updateFileFilterFunction = async function (req, file, callback) {
-	console.log("update file 1");
 	req = await getDiscordUserFromCookies(
 		req,
 		'User is not allowed to upload missions.'
 	);
-	console.log("update file 2");
 	if (req.authError) {
-		console.log("update file 3");
 		return callback(null, false);
 	}
-	console.log("update file 4");
+
 	req.missionDataErrors = validateData(req.body, false);
-	console.log("update file 5");
 	if (file.mimetype !== 'application/octet-stream') {
-		console.log("update file 6");
 		req.missionDataErrors.file = 'File is not a .pbo.';
 		callback(null, false);
 		return;
 	} else {
-		console.log("update file 7");
 		const originalNameArray = file.originalname.split('.');
 		const format = originalNameArray[originalNameArray.length - 1];
-		console.log("update file 8");
 		if (format !== 'pbo') {
-			console.log("update file 9");
 			req.missionDataErrors.file = 'File is not a pbo.';
 			callback(null, false);
 			return;
@@ -110,16 +102,12 @@ updateFileFilterFunction = async function (req, file, callback) {
 				`${process.env.ROOT_FOLDER}/${process.env.ARCHIVE}/${file.fileName}`
 			)
 		) {
-			console.log("update file 10");
-			console.log(file.originalname);
 			req.missionDataErrors.misc =
 				'A mission with this filename already exists.';
 			callback(null, false);
 			return;
 		}
-		console.log("update file 11");
 	}
-	console.log("update file 12");
 	req.file = file;
 	callback(null, true);
 };
@@ -1112,5 +1100,44 @@ router.get('/votes/reset_votes', async (req, res) => {
 
 });
 
+
+router.get('/votes/reset_my_votes', async (req, res) => {
+	req = await getDiscordUserFromCookies(
+		req,
+		'User not allowed to interact with missions'
+	);
+
+	if (req.authError) {
+		res.status(401).send({
+			authError: 'User not allowed to reset votes'
+		});
+	}
+
+
+	await User.updateMany(
+		{
+			discordId: req.discordUser.user.id,
+			votes: { $exists: true, $type: 'array', $ne: [] }
+		},
+		{
+			$set: {
+				votes: []
+			}
+		}
+	).exec();
+
+
+	await Mission.updateMany(
+		{ votes: req.discordUser.user.id },
+		{
+			$pull: {
+				votes: req.discordUser.user.id
+			}
+		}
+	).exec();
+
+	return res.send({"ok":true});
+
+});
 
 module.exports = router;

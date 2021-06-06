@@ -12,7 +12,10 @@
 				<div>
 					<small>Note: This list will be reseted every monday. </small>
 					<button mat-raised-button class="smaller-button" *ngIf="canResetVotes()" color="warn" (click)="resetVotes()">
-						Reset
+						Reset all votes
+					</button>
+					<button mat-raised-button class="smaller-button"  style="margin-left: 20px"  color="warn" (click)="resetMyVotes()">
+						Reset my votes
 					</button>
 				</div>
 				<h3 *ngIf="votedMissions.length == 0" style="text-align: center">
@@ -26,7 +29,7 @@
 
 					<div class="mission-details">
 						<h2 class="title">
-							{{i + 1}}) {{mission.name}}
+							{{i + 1}}) <a href="/mission-details/{{mission.uniqueName}}">{{mission.name}}</a>
 						</h2>
 						<div class="author-votes-btn">
 							<h3 class="author">
@@ -51,7 +54,6 @@
 									</button>
 								</div>
 							</div>
-
 						</div>
 
 						<div class="description">
