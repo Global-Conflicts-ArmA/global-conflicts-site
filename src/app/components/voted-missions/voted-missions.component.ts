@@ -13,7 +13,7 @@ export class VotedMissionsComponent implements OnInit {
 	doneLoading: boolean;
 	discordUser: DatabaseUser | null;
 	votedMissions: IMission[] = [];
-	userVotesCount = 0;
+	userVotesCount = 4;
 	loadingVote: boolean;
 
 	constructor(
@@ -91,14 +91,30 @@ export class VotedMissionsComponent implements OnInit {
 	}
 
 	resetVotes() {
-		this.missionsService.resetVotes().subscribe(
-			(value) => {
-				this.getVotedMissions();
-			},
-			(error) => {
-				console.log(error);
-			}
-		);
+		if(confirm('Are you sure you want to reset ALL votes?')){
+			this.missionsService.resetVotes().subscribe(
+				(value) => {
+					this.getVotedMissions();
+				},
+				(error) => {
+					console.log(error);
+				}
+			);
+		}
+
+	}
+
+	resetMyVotes() {
+		if (confirm('Are you sure you want to reset your votes?')) {
+			this.missionsService.resetMyVotes().subscribe(
+				(value) => {
+					this.getVotedMissions();
+				},
+				(error) => {
+					console.log(error);
+				}
+			);
+		}
 	}
 
 	isVotingDisabled(mission: IMission) {
