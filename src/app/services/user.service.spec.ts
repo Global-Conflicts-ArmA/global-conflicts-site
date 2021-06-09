@@ -1,21 +1,19 @@
 import { waitForAsync, TestBed } from '@angular/core/testing';
 import { CookieService } from 'ngx-cookie-service';
 import { HttpClient } from '@angular/common/http';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { DiscordUser } from '../models/discorduser';
 import { UserService } from './user.service';
 import { RemoteDiscordUser } from '@app/models/remoteDiscordUser';
 import { of } from 'rxjs';
+import { DiscordUser } from '../models/discorduser'
 
 /**
  * user service unit tests
  * @author StatusRed
  * @since 2021
  */
-fdescribe('UserService', () => {
+describe('UserService', () => {
   let service: UserService;
 	let httpClient: jasmine.SpyObj<HttpClient>;
-	// let httpTestingController: HttpTestingController;
 	let cookieService: jasmine.SpyObj<CookieService>;
 
   beforeEach(() => {
@@ -34,14 +32,7 @@ fdescribe('UserService', () => {
     service = TestBed.inject(UserService);
 		cookieService = TestBed.inject(CookieService) as jasmine.SpyObj<CookieService>;
 		httpClient = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
-		// httpClient = TestBed.inject(HttpClient);
-		// httpTestingController = TestBed.inject(HttpTestingController);
   });
-
-	afterEach(() => {
-	  // After every test, assert that there are no more pending requests.
-	  // httpTestingController.verify();
-	});
 
   it('should be created', () => {
     expect(service).toBeTruthy();
@@ -49,19 +40,10 @@ fdescribe('UserService', () => {
 
 	describe('logout', () => {
 		it('should call the logout endpoint', () => {
-			// const url = 'api/auth/logout';
-			// httpClient.get(url).subscribe(() => {
-			// 	expect(cookieService.deleteAll).toHaveBeenCalled();
-			// });
 			httpClient.get.and.returnValue(of());
 			cookieService.deleteAll.and.stub();
 
 			service.logout();
-
-			// const reqs = httpTestingController.match(url);
-			// expect(reqs.length).toEqual(2);
-			// reqs[0].flush(mockData);
-			// reqs[1].flush(mockData);
 		});
 	});
 
@@ -124,23 +106,75 @@ fdescribe('UserService', () => {
 		});
 	});
 
-  describe('getUserSettings', () => {
-		it('given an error should return settings', waitForAsync(() => {
-      const expectedSettings = {
-  			missionEditDM: true,
-  			missionReportDM: true,
-  			missionReviewDM: true,
-  			missionRemoveDM: true,
-  			missionAcceptDM: true
-			};
+  describe('DiscordUser', () => {
+		it('should return if a member of our discord', () => {
+				const user: DiscordUser = new DiscordUser('1', 'x', 'StatusRed', 'role', 'yellow', 'x');
+        const expectedResult = true;
 
-      httpClient.get.and.returnValue(of({err: 'Error'}))
-			// httpClient.get.and.throwError('An error occured.');
+        const actualResult = user.isAMemberOfOurDiscord();
 
-			const settings = service.getUserSettings('StatusRed');
+        expect(actualResult).toEqual(expectedResult);
+		});
 
-      expect(settings).toEqual(expectedSettings);
-			expect(httpClient.get.calls.count()).toBe(1, 'one call');
-		}));
+		it('should return true when isProcessed called given role length greater than 0', () => {
+      const role = 'Mission Maker';
+      const user: DiscordUser = new DiscordUser('1', 'x', 'StatusRed', role, 'yellow', 'x');
+      const expectedResult = true;
+
+      const actualResult = user.isProcessed();
+
+      expect(actualResult).toEqual(expectedResult);
+		});
+
+    it('should return false when isProcessed called given role length equal to 0', () => {
+      const role = '';
+      const user: DiscordUser = new DiscordUser('1', 'x', 'StatusRed', role, 'yellow', 'x');
+      const expectedResult = false;
+
+      const actualResult = user.isProcessed();
+
+      expect(actualResult).toEqual(expectedResult);
+		});
+
+    it('should return false when isTrustedMissionMaker called given role is not trusted', () => {
+      const role = 'Noob';
+      const user: DiscordUser = new DiscordUser('1', 'x', 'StatusRed', role, 'yellow', 'x');
+      const expectedResult = false;
+
+      const actualResult = user.isTrustedMissionMaker();
+
+      expect(actualResult).toEqual(expectedResult);
+		});
+
+    it('should return true when isTrustedMissionMaker called given role is trusted', () => {
+      const role = 'Mission Maker';
+      const user: DiscordUser = new DiscordUser('1', 'x', 'StatusRed', role, 'yellow', 'x');
+      const expectedResult = true;
+
+      const actualResult = user.isTrustedMissionMaker();
+
+      expect(actualResult).toEqual(expectedResult);
+		});
 	});
+
+// Code written in an almost untestable way
+  // describe('getUserSettings', () => {
+	// 	it('given an error should return settings', waitForAsync(() => {
+  //     const expectedSettings = {
+  // 			missionEditDM: true,
+  // 			missionReportDM: true,
+  // 			missionReviewDM: true,
+  // 			missionRemoveDM: true,
+  // 			missionAcceptDM: true
+	// 		};
+  //
+  //     httpClient.get.and.returnValue(of({err: 'Error'}))
+	// 		// httpClient.get.and.throwError('An error occured.');
+  //
+	// 		const settings = service.getUserSettings('StatusRed');
+  //
+  //     expect(settings).toEqual(expectedSettings);
+	// 		expect(httpClient.get.calls.count()).toBe(1, 'one call');
+	// 	}));
+	// });
 });
