@@ -113,7 +113,7 @@ export class MissionDetailsComponent implements OnInit {
 						review.version
 					);
 				});
-				this.mission = mission;
+
 				this.dataSourceUpdates = new MatTableDataSource<IUpdate>(
 					mission.updates
 				);
@@ -128,6 +128,8 @@ export class MissionDetailsComponent implements OnInit {
 					});
 				});
 
+				mission.history = mission.history?.reverse();
+				this.mission = mission;
 				this.doneLoading = true;
 			},
 			(error) => {
