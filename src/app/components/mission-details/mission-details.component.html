@@ -181,11 +181,11 @@
 									<div [ngSwitch]="element.reviewState">
 										<div *ngSwitchDefault>
 											<mat-icon [matTooltip]="'Not submitted for review'" class="white-icon"
-																[fontSet]="'outlined'">pending
+																 >pending
 											</mat-icon>
 										</div>
 										<div *ngSwitchCase="'review_pending'">
-											<mat-icon [matTooltip]="'Pending review'">pending_actions</mat-icon>
+											<mat-icon [matTooltip]="'Pending review'" >pending_actions</mat-icon>
 										</div>
 										<div *ngSwitchCase="'review_reproved'">
 											<mat-icon [matTooltip]="'Rejected'" class="red-icon">error</mat-icon>
