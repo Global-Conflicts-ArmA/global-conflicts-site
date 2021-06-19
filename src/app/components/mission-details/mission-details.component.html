@@ -180,12 +180,12 @@
 									<div class="mission-status-icon-title">State</div>
 									<div [ngSwitch]="element.reviewState">
 										<div *ngSwitchDefault>
-											<mat-icon [matTooltip]="'Not submitted for review'" class="material-icons-outlined"
+											<mat-icon [matTooltip]="'Not submitted for review'" class="white-icon"
 																[fontSet]="'outlined'">pending
 											</mat-icon>
 										</div>
 										<div *ngSwitchCase="'review_pending'">
-											<mat-icon [matTooltip]="'Pending review'" class="white-icon">pending_actions</mat-icon>
+											<mat-icon [matTooltip]="'Pending review'">pending_actions</mat-icon>
 										</div>
 										<div *ngSwitchCase="'review_reproved'">
 											<mat-icon [matTooltip]="'Rejected'" class="red-icon">error</mat-icon>
