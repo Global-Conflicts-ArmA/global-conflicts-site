@@ -237,6 +237,7 @@ export class MissionDetailsComponent implements OnInit {
 	hasActions() {
 		return (
 			this.userService.loggedUser?.isAdmin() ||
+			this.userService.loggedUser?.isMissionReviewer() ||
 			this.mission?.authorID === this.userService.loggedUser?.userID
 		);
 	}
