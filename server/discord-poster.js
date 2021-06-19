@@ -537,14 +537,14 @@ async function postMissionAuditSubmited(
 	}
 	if (status === 'reproved') {
 		discordJsClient.channels.cache
-			.get(process.env.DISCORD_BOT_MISSION_REVIEWER_CHANNEL)
+			.get(process.env.DISCORD_BOT_CHANNEL)
 			.send(
 				`<@${author.user.id}>, your mission has been rejected. 🛑`,
 				newMissionEmbed
 			);
 	} else {
 		discordJsClient.channels.cache
-			.get(process.env.DISCORD_BOT_MISSION_REVIEWER_CHANNEL)
+			.get(process.env.DISCORD_BOT_CHANNEL)
 			.send(
 				`<@&${process.env.DISCORD_ADMIN_ROLE_ID}>, a mission was accepted to be uploaded:\n<@${author.user.id}>, your mission has been accepted. ✅`,
 				newMissionEmbed
