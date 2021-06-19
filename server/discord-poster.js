@@ -539,7 +539,7 @@ async function postMissionAuditSubmited(
 		discordJsClient.channels.cache
 			.get(process.env.DISCORD_BOT_MISSION_REVIEWER_CHANNEL)
 			.send(
-				`<@${author.user.id}>, your mission has been reproved. 🛑`,
+				`<@${author.user.id}>, your mission has been rejected. 🛑`,
 				newMissionEmbed
 			);
 	} else {
