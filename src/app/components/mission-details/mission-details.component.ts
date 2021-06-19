@@ -257,7 +257,8 @@ export class MissionDetailsComponent implements OnInit {
 			}
 
 			if (result === MissionActions.ASK_FOR_REVIEW) {
-				this._snackBar.open('Mission uploaded', '', {
+				this.refresh();
+				this._snackBar.open('Asked for review!', '', {
 					duration: 6000
 				});
 			}
