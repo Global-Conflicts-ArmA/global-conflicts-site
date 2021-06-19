@@ -93,7 +93,7 @@ export class VotedMissionsComponent implements OnInit {
 	}
 
 	canResetVotes() {
-		return this.userService.loggedUser?.isAdmin;
+		return this.userService.loggedUser?.isAdmin();
 	}
 
 	resetVotes() {
