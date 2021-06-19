@@ -1,15 +1,15 @@
-import {AfterViewInit, Component, Inject, OnInit} from '@angular/core';
+import { AfterViewInit, Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
 	MatDialog,
 	MatDialogRef,
 	MAT_DIALOG_DATA
 } from '@angular/material/dialog';
-import { DatabaseUser } from '@app/models/databaseUser';
+import { User } from '@app/models/user';
 import { IMission, IReport, IReview } from '@app/models/mission';
 import { MissionsService } from '@app/services/missions.service';
 import { UserService } from '@app/services/user.service';
-import {MissionActions} from "@app/components/mission-details/dialog-actions/dialog-actions.component";
+import { MissionActions } from '@app/components/mission-details/dialog-actions/dialog-actions.component';
 
 @Component({
 	selector: 'dialog-submit-review',
@@ -17,29 +17,28 @@ import {MissionActions} from "@app/components/mission-details/dialog-actions/dia
 })
 export class DialogSubmitReviewComponent implements OnInit {
 	enableErrorLog = false;
+
 	constructor(
 		public dialogRef: MatDialogRef<DialogSubmitReviewComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: {mission:IMission, review:IReview},
+		@Inject(MAT_DIALOG_DATA)
+		public data: { mission: IMission; review: IReview },
 		private formBuilder: FormBuilder,
 		public missionsService: MissionsService,
-		private userService: UserService
+		public userService: UserService
 	) {}
 
 	reviewGroup: FormGroup;
-	discordUser: DatabaseUser | null;
 
 	ngOnInit(): void {
-		this.discordUser = this.userService.getUserLocally();
 		this.reviewGroup = this.formBuilder.group({
-			version: [this.data.review?.version??'', [Validators.required]],
-			review: [this.data.review?.review??'', [Validators.required]]
+			version: [this.data.review?.version ?? '', [Validators.required]],
+			review: [this.data.review?.review ?? '', [Validators.required]]
 		});
 	}
 
 	compareVersions(o1: any, o2: any) {
 		return o1.major === o2.major && o1.minor === o2.minor;
 	}
-
 
 	buildFormData(
 		formData: { append: (arg0: any, arg1: any) => void },
@@ -67,13 +66,16 @@ export class DialogSubmitReviewComponent implements OnInit {
 	}
 
 	submit() {
+		if (!this.userService.loggedUser) {
+			return;
+		}
 		const review: IReview = {
 			version: this.reviewGroup.get('version')?.value,
-			authorID: this.discordUser?.id ?? '',
+			authorID: this.userService.loggedUser.userID,
 			date: new Date(),
 			review: this.reviewGroup.get('review')?.value ?? ''
 		};
-		if(this.data.review){
+		if (this.data.review) {
 			review._id = this.data.review._id;
 		}
 		console.log('review: ', review);
@@ -83,19 +85,21 @@ export class DialogSubmitReviewComponent implements OnInit {
 		};
 		const formData: any = new FormData();
 		this.buildFormData(formData, request);
-		this.missionsService.submitReview(formData, !!this.data.review ).subscribe(
-			() => {
-				this.dialogRef.close();
-			},
-			(httpError) => {
-				this.dialogRef.close();
-			}
-		);
+		this.missionsService
+			.submitReview(formData, !!this.data.review)
+			.subscribe(
+				() => {
+					this.dialogRef.close();
+				},
+				(httpError) => {
+					this.dialogRef.close();
+				}
+			);
 	}
 
 	removeEntry() {
-		if(confirm("ARE YOU SURE YOU WANT TO REMOVE THIS REVIEW?")) {
-			this.dialogRef.close({action:"delete_review"});
+		if (confirm('ARE YOU SURE YOU WANT TO REMOVE THIS REVIEW?')) {
+			this.dialogRef.close({ action: 'delete_review' });
 		}
 	}
 }

@@ -1,5 +1,10 @@
 const sharp = require('sharp');
 
+REVIEW_STATE_PENDING = 'review_pending';
+REVIEW_STATE_REPROVED = 'review_reproved';
+REVIEW_STATE_ACCEPTED = 'review_accepted';
+REVIEW_STATE_ACCEPTS_WITH_CAVEATS = 'review_accepted_with_caveats';
+
 const { discordJsClient, Discord } = require('./config/discord-bot');
 
 async function getRemoteUser(id) {
@@ -133,7 +138,35 @@ async function postDiscordMissionReady(request, mission, updateid) {
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
 		.send(
-			`<@&${process.env.DISCORD_MISSION_SANITIZERS_ROLE_ID}>, a mission marked as ready.`,
+			`<@&${process.env.DISCORD_MISSION_REVIEW_TEAM_ROLE_ID}>, a mission marked as ready.`,
+			newMissionEmbed
+		);
+}
+
+async function postDiscordAskForReview(request, mission, updateid) {
+	const author = await getRemoteUser(mission.authorID);
+	const update = mission.updates.filter(
+		(updt) => updt._id.toString() === updateid
+	)[0];
+
+	const newMissionEmbed = new Discord.MessageEmbed()
+		.setColor('#22cf26')
+		.setTitle(`${mission.name}`)
+		.setAuthor(
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
+		)
+		.addFields()
+		.setDescription(`Version: ${buildVersionStr(update.version)}.`)
+		.setTimestamp()
+		.setURL(
+			`https://globalconflicts.net/mission-details/${mission.uniqueName}`
+		);
+
+	discordJsClient.channels.cache
+		.get(process.env.DISCORD_BOT_MISSION_REVIEWER_CHANNEL)
+		.send(
+			`<@&${process.env.DISCORD_MISSION_REVIEW_TEAM_ROLE_ID}>, a mission review has been requested.`,
 			newMissionEmbed
 		);
 }
@@ -169,7 +202,7 @@ async function postDiscordReport(report, missionData) {
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send(`New bug report added, <@${report.authorID}>`, reportEmbed);
+		.send(`New bug report added, <@${missionData.authorID}>`, reportEmbed);
 }
 
 async function postDiscordReview(review, missionData) {
@@ -200,7 +233,7 @@ async function postDiscordReview(review, missionData) {
 	}
 	discordJsClient.channels.cache
 		.get(process.env.DISCORD_BOT_CHANNEL)
-		.send(`New review added, <@${review.authorID}>`, reviewEmbed);
+		.send(`New review added, <@${missionData.authorID}>`, reviewEmbed);
 }
 
 async function postDiscordUpdate(update, missionData) {
@@ -398,6 +431,9 @@ async function postNewMissionHistory(request, mission, history, isNew) {
 	if (history.gmNote) {
 		gameplayHistoryEmbed.addField('GM Notes:', history.gmNote);
 	}
+	if (history.aarReplayLink) {
+		gameplayHistoryEmbed.addField('AAR Replay:', history.aarReplayLink);
+	}
 	gameplayHistoryEmbed.addField(leaderText, leadersFieldText);
 
 	discordJsClient.channels.cache
@@ -407,7 +443,6 @@ async function postNewMissionHistory(request, mission, history, isNew) {
 
 async function postNewAAR(request, mission, outcome, leader, aarText) {
 	const author = await getRemoteUser(mission.authorID);
-
 
 	let sendText = `New AAR submited!\n <@${mission.authorID}>, this is your mission, take a look at the AAR.`;
 
@@ -422,11 +457,9 @@ async function postNewAAR(request, mission, outcome, leader, aarText) {
 		aarText = aarText.substring(0, 300) + '...';
 	}
 
-
 	aarText = [
 		`<@${leader.discordID}>, **${sidePositionString} AAR**:\n` + aarText
-		].join("")
-
+	].join('');
 
 	const aarEmbed = new Discord.MessageEmbed()
 		.setTitle(`${mission.name}`)
@@ -445,6 +478,80 @@ async function postNewAAR(request, mission, outcome, leader, aarText) {
 		.send(sendText, aarEmbed);
 }
 
+async function postMissionAuditSubmited(
+	request,
+	mission,
+	updateid,
+	status,
+	checklist,
+	notes
+) {
+	const author = await getRemoteUser(mission.authorID);
+	const update = mission.updates.filter(
+		(updt) => updt._id.toString() === updateid
+	)[0];
+
+	if (status === REVIEW_STATE_REPROVED) {
+		status = 'reproved';
+	} else {
+		status = 'approved';
+	}
+
+	const newMissionEmbed = new Discord.MessageEmbed()
+		.setColor(`${status === 'reproved' ? '#ff0000' : '#56ff3b'}`)
+		.setTitle(`${mission.name}`)
+		.setAuthor(
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
+		)
+		.addFields()
+		.setDescription(
+			`Version: ${buildVersionStr(update.version)}
+			${
+				notes != null
+					? `**Notes**:
+			----------------------------------------------------------------------
+			${notes}
+			----------------------------------------------------------------------
+			`
+					: ''
+			}
+		`
+		)
+		.setTimestamp()
+		.setURL(
+			`https://globalconflicts.net/mission-details/${mission.uniqueName}`
+		);
+	if (status === 'reproved') {
+		newMissionEmbed.setDescription(
+			newMissionEmbed.description + '**These are the issues:**'
+		);
+		for (let checklistElement of checklist) {
+			if (checklistElement.value === 'NO') {
+				newMissionEmbed.addField(
+					checklistElement.text,
+					checklistElement.value
+				);
+			}
+		}
+	}
+	if (status === 'reproved') {
+		discordJsClient.channels.cache
+			.get(process.env.DISCORD_BOT_MISSION_REVIEWER_CHANNEL)
+			.send(
+				`<@${author.user.id}>, your mission has been reproved. 🛑`,
+				newMissionEmbed
+			);
+	} else {
+		discordJsClient.channels.cache
+			.get(process.env.DISCORD_BOT_MISSION_REVIEWER_CHANNEL)
+			.send(
+				`<@&${process.env.DISCORD_ADMIN_ROLE_ID}>, a mission was accepted to be uploaded:\n<@${author.user.id}>, your mission has been accepted. ✅`,
+				newMissionEmbed
+			);
+	}
+}
+
 module.exports = {
 	postDiscordNewMission,
 	postDiscordReport,
@@ -452,7 +559,9 @@ module.exports = {
 	postDiscordUpdate,
 	postDiscordEdit,
 	postDiscordMissionReady,
+	postDiscordAskForReview,
 	postMissionCopiedRemovedToServer,
 	postNewMissionHistory,
-	postNewAAR
+	postNewAAR,
+	postMissionAuditSubmited
 };

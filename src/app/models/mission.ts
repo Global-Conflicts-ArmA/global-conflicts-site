@@ -1,6 +1,7 @@
-import { ILeader } from "@app/models/leader";
+import { ILeader } from '@app/models/leader';
 
 export interface IUpdate {
+	reviewState?: string;
 	version: {
 		major: number;
 		minor?: string;
@@ -71,6 +72,7 @@ export interface IEdit {
 }
 
 export interface IMission {
+	reviewerNote?: string;
 	uniqueName: string;
 	name: string;
 	authorName?: string;
@@ -99,16 +101,25 @@ export interface IMission {
 		minor?: string;
 	};
 	lastVersionStr?: string;
+
 	reports?: IReport[];
 	reviews?: IReview[];
 	history?: IHistory[];
+	reviewChecklist?: IReviewChecklistItem[];
 }
 
 export interface IHistory {
-	_id?: string,
+	_id?: string;
 	date?: Date;
 	gmNote?: string;
 	outcome?: string;
+	aarReplayLink?: string;
 	leaders?: ILeader[];
 }
 
+export interface IReviewChecklistItem {
+	type: string;
+	text: string;
+	mandatory: boolean;
+	value?: any;
+}

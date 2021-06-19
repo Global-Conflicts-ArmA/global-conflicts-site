@@ -2,9 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
-import { DatabaseUser } from '../models/databaseUser';
+import { User } from '../models/user';
 import { RemoteDiscordUser } from '../models/remoteDiscordUser';
-import {DiscordUser} from "@app/models/discordUser";
+
+import { util } from 'prismjs';
+import { DialogJoinDiscordComponent } from "@app/components/home/dialog-join-discord/dialog-join-discord.component";
+import { MatDialog } from "@angular/material/dialog";
 
 @Injectable({
 	providedIn: 'root'
@@ -12,11 +15,12 @@ import {DiscordUser} from "@app/models/discordUser";
 export class UserService {
 	userCache: RemoteDiscordUser[] = [];
 
-
+	private _loggedUser: User | null;
 
 	constructor(
 		private httpClient: HttpClient,
-		private cookieService: CookieService
+		private cookieService: CookieService,
+		public dialog: MatDialog,
 	) {}
 
 	public logout() {
@@ -26,37 +30,14 @@ export class UserService {
 		});
 	}
 
-	public getUserLocally(): DatabaseUser | null {
-		const id = this.cookieService.get('id');
-		const token = this.cookieService.get('token');
-		const username = this.cookieService.get('username');
-		const role = this.cookieService.get('role');
-		const roleColor = this.cookieService.get('roleColor');
-		const avatarLink =
-			'https://cdn.discordapp.com/avatars/' +
-			this.cookieService.get('id') +
-			'/' +
-			this.cookieService.get('avatar') +
-			'.png';
-		if (token) {
-			return new DatabaseUser(
-				id,
-				token,
-				username,
-				role,
-				roleColor,
-				avatarLink
-			);
-		} else {
-			return null;
-		}
+	public list(): Observable<User[]> {
+		return this.httpClient.get<User[]>('/api/users');
 	}
 
-	public list(): Observable<DatabaseUser[]> {
-		return this.httpClient.get<DatabaseUser[]>('/api/users');
-	}
-	public listDiscordUsers(): Observable<DiscordUser[]> {
-		return this.httpClient.get<DiscordUser[]>('/api/users/discord_users');
+	public listDiscordUsers(): Observable<RemoteDiscordUser[]> {
+		return this.httpClient.get<RemoteDiscordUser[]>(
+			'/api/users/discord_users'
+		);
 	}
 
 	public async getDiscordUsername(id: string): Promise<string> {
@@ -64,7 +45,6 @@ export class UserService {
 			return result.userID === id;
 		});
 		if (user) {
-
 			return user.nickname ?? user.displayName ?? 'error';
 		} else {
 			return this.httpClient
@@ -99,9 +79,9 @@ export class UserService {
 
 	// public async getUserSettings(id: string): Promise<IUserSettings> {
 	// 	return this.httpClient
-	// 		.get<DatabaseUser>('/api/users/' + id)
+	// 		.get<User>('/api/users/' + id)
 	// 		.toPromise()
-	// 		.then((user: DatabaseUser) => {
+	// 		.then((user: User) => {
 	// 			const settings = {
 	// 				missionEditDM: true,
 	// 				missionReportDM: true,
@@ -157,6 +137,63 @@ export class UserService {
 		return this.userCache;
 	}
 
+	async saveUser() {
+		this.httpClient.get<User>('/api/auth/login').subscribe(
+			(user) => {
+				this._loggedUser = new User(
+					user.deleted,
+					user.nickname,
+					user.userID,
+					user.roleslist,
+					user.displayName,
+					user.avatar,
+				);
+				localStorage.setItem('user', JSON.stringify(user));
+			},
+			(error) => {
+
+				console.log(error);
+			}
+		);
+	}
+
+	getUserFromLocalStorage() {
+		const userString = localStorage.getItem('user');
+		if (typeof userString === 'string') {
+			return JSON.parse(userString);
+		} else {
+			return null;
+		}
+	}
+
+	saveToken(token: string) {
+		localStorage.setItem('token', token);
+	}
+
+	getToken() {
+		return localStorage.getItem('token');
+	}
+
+	get loggedUser(): User | null {
+		if (this._loggedUser) {
+			return this._loggedUser;
+		} else {
+			const user = this.getUserFromLocalStorage();
+			if (user) {
+				this._loggedUser = new User(
+					user.deleted,
+					user.nickname,
+					user.userID,
+					user.roleslist,
+					user.displayName,
+					user.avatar,
+				);
+				return this._loggedUser;
+			} else {
+				return null;
+			}
+		}
+	}
 }
 
 export interface IUserSettings {

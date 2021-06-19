@@ -1,7 +1,7 @@
-<div class="container">
-	<div style="position: relative">
-		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser.role)">You must join our Discord server and complete the welcoming process to upload missions!</div>
-		<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser.role)">
+<div [class.container]="!isEdit">
+	<div mat-dialog-content style="position: relative">
+		<div class="not-allowed-text" *ngIf="!(userService.loggedUser)">You must join our Discord server to upload missions!</div>
+		<div class="column" [class.not-allowed-overlay]="!(userService.loggedUser)">
 			<mat-vertical-stepper class="field-container" [linear]="true" #stepper>
 				<mat-step *ngIf="isEdit==false" [stepControl]="fileUploadGroup">
 					<form [formGroup]="fileUploadGroup">
@@ -114,7 +114,7 @@
 
 							<mat-form-field>
 								<mat-label class="inset-label">Blufor Ratio</mat-label>
-								<input matInput type="text" formControlName="ratioBlufor" placeholder="Opfor Ratio"  mask="0.0"  />
+								<input matInput type="text" formControlName="ratioBlufor" placeholder="Opfor Ratio"    mask="0.00"  [dropSpecialCharacters]="false" />
 								<button matTooltip="Enable/Disable ratio" (click)="onRatioEnabledChange('ratioBlufor')" matSuffix mat-icon-button color="accent"  >
 									<mat-icon *ngIf="missionSizeGroup.get('ratioBlufor')?.enabled">group</mat-icon>
 									<mat-icon *ngIf="!missionSizeGroup.get('ratioBlufor')?.enabled">group_off</mat-icon>
@@ -124,7 +124,7 @@
 
 							<mat-form-field>
 								<mat-label class="inset-label">Opfor Ratio</mat-label>
-								<input matInput type="text" formControlName="ratioOpfor" placeholder="Opfor Ratio"  mask="0.0"  />
+								<input matInput type="text" formControlName="ratioOpfor" placeholder="Opfor Ratio"  mask="0.00"  [dropSpecialCharacters]="false" />
 								<button matTooltip="Enable/Disable ratio" (click)="onRatioEnabledChange('ratioOpfor')" matSuffix mat-icon-button color="accent"  >
 									<mat-icon *ngIf="missionSizeGroup.get('ratioOpfor')?.enabled">group</mat-icon>
 									<mat-icon *ngIf="!missionSizeGroup.get('ratioOpfor')?.enabled">group_off</mat-icon>
@@ -134,7 +134,7 @@
 
 							<mat-form-field>
 								<mat-label class="inset-label">Indfor Ratio</mat-label>
-								<input matInput type="text" formControlName="ratioIndfor" placeholder="Indfor Ratio"  mask="0.0"  />
+								<input matInput type="text" formControlName="ratioIndfor" placeholder="Indfor Ratio"  mask="0.00"  [dropSpecialCharacters]="false" />
 								<button matTooltip="Enable/Disable ratio" (click)="onRatioEnabledChange('ratioIndfor')" matSuffix mat-icon-button color="accent"  >
 									<mat-icon *ngIf="missionSizeGroup.get('ratioIndfor')?.enabled">group</mat-icon>
 									<mat-icon *ngIf="!missionSizeGroup.get('ratioIndfor')?.enabled">group_off</mat-icon>
@@ -144,7 +144,7 @@
 
 							<mat-form-field>
 								<mat-label class="inset-label">Civ Ratio</mat-label>
-								<input matInput type="text" formControlName="ratioCiv" placeholder="Civ Ratio"  mask="0.0"  />
+								<input matInput type="text" formControlName="ratioCiv" placeholder="Civ Ratio"  mask="0.00"  [dropSpecialCharacters]="false" />
 								<button matTooltip="Enable/Disable ratio" (click)="onRatioEnabledChange('ratioCiv')" matSuffix mat-icon-button color="accent"  >
 									<mat-icon *ngIf="missionSizeGroup.get('ratioCiv')?.enabled">group</mat-icon>
 									<mat-icon *ngIf="!missionSizeGroup.get('ratioCiv')?.enabled">group_off</mat-icon>

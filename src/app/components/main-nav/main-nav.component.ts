@@ -1,13 +1,13 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { UserService } from '../../services/user.service';
-import { DatabaseUser } from '../../models/databaseUser';
+import { User } from '../../models/user';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import {environment} from '../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 @Component({
 	selector: 'app-main-nav',
@@ -22,7 +22,7 @@ export class MainNavComponent implements OnInit {
 		private matIconRegistry: MatIconRegistry,
 		private domSanitizer: DomSanitizer,
 		private router: Router,
-		private userService: UserService
+		public userService: UserService
 	) {
 		this.matIconRegistry.addSvgIcon(
 			'discord',
@@ -32,7 +32,7 @@ export class MainNavComponent implements OnInit {
 		);
 	}
 
-	discordUser: DatabaseUser | null;
+
 
 	isHandset$: Observable<boolean> = this.breakpointObserver
 		.observe('(max-width: 959.99px)')
@@ -44,7 +44,8 @@ export class MainNavComponent implements OnInit {
 		);
 
 	ngOnInit(): void {
-		this.discordUser = this.userService.getUserLocally();
+		console.log(this.userService);
+
 	}
 
 	logout() {
@@ -52,22 +53,18 @@ export class MainNavComponent implements OnInit {
 	}
 
 	openMissionList() {
-		this.router.navigate([
-			`mission-list`
-		]);
-
+		this.router.navigate([`mission-list`]);
 	}
 
 	openUploadForm() {
-		this.router.navigate([
-			`mission-upload`
-		]);
+		this.router.navigate([`mission-upload`]);
 	}
-	getDiscordHref(){
+
+	getDiscordHref() {
 		if (environment.production) {
-			return "https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=https%3A%2F%2Fglobalconflicts.net%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds";
-		}else{
-			return "https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds";
+			return 'https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=https%3A%2F%2Fglobalconflicts.net%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds';
+		} else {
+			return 'https://discord.com/api/oauth2/authorize?client_id=731266255306227813&redirect_uri=http%3A%2F%2Flocalhost%3A4200%2Fapi%2Fauth%2Fcallback&response_type=code&scope=identify%20guilds';
 		}
 	}
 }

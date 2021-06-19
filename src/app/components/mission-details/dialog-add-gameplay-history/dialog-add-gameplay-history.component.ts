@@ -8,9 +8,10 @@ import { UserService } from '@app/services/user.service';
 import { Observable } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
-import { DiscordUser } from '@app/models/discordUser';
+
 import { ILeader } from '@app/models/leader';
 import { DatePipe } from '@angular/common';
+import { RemoteDiscordUser } from '@app/models/remoteDiscordUser';
 
 @Component({
 	selector: 'app-dialog-add-gameplay-history',
@@ -25,7 +26,7 @@ export class DialogAddGameplayHistoryComponent implements OnInit {
 		private datePipe: DatePipe,
 		@Inject(MAT_DIALOG_DATA)
 		public data: {
-			discordUser: DiscordUser;
+			discordUser: RemoteDiscordUser;
 			mission: IMission;
 			update: IUpdate;
 			oldHistory: IHistory;
@@ -35,12 +36,13 @@ export class DialogAddGameplayHistoryComponent implements OnInit {
 	userListControl = new FormControl();
 	outcomeControl = new FormControl();
 
-	filtredDiscordUsers: Observable<DiscordUser[]>;
+	filtredDiscordUsers: Observable<RemoteDiscordUser[]>;
 	filtredOutcomes: Observable<string[]>;
 
 	public noteMarkdown = '';
 	public showNotePreview = false;
-	public discordUsers: DiscordUser[] = [];
+
+	public discordUsers: RemoteDiscordUser[] = [];
 	public selectedLeaders: Set<ILeader> = new Set();
 	outcomes: string[] = [
 		'Major victory',
@@ -82,7 +84,9 @@ export class DialogAddGameplayHistoryComponent implements OnInit {
 		);
 	}
 
-	private _filterDiscordUser(value: string | DiscordUser): DiscordUser[] {
+	private _filterDiscordUser(
+		value: string | RemoteDiscordUser
+	): RemoteDiscordUser[] {
 		if (typeof value !== 'string') {
 			return [value];
 		}
@@ -152,7 +156,6 @@ export class DialogAddGameplayHistoryComponent implements OnInit {
 		this.history.leaders = Array.from(this.selectedLeaders);
 		this.history.outcome = this.outcomeControl.value;
 
-		console.log(this.history);
 		this.dialogRef.close(this.history);
 	}
 }

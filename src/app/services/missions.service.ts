@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IHistory, IMission, IReview } from '../models/mission';
+import {
+	IHistory,
+	IMission,
+	IReview,
+	IReviewChecklistItem
+} from '../models/mission';
 import { MissionConstants } from '../constants/missionConstants';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as fileSaver from 'file-saver';
@@ -9,6 +14,7 @@ import * as fileSaver from 'file-saver';
 import Terrains from '../../assets/terrains.json';
 import { ILeader } from '@app/models/leader';
 import { DatePipe } from '@angular/common';
+import { ITerrain } from '@app/models/terrain';
 
 @Injectable({
 	providedIn: 'root'
@@ -19,7 +25,17 @@ export class MissionsService {
 		private mC: MissionConstants,
 		private sanitizer: DomSanitizer,
 		private datePipe: DatePipe
-	) {}
+	) {
+		if (this.terrainList.length === 0) {
+			this.httpClient
+				.get<ITerrain[]>('api/configs/terrains')
+				.subscribe((value) => {
+					this.terrainList = value;
+				});
+		}
+	}
+
+	public terrainList: ITerrain[] = [];
 
 	public list(): Observable<IMission[]> {
 		return this.httpClient.get<IMission[]>('/api/missions');
@@ -72,7 +88,7 @@ export class MissionsService {
 		if (mission?.image) {
 			return this.sanitizer.bypassSecurityTrustResourceUrl(mission.image);
 		} else {
-			return '../../../assets/imgs/noImage.png';
+			return `https://globalconflicts.net/content/terrain_pics/${mission?.terrain}.jpg`
 		}
 	}
 
@@ -153,11 +169,32 @@ export class MissionsService {
 		updateId: string,
 		filename: string
 	) {
-		return this.httpClient.post(`/api/missions/${uniqueName}/action`, {
-			action,
+		return this.httpClient.post(
+			`/api/missions/${uniqueName}/action/${action}`,
+			{
+				action,
+				uniqueName,
+				updateId,
+				filename
+			}
+		);
+	}
+
+	public submitAuditReview(
+		uniqueName: string,
+		updateId: string,
+		filename: string,
+		reviewChecklist: [],
+		reviewerNotes: string,
+		reviewState: string
+	) {
+		return this.httpClient.post(`/api/audit_review/submit_audit_review`, {
 			uniqueName,
 			updateId,
-			filename
+			filename,
+			reviewChecklist,
+			reviewerNotes,
+			reviewState
 		});
 	}
 
@@ -181,22 +218,22 @@ export class MissionsService {
 	}
 
 	public submitVote(mission: IMission) {
-		return this.httpClient.put(`/api/missions/${mission.uniqueName}/votes`, null);
-	}
-
-
-	public getUserVotes(){
-		return this.httpClient.get('/api/missions/votes/vote_count',{
-				headers: {
-					'Cache-Control':
-						'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
-					Pragma: 'no-cache',
-					Expires: '0'
-				}
-			}
+		return this.httpClient.put(
+			`/api/missions/${mission.uniqueName}/votes`,
+			null
 		);
 	}
 
+	public getUserVotes() {
+		return this.httpClient.get('/api/missions/votes/vote_count', {
+			headers: {
+				'Cache-Control':
+					'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
+				Pragma: 'no-cache',
+				Expires: '0'
+			}
+		});
+	}
 
 	public retractVote(mission: IMission) {
 		return this.httpClient.delete(
@@ -204,9 +241,10 @@ export class MissionsService {
 		);
 	}
 
-	public getVotedMissions(): Observable<IMission[]>  {
+	public getVotedMissions(): Observable<IMission[]> {
 		return this.httpClient.get<IMission[]>(
-			`/api/missions/votes/voted_missions`,{
+			`/api/missions/votes/voted_missions`,
+			{
 				headers: {
 					'Cache-Control':
 						'no-cache, no-store, must-revalidate, post-check=0, pre-check=0',
@@ -218,14 +256,16 @@ export class MissionsService {
 	}
 
 	public resetVotes() {
-		return this.httpClient.get(
-			`/api/missions/votes/reset_votes`
-		);
+		return this.httpClient.get(`/api/missions/votes/reset_votes`);
 	}
 
 	public resetMyVotes() {
-		return this.httpClient.get(
-			`/api/missions/votes/reset_my_votes`
+		return this.httpClient.get(`/api/missions/votes/reset_my_votes`);
+	}
+
+	public getQuestionnaire() {
+		return this.httpClient.get<IReviewChecklistItem[]>(
+			`/api/audit_review/questionnaire`
 		);
 	}
 }

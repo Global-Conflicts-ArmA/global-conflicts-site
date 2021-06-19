@@ -3,11 +3,10 @@
 		<div class="center" *ngIf="!doneLoading">
 			<mat-progress-spinner diameter="100" mode="indeterminate" color="accent">Loading</mat-progress-spinner>
 		</div>
-		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser?.role)">You must join our Discord server and
-			complete the welcoming process to upload missions!
+		<div class="not-allowed-text" *ngIf="!(userService.loggedUser)">You must join our Discord to see the most voted missions, and vote!
 		</div>
 		<div [class.not-allowed-overlay]="!doneLoading" *ngIf="!!votedMissions">
-			<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser?.role)">
+			<div class="column" [class.not-allowed-overlay]="!(userService.loggedUser)">
 				<h2>These are the top voted missions for the next play sessions:</h2>
 				<div>
 					<small>Note: This list will be reseted every monday. </small>

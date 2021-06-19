@@ -8,7 +8,6 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { MissionsService } from '@app/services/missions.service';
 import { MatDialog } from '@angular/material/dialog';
-import { DatabaseUser } from '@app/models/databaseUser';
 import { UserService } from '@app/services/user.service';
 import {
 	IHistory,
@@ -33,8 +32,8 @@ import { MissionUploadComponent } from '@app/components/mission-upload/mission-u
 import { DialogAddGameplayHistoryComponent } from '@app/components/mission-details/dialog-add-gameplay-history/dialog-add-gameplay-history.component';
 import { ILeader } from '@app/models/leader';
 import { DialogAddAarComponent } from '@app/components/mission-details/dialog-add-aar/dialog-add-aar.component';
-import { MatAccordion } from '@angular/material/expansion';
 import { DialogViewGmNotesComponent } from '@app/components/mission-details/dialog-view-gm-notes/dialog-view-gm-notes.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
 	selector: 'app-mission-details',
@@ -43,16 +42,16 @@ import { DialogViewGmNotesComponent } from '@app/components/mission-details/dial
 })
 export class MissionDetailsComponent implements OnInit {
 	constructor(
-		private userService: UserService,
+		public userService: UserService,
 		public missionsService: MissionsService,
 		private route: ActivatedRoute,
 		public dialog: MatDialog,
 		public overlay: Overlay,
 		private router: Router,
+		private _snackBar: MatSnackBar,
 		private changeDetectorRef: ChangeDetectorRef
 	) {}
 
-	discordUser: DatabaseUser | null;
 	mission: IMission | null;
 	dataSourceUpdates: MatTableDataSource<IUpdate>;
 	updateColumns = ['date', 'versionStr', 'authorName', 'status', 'buttons'];
@@ -70,17 +69,14 @@ export class MissionDetailsComponent implements OnInit {
 		this.innerWidth = window.innerWidth;
 	}
 
-
 	ngOnInit(): void {
-		this.discordUser = this.userService.getUserLocally();
 		this.uniqueName = this.route.snapshot.paramMap.get('id');
 		this.refresh();
-		this.missionsService.getUserVotes().subscribe(value => {
-			if(value['votes']){
+		this.missionsService.getUserVotes().subscribe((value) => {
+			if (value['votes']) {
 				this.userVotesCount = value['votes'].length;
 			}
-
-		})
+		});
 	}
 
 	refresh() {
@@ -162,7 +158,8 @@ export class MissionDetailsComponent implements OnInit {
 	public editMission(mission: IMission | null = this.mission) {
 		const dialogRef = this.dialog.open(MissionUploadComponent, {
 			data: mission,
-			minWidth: '20rem'
+			minWidth: '20rem',
+
 		});
 		dialogRef.afterClosed().subscribe((value) => {
 			if (value) {
@@ -239,8 +236,8 @@ export class MissionDetailsComponent implements OnInit {
 
 	hasActions() {
 		return (
-			this.discordUser?.role === 'Admin' ||
-			this.mission?.authorID === this.discordUser?.id
+			this.userService.loggedUser?.isAdmin() ||
+			this.mission?.authorID === this.userService.loggedUser?.userID
 		);
 	}
 
@@ -248,7 +245,6 @@ export class MissionDetailsComponent implements OnInit {
 		const dialogRef = this.dialog.open(DialogActionsComponent, {
 			width: '600px',
 			data: {
-				discordUser: this.discordUser,
 				mission: this.mission,
 				update
 			},
@@ -258,29 +254,41 @@ export class MissionDetailsComponent implements OnInit {
 			if (result === MissionActions.REMOVE_ARCHIVE) {
 				this.router.navigate([`mission-list`]);
 			}
+
+			if (result === MissionActions.ASK_FOR_REVIEW) {
+				this._snackBar.open('Mission uploaded', '', {
+					duration: 6000
+				});
+			}
 		});
 	}
 
 	canUpdateMission() {
 		return (
-			this.discordUser?.role === 'Admin' ||
-			this.mission?.authorID === this.discordUser?.id
+			this.userService.loggedUser?.isAdmin() ||
+			this.mission?.authorID === this.userService.loggedUser?.userID
 		);
 	}
 
 	canEditRe(re: IReport | IReview) {
 		return (
-			this.discordUser?.role === 'Admin' ||
-			re?.authorID === this.discordUser?.id
+			this.userService.loggedUser?.isAdmin() ||
+			re?.authorID === this.userService.loggedUser?.userID
 		);
 	}
 
 	canAddGameplayHistory() {
-		return this.discordUser?.role === 'Admin';
+		return (
+			this.userService.loggedUser?.isAdmin() ||
+			this.userService.loggedUser?.isGM()
+		);
 	}
 
 	canEditHistory() {
-		return this.discordUser?.role === 'Admin';
+		return (
+			this.userService.loggedUser?.isAdmin() ||
+			this.userService.loggedUser?.isGM()
+		);
 	}
 
 	addGAmeplayHistory() {
@@ -375,21 +383,26 @@ export class MissionDetailsComponent implements OnInit {
 	}
 
 	vote() {
-		if (this.mission && this.discordUser) {
+		console.log(this.mission);
+		if (this.mission && this.userService.loggedUser) {
 			this.loadingVote = true;
 			if (
-				!this.mission.votes ||
-				!this.mission.votes?.includes(this.discordUser.id) ||
-				this.userVotesCount >= 4
+				this.userVotesCount < 4 &&
+				(!this.mission.votes ||
+					!this.mission.votes?.includes(
+						this.userService.loggedUser.userID
+					))
 			) {
 				this.missionsService
 					.submitVote(this.mission)
 					.subscribe((value) => {
-						if (this.mission && this.discordUser) {
-							if(!this.mission.votes){
-								this.mission.votes = []
+						if (this.mission && this.userService.loggedUser) {
+							if (!this.mission.votes) {
+								this.mission.votes = [];
 							}
-							this.mission.votes?.push(this.discordUser.id);
+							this.mission.votes?.push(
+								this.userService.loggedUser.userID
+							);
 							this.userVotesCount += 1;
 							this.loadingVote = false;
 						}
@@ -401,11 +414,11 @@ export class MissionDetailsComponent implements OnInit {
 						if (
 							this.mission &&
 							this.mission.votes &&
-							this.discordUser
+							this.userService.loggedUser
 						) {
 							this.loadingVote = false;
 							const index = this.mission.votes.indexOf(
-								this.discordUser.id,
+								this.userService.loggedUser.userID,
 								0
 							);
 							if (index > -1) {
@@ -419,7 +432,7 @@ export class MissionDetailsComponent implements OnInit {
 	}
 
 	isVotingDisabled(mission: IMission) {
-		if (!this.discordUser) {
+		if (!this.userService.loggedUser) {
 			return true;
 		}
 		if (this.loadingVote) {
@@ -433,15 +446,16 @@ export class MissionDetailsComponent implements OnInit {
 			return true;
 		}
 	}
+
 	private missionHasMyVote(mission: IMission) {
-		if(this.discordUser){
-			return mission.votes?.includes(this.discordUser.id);
+		if (this.userService.loggedUser) {
+			return mission.votes?.includes(this.userService.loggedUser.userID);
 		}
 	}
 
 	getVotingTooltip(mission: IMission) {
-		if (this.discordUser) {
-			if (mission.votes?.includes(this.discordUser.id)) {
+		if (this.userService.loggedUser) {
+			if (mission.votes?.includes(this.userService.loggedUser.userID)) {
 				return 'Retract vote';
 			} else {
 				return 'Vote for this mission to be played on the next session';
@@ -451,8 +465,8 @@ export class MissionDetailsComponent implements OnInit {
 	}
 
 	getVotingBtnText(mission: IMission) {
-		if (this.discordUser) {
-			if (mission.votes?.includes(this.discordUser.id)) {
+		if (this.userService.loggedUser) {
+			if (mission.votes?.includes(this.userService.loggedUser.userID)) {
 				return 'Retract vote';
 			} else {
 				return 'Vote';
@@ -460,6 +474,4 @@ export class MissionDetailsComponent implements OnInit {
 		}
 		return 'Vote';
 	}
-
-
 }

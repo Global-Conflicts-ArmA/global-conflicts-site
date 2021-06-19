@@ -1,7 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const User = require('../models/discordUser.model');
-const {getDiscordUserFromCookies} = require("../misc/validate-cookies");
+const { requireAdmin } = require('../middleware/middlewares');
+const { getDiscordUserFromCookies } = require('../misc/validate-cookies');
 const router = express.Router();
 const { discordJsClient } = require('../config/discord-bot');
 const { Observable } = require('rxjs');
@@ -22,33 +23,20 @@ async function getRemoteUser(id) {
 		});
 }
 
-
-
-
-router.get('/discord_users', async (req, res) => {
-	req = await getDiscordUserFromCookies(
-		req,
-		'User not allowed to list discord users.'
-	)
-	const canList = req.discordUser.roles.cache.some(r=>["Admin", "Arma GM"].includes(r.name))
-	if (req.authError || !canList) {
-		return res.status(401).send({
-			authError: req.authError
-		});
-	}
-
+router.get('/discord_users', [requireAdmin], async (req, res) => {
 	// Get the Guild and store it under the variable "list"
-	discordJsClient.guilds.fetch(process.env.DISCORD_SERVER_ID).then(guild => {
-		guild.members.fetch().then(value => {
-			return res.json(value);
-		}).catch(reason => {
-			return res.json([ ]);
-
-		})
-
-	});
-
-
+	discordJsClient.guilds
+		.fetch(process.env.DISCORD_SERVER_ID)
+		.then((guild) => {
+			guild.members
+				.fetch()
+				.then((value) => {
+					return res.json(value);
+				})
+				.catch((reason) => {
+					return res.json([]);
+				});
+		});
 });
 
 router.get('/', (req, res) => {
@@ -112,7 +100,5 @@ router.post('/', (req, res) => {
 		}
 	});
 });
-
-
 
 module.exports = router;

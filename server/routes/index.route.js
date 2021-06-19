@@ -2,6 +2,8 @@ const express = require('express');
 const usersRoutes = require('./users.route');
 const authRoute = require('./auth.route');
 const missionsRoutes = require('./missions.route');
+const auditReviewRoutes = require('./audit_review.route');
+const configsRoutes = require('./configs.route');
 const mongoose = require('mongoose');
 const session = require('express-session');
 
@@ -21,5 +23,7 @@ router.get('/health-check', function (req, res) {
 router.use('/auth', authRoute);
 router.use('/users', usersRoutes);
 router.use('/missions', missionsRoutes);
+router.use('/audit_review', auditReviewRoutes);
+router.use('/configs', configsRoutes);
 
 module.exports = router;

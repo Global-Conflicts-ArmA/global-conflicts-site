@@ -7,17 +7,28 @@
 	margin-bottom: 8px;
 }
 
+mat-icon{
+
+	user-select: none;
+}
 .details-break {
 	display: none;
 }
 
 .green-icon {
-	color: green;
+	color: greenyellow;
+	cursor: default;
 }
 
 .red-icon {
 	color: red;
+	cursor: default;
 }
+.white-icon{
+	color: #ababab;
+	cursor: default;
+}
+
 
 .mission-title-container {
 	display: flex;

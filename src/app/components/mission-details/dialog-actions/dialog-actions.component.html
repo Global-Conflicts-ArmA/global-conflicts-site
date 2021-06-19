@@ -7,11 +7,13 @@
 			class="text">For adding missions the server must not be in the mission selection screen, else it will crash.
 		</div>
 		<div class="buttons">
-			<button *ngIf="canCopyToMainServer()" [disabled]="loading" (click)="doAction(getActionType.COPY_TO_MAIN)" color="accent"
-					mat-raised-button>Copy to Main Server
+			<button *ngIf="canCopyToMainServer()" [disabled]="loading" (click)="doAction(getActionType.COPY_TO_MAIN)"
+							color="accent"
+							mat-raised-button>Copy to Main Server
 			</button>
-			<button *ngIf="canCopyToTestServer()" [disabled]="loading" (click)="doAction(getActionType.COPY_TO_TEST)" color="accent"
-					mat-raised-button>Copy to Test Server
+			<button *ngIf="canCopyToTestServer()" [disabled]="loading" (click)="doAction(getActionType.COPY_TO_TEST)"
+							color="accent"
+							mat-raised-button>Copy to Test Server
 			</button>
 		</div>
 	</div>
@@ -20,34 +22,51 @@
 		<hr>
 		<div class="text">For removal the server must not have the missions loaded in memory.</div>
 		<div class="buttons">
-			<button *ngIf="canRemoveFromMainServer()" [disabled]="loading" (click)="doAction(getActionType.REMOVE_FROM_MAIN)" color="accent"
-					mat-raised-button>Remove from Main server
+			<button *ngIf="canRemoveFromMainServer()" [disabled]="loading" (click)="doAction(getActionType.REMOVE_FROM_MAIN)"
+							color="accent"
+							mat-raised-button>Remove from Main server
 			</button>
-			<button *ngIf="canRemoveFromTestServer()" [disabled]="loading" (click)="doAction(getActionType.REMOVE_FROM_TEST)" color="accent"
-					mat-raised-button>Remove from Test server
+			<button *ngIf="canRemoveFromTestServer()" [disabled]="loading" (click)="doAction(getActionType.REMOVE_FROM_TEST)"
+							color="accent"
+							mat-raised-button>Remove from Test server
 			</button>
 		</div>
 	</div>
 
-	<div *ngIf="canMarkAsReady()">
+	<div *ngIf="canAskForReview()">
 		<hr>
-		<div class="text">For new missions or major updates, review it with another person before marking it as ready.
+		<div class="text">To <b>upload</b> your mission to the main server, ask review team to review it. If it passes it
+			will be uploaded. You will be notified of the results.
 		</div>
 		<div class="buttons">
-			<button *ngIf="canMarkAsReady()" [disabled]="loading" (click)="doAction(getActionType.MARK_AS_READY)" color="accent"
-					mat-raised-button>Mark as ready
+			<button *ngIf="canAskForReview()" [disabled]="loading" (click)="doAction(getActionType.ASK_FOR_REVIEW)"
+							color="accent"
+							mat-raised-button>Ask for review
 			</button>
-
 		</div>
 	</div>
+
+	<div *ngIf="canReviewMission()">
+		<hr>
+		<div class="text">
+			Click the button to submit your examination of this mission.
+		</div>
+		<div class="buttons">
+			<button *ngIf="canReviewMission()" [disabled]="loading" (click)="openReviewDialog()" color="accent"
+							mat-raised-button>Open review process
+			</button>
+		</div>
+	</div>
+
 
 	<div *ngIf="canRemoveArchive()">
 		<hr>
-		<div class="text">Removing the archive will delete the mission file from the archive folder AND remove this update entry on the database.
+		<div class="text">Removing the archive will delete the mission file from the archive folder AND remove this update
+			entry on the database.
 		</div>
 		<div class="buttons">
 			<button *ngIf="canRemoveArchive" (click)="removeArchive()" color="warn"
-					mat-raised-button>Remove Archive
+							mat-raised-button>Remove Archive
 			</button>
 
 		</div>

@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const DiscordOauth2 = new require('discord-oauth2');
+const DiscordOauth2 =  require('discord-oauth2');
+const {requireLogin, requireMissionReviewer} = require('../middleware/middlewares');
+
+
 const { discordJsClient } = require('../config/discord-bot');
 
 const discordOauth2 = new DiscordOauth2({
@@ -9,9 +12,8 @@ const discordOauth2 = new DiscordOauth2({
 	redirectUri: process.env.DISCORD_CALLBACK_URL
 });
 
-router.get('/login', function (req, res) {
-	// tslint:disable-next-line:no-console
-	console.log('login');
+router.get('/login', [requireLogin], function (req, res) {
+	return res.send(req.discordUser);
 });
 
 router.get('/logout', function (req, res) {
@@ -45,7 +47,7 @@ async function getUser(token) {
 				return {
 					token: token,
 					username: member.user.username,
-					role: member.roles.highest.name,
+					roles: member.roles,
 					roleColor: member.roles.highest.hexColor,
 					id: member.user.id,
 					avatar: member.user.avatar
@@ -71,13 +73,7 @@ router.get('/callback', function (req, res) {
 		})
 		.then(async function (tokenRequestResult) {
 			const user = await getUser(tokenRequestResult.access_token);
-			res.cookie('token', user.token);
-			if (user.username) res.cookie('username', user.username);
-			if (user.role) res.cookie('role', user.role);
-			if (user.roleColor) res.cookie('roleColor', user.roleColor);
-			if (user.id) res.cookie('id', user.id);
-			if (user.avatar) res.cookie('avatar', user.avatar);
-			return res.redirect('/');
+			return res.redirect('/?token=' + tokenRequestResult.access_token);
 		})
 		.catch((reason) => {
 			return res.redirect('/');

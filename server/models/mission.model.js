@@ -63,6 +63,10 @@ const MissionSchema = new Schema(
 			type: Boolean,
 			required: true
 		},
+		reviewState: {
+			type: String,
+			required: false
+		},
 		tags: [String],
 		timeOfDay: {
 			type: String,
@@ -130,13 +134,13 @@ const MissionSchema = new Schema(
 				required: false
 			}
 		},
-		lastPlayed:  {
+		lastPlayed: {
 			type: Date,
 			required: false
 		},
-		history:[
+		history: [
 			{
-				date:  {
+				date: {
 					type: Date,
 					required: true
 				},
@@ -144,31 +148,34 @@ const MissionSchema = new Schema(
 					type: String,
 					required: false
 				},
-				gmNote:{
+				gmNote: {
+					type: String,
+					required: false
+				},
+				aarReplayLink: {
 					type: String,
 					required: false
 				},
 				leaders: [
 					{
-						discordID:{
+						discordID: {
 							type: String,
 							required: true
 						},
-						side:{
+						side: {
 							type: String,
 							required: false
 						},
-						role:{
+						role: {
 							type: String,
 							required: false
 						},
 						aar: {
 							type: String,
 							required: false
-						},
+						}
 					}
 				]
-
 			}
 		],
 		reports: [
@@ -198,7 +205,7 @@ const MissionSchema = new Schema(
 						type: String,
 						required: false
 					}
-				},
+				}
 			}
 		],
 		reviews: [
@@ -224,7 +231,7 @@ const MissionSchema = new Schema(
 						type: String,
 						required: false
 					}
-				},
+				}
 			}
 		],
 		votes: [String] // unique array of discordIDs. Is reseted every monday.
@@ -236,4 +243,4 @@ const MissionSchema = new Schema(
 
 MissionSchema.index({ uniqueName: 1 }, { unique: true });
 
-module.exports = mongooseConfig.model('mission', MissionSchema, 'missions');
+module.exports = mongooseConfig.model("mission", MissionSchema, "missions");

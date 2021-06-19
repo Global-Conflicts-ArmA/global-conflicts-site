@@ -5,13 +5,9 @@ import {
 	FormGroup,
 	Validators
 } from '@angular/forms';
-import {
-	MatDialog,
-	MatDialogRef,
-	MAT_DIALOG_DATA
-} from '@angular/material/dialog';
-import { DatabaseUser } from '@app/models/databaseUser';
-import {IMission, IReport, IReview} from '@app/models/mission';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { User } from '@app/models/user';
+import { IMission, IReport } from '@app/models/mission';
 import { MissionsService } from '@app/services/missions.service';
 import { UserService } from '@app/services/user.service';
 
@@ -21,25 +17,29 @@ import { UserService } from '@app/services/user.service';
 })
 export class DialogSubmitBugReportComponent implements OnInit {
 	enableErrorLog = false;
+
 	constructor(
 		public dialogRef: MatDialogRef<DialogSubmitBugReportComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: {mission:IMission, report:IReport},
+		@Inject(MAT_DIALOG_DATA)
+		public data: { mission: IMission; report: IReport },
 		private formBuilder: FormBuilder,
 		public missionsService: MissionsService,
-		private userService: UserService
+		public userService: UserService
 	) {}
 
 	bugReportGroup: FormGroup;
-	discordUser: DatabaseUser | null;
+	discordUser: User | null;
 
 	ngOnInit(): void {
-		this.discordUser = this.userService.getUserLocally();
 		this.bugReportGroup = this.formBuilder.group(
 			{
-				version: [this.data.report?.version??'', [Validators.required]],
-				report: [this.data.report?.report??'', [Validators.required]],
+				version: [
+					this.data.report?.version ?? '',
+					[Validators.required]
+				],
+				report: [this.data.report?.report ?? '', [Validators.required]],
 				logEnabled: [!!this.data.report?.log],
-				log: [this.data.report?.log??'']
+				log: [this.data.report?.log ?? '']
 			},
 			{
 				validators: [this.checkLog]
@@ -137,9 +137,12 @@ export class DialogSubmitBugReportComponent implements OnInit {
 	}
 
 	submit() {
+		if (!this.userService.loggedUser) {
+			return;
+		}
 		const report: IReport = {
 			version: this.bugReportGroup.get('version')?.value,
-			authorID: this.discordUser?.id ?? '',
+			authorID: this.userService.loggedUser.userID,
 			date: new Date(),
 			report: this.bugReportGroup.get('report')?.value ?? ''
 		};
@@ -154,26 +157,28 @@ export class DialogSubmitBugReportComponent implements OnInit {
 			data: report,
 			uniqueName: this.data.mission.uniqueName
 		};
-		if(this.data.report){
+		if (this.data.report) {
 			report._id = this.data.report._id;
 		}
 		const formData: any = new FormData();
 		this.buildFormData(formData, request);
-		this.missionsService.submitReport(formData, !!this.data.report ).subscribe(
-			() => {
-				console.log('upload success');
-				this.dialogRef.close();
-			},
-			(httpError) => {
-				console.log('upload error');
-				this.dialogRef.close();
-			}
-		);
+		this.missionsService
+			.submitReport(formData, !!this.data.report)
+			.subscribe(
+				() => {
+					console.log('upload success');
+					this.dialogRef.close();
+				},
+				(httpError) => {
+					console.log('upload error');
+					this.dialogRef.close();
+				}
+			);
 	}
 
 	removeEntry() {
-		if(confirm("ARE YOU SURE YOU WANT TO REMOVE THIS BUG REPORT?")) {
-			this.dialogRef.close({action:"delete_report"});
+		if (confirm('ARE YOU SURE YOU WANT TO REMOVE THIS BUG REPORT?')) {
+			this.dialogRef.close({ action: 'delete_report' });
 		}
 	}
 }
