@@ -26,6 +26,8 @@ export class UserService {
 	public logout() {
 		this.httpClient.get('api/auth/logout').subscribe(() => {
 			this.cookieService.deleteAll();
+			localStorage.clear();
+			this._loggedUser = null;
 			window.location.replace('/');
 		});
 	}
