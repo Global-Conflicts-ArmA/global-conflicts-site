@@ -1,7 +1,6 @@
 import {
 	Component,
 	ElementRef,
-	Inject,
 	Injector,
 	OnInit,
 	ViewChild
@@ -15,7 +14,6 @@ import {
 } from '@angular/forms';
 import { MissionConstants } from '@app/constants/missionConstants';
 import { MissionsService } from '@app/services/missions.service';
-import { DatabaseUser } from '@app/models/databaseUser';
 import { IMission, IUpdate } from '@app/models/mission';
 import { UserService } from '@app/services/user.service';
 import { FileValidator } from 'ngx-material-file-input';
@@ -27,8 +25,7 @@ import {
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-// @ts-ignore
-import Terrains from '../../../assets/terrains.json';
+
 @Component({
 	selector: 'app-mission-upload',
 	templateUrl: './mission-upload.component.html',
@@ -38,7 +35,7 @@ import Terrains from '../../../assets/terrains.json';
 export class MissionUploadComponent implements OnInit {
 	constructor(
 		private missionsService: MissionsService,
-		private userService: UserService,
+		public userService: UserService,
 		private formBuilder: FormBuilder,
 		public mC: MissionConstants,
 		public sharedService: SharedService,
@@ -58,7 +55,7 @@ export class MissionUploadComponent implements OnInit {
 	private readonly missionDataFromDetails: IMission;
 
 	isEdit = false;
-	discordUser: DatabaseUser | null;
+
 	misType = 'CO';
 	missionToUpload: File | null;
 	description: string;
@@ -73,8 +70,8 @@ export class MissionUploadComponent implements OnInit {
 	missionImageSrc: any;
 	missionTerrain = '';
 
-	readonly maxSize: number = 8388608;
-	readonly maxSizeImage: number = 2097152;
+	readonly maxSize: number = 10 * 1024 * 1024;
+	readonly maxSizeImage: number = 2 * 1024 * 1024;
 	readonly minNameLength: number = 3;
 	readonly maxNameLength: number = 30;
 
@@ -92,7 +89,6 @@ export class MissionUploadComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.sharedService.uploadingState = 'ready';
-		this.discordUser = this.userService.getUserLocally();
 		this.fileUploadGroup = this.formBuilder.group({
 			missionFile: [
 				'',
@@ -312,15 +308,21 @@ export class MissionUploadComponent implements OnInit {
 						requiredTerrain: true
 					};
 				} else {
-					const terrainFound = Terrains.find(terrain=>{
-						return terrain.class.toLowerCase() === fileNameArray[1].toLowerCase()
-					});
+					const terrainFound = this.missionsService.terrainList.find(
+						(terrain) => {
+							return (
+								terrain.class.toLowerCase() ===
+								fileNameArray[1].toLowerCase()
+							);
+						}
+					);
 					if (!terrainFound) {
 						return {
 							notAcceptedTerrain: true
 						};
 					}
 				}
+
 				return null;
 			}
 			return null;
@@ -721,24 +723,27 @@ export class MissionUploadComponent implements OnInit {
 				: this.missionDataFromDetails.terrain
 		);
 
-		this.missionsService.findOne(uniqueNameVar).subscribe((result) => {
-			if (!this.isEdit) {
-				if (result != null) {
-					this.sharedService.uploadingState = 'name-conflict';
-				} else {
-					this.sendMission(nameVar, uniqueNameVar);
+		this.missionsService.findOne(uniqueNameVar).subscribe(
+			(result) => {
+				if (!this.isEdit) {
+					if (result != null) {
+						this.sharedService.uploadingState = 'name-conflict';
+					} else {
+						this.sendMission(nameVar, uniqueNameVar);
+					}
 				}
-			}
-			if (this.isEdit) {
-				if (result != null) {
-					this.sendMission(nameVar, uniqueNameVar);
-				} else {
-					this.sharedService.uploadingState = 'not-found'; // database error, should never happen
+				if (this.isEdit) {
+					if (result != null) {
+						this.sendMission(nameVar, uniqueNameVar);
+					} else {
+						this.sharedService.uploadingState = 'not-found'; // database error, should never happen
+					}
 				}
+			},
+			(error) => {
+				console.log('error');
 			}
-		}, error => {
-			console.log("error")
-		});
+		);
 	}
 
 	buildFormData(
@@ -767,6 +772,10 @@ export class MissionUploadComponent implements OnInit {
 	}
 
 	sendMission(nameVar: string, uniqueNameVar: string) {
+		if (!this.userService.loggedUser) {
+			return;
+		}
+
 		const misType = this.missionTypeGroup.get('missionType')?.value.title;
 		const minSize = this.missionSizeGroup.get('minPlayers')?.value;
 		const maxSize = this.missionSizeGroup.get('maxPlayers')?.value;
@@ -780,7 +789,7 @@ export class MissionUploadComponent implements OnInit {
 			version: {
 				major: 1
 			},
-			authorID: this.discordUser?.id ?? '',
+			authorID: this.userService.loggedUser.userID,
 			date: new Date(),
 			fileName: this.missionFileName ?? '',
 			changeLog: 'First Version'
@@ -788,7 +797,7 @@ export class MissionUploadComponent implements OnInit {
 		const mission: IMission = {
 			uniqueName: uniqueNameVar,
 			name: nameVar,
-			authorID: this.discordUser?.id ?? '',
+			authorID: this.userService.loggedUser.userID,
 			terrain: this.missionTerrain,
 			type: misType,
 			size: {
@@ -857,7 +866,7 @@ export class MissionUploadComponent implements OnInit {
 			);
 		} else {
 			this.missionsService.upload(formData).subscribe(
-				  () => {
+				() => {
 					this.sharedService.uploadingState = 'success';
 					this.authError = null;
 					this.router.routeReuseStrategy.shouldReuseRoute = () =>
@@ -867,12 +876,9 @@ export class MissionUploadComponent implements OnInit {
 						duration: 6000
 					});
 
-					setTimeout(()=>{
-						  this.router.navigate([
-							`/mission-list`
-						]);
-					}, 2000)
-
+					setTimeout(() => {
+						this.router.navigate([`/mission-list`]);
+					}, 2000);
 				},
 				(httpError) => {
 					this.missionErrors = httpError.error.missionErrors ?? {};

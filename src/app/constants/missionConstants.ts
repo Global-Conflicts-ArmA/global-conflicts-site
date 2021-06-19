@@ -76,4 +76,6 @@ export class MissionConstants {
 	MissionTimes: string[] = ['Dawn', 'Day', 'Dusk', 'Night', 'Custom'];
 
 
+
 }
+

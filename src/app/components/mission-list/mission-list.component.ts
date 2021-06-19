@@ -2,17 +2,15 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MissionsService } from '@app/services/missions.service';
 import { IMission, IUpdate } from '@app/models/mission';
-import { DatabaseUser } from '@app/models/databaseUser';
 import { UserService } from '@app/services/user.service';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSelect } from '@angular/material/select';
-import { ITerrain, MissionConstants } from '@app/constants/missionConstants';
+import { MissionConstants } from '@app/constants/missionConstants';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { SharedService } from '@app/services/shared';
-// @ts-ignore
-import Terrains from '../../../assets/terrains.json';
+
 @Component({
 	selector: 'app-mission-list',
 	templateUrl: './mission-list.component.html',
@@ -24,7 +22,7 @@ export class MissionListComponent implements OnInit {
 	@ViewChild(MatSort) sort: MatSort;
 
 	rowData: IMission[] = [];
-	discordUser: DatabaseUser | null;
+
 	displayedColumns: string[] = [
 		'name',
 		'type',
@@ -40,7 +38,7 @@ export class MissionListComponent implements OnInit {
 	dataSource: MatTableDataSource<IMission>;
 	filterGroup: FormGroup;
 	userList: string[];
-	terrainList: string[];
+
 	doneLoading = false;
 
 	constructor(
@@ -53,52 +51,55 @@ export class MissionListComponent implements OnInit {
 	) {}
 
 	public refresh() {
-		this.missionsService.list().subscribe(  (value) => {
-			this.userList = [];
+		this.missionsService.list().subscribe(
+			(value) => {
+				this.userList = [];
 
-			value.map((mission: IMission) => {
-				const lastUpdate =
-					mission.updates[mission.updates.length - 1];
-				mission.lastVersionStr = this.missionsService.buildVersionStr(
-					mission.lastVersion
-				);
-				if(lastUpdate){
-					this.userService.insertUserIds(lastUpdate.authorID);
-				}
+				value.map((mission: IMission) => {
+					const lastUpdate =
+						mission.updates[mission.updates.length - 1];
+					mission.lastVersionStr = this.missionsService.buildVersionStr(
+						mission.lastVersion
+					);
+					if (lastUpdate) {
+						this.userService.insertUserIds(lastUpdate.authorID);
+					}
+				});
+				// iterate the list of users, and get the names of those who doesn't have a name yet
+				this.userService.getAuthorsName().then((usersOnCache) => {
+					value.map((mission) => {
+						// find author by id
+						const userFound = usersOnCache.find(
+							(userOnCahce) =>
+								userOnCahce.userID === mission.authorID
+						);
+						if (userFound) {
+							mission.authorName = userFound.displayName;
+						}
+					});
+				});
 
-			});
-			// iterate the list of users, and get the names of those who doesn't have a name yet
-			 this.userService.getAuthorsName().then(usersOnCache => {
-				 value.map((mission) => {
-					 // find author by id
-					 const userFound = usersOnCache.find(
-						 (userOnCahce) => userOnCahce.userID === mission.authorID
-					 );
-					 if (userFound) {
-						 mission.authorName = userFound.displayName;
-					 }
-				 });
-			} );
-
-			this.userList.sort();
-			this.dataSource = new MatTableDataSource<IMission>(value);
-			this.rowData = this.dataSource.data;
-			this.dataSource.paginator = this.paginator;
-			this.dataSource.sortingDataAccessor = (item, property) => {
-				switch (property) {
-					case 'size.min':
-						return item.size.min;
-					case 'size.max':
-						return item.size.max;
-					default:
-						return item[property];
-				}
-			};
-			this.dataSource.sort = this.sort;
-			this.doneLoading = true;
-		},  error => {
-			console.log("error")
-		});
+				this.userList.sort();
+				this.dataSource = new MatTableDataSource<IMission>(value);
+				this.rowData = this.dataSource.data;
+				this.dataSource.paginator = this.paginator;
+				this.dataSource.sortingDataAccessor = (item, property) => {
+					switch (property) {
+						case 'size.min':
+							return item.size.min;
+						case 'size.max':
+							return item.size.max;
+						default:
+							return item[property];
+					}
+				};
+				this.dataSource.sort = this.sort;
+				this.doneLoading = true;
+			},
+			(error) => {
+				console.log('error');
+			}
+		);
 	}
 
 	ngOnInit(): void {
@@ -123,12 +124,6 @@ export class MissionListComponent implements OnInit {
 			this.filterGroup.get(element)?.setValue('ALL');
 		});
 		this.refresh();
-		this.discordUser = this.userService.getUserLocally();
-		this.terrainList = [];
-		Terrains.forEach((terrain)=>{
-			this.terrainList.push(terrain.display_name);
-		});
-		this.terrainList.sort();
 	}
 
 	onListChipRemoved(multiSelect: MatSelect, matChipIndex: number): void {
@@ -219,7 +214,7 @@ export class MissionListComponent implements OnInit {
 			filteredData = filteredData.filter((element: IMission) => {
 				return (
 					this.missionsService.getTerrainData(element.terrain)
-						?.display_name === terrain
+						?.class === terrain
 				);
 			});
 		}
@@ -292,8 +287,18 @@ export class MissionListComponent implements OnInit {
 		}
 	}
 
-	onActivate(row: IMission) {
+	onActivate(row: IMission, newtab: boolean) {
 		console.log('got click event for:', row.name);
-		this.router.navigate([`/mission-details/${row.uniqueName}`]);
+		if (newtab) {
+			window.open(`/mission-details/${row.uniqueName}`);
+		} else {
+			this.router.navigate([`/mission-details/${row.uniqueName}`]);
+		}
+	}
+
+	disableScroll(e) {
+		if (e.button === 1) {
+			e.preventDefault();
+		}
 	}
 }

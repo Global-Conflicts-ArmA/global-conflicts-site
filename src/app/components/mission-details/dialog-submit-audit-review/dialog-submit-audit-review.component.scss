@@ -1,0 +1,20 @@
+@use '../../../../colors';
+
+.mat-radio-button:not(:last-child) {
+	margin-right: 20px;
+}
+.approve-btn{
+	color: greenyellow;
+}
+.reprove-btn{
+	color:  colors.$error;
+}
+
+.checkbox-container{
+	margin-bottom: 5px;
+	margin-top: 5px;
+}
+
+.notes-label{
+
+}

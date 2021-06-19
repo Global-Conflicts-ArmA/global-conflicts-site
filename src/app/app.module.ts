@@ -32,7 +32,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
@@ -70,6 +70,9 @@ import { DialogAddGameplayHistoryComponent } from '@app/components/mission-detai
 import { DialogAddAarComponent } from '@app/components/mission-details/dialog-add-aar/dialog-add-aar.component';
 import { VotedMissionsComponent } from '@app/components/voted-missions/voted-missions.component';
 import { DialogViewGmNotesComponent } from '@app/components/mission-details/dialog-view-gm-notes/dialog-view-gm-notes.component';
+import { DialogSubmitAuditReviewComponent } from './components/mission-details/dialog-submit-audit-review/dialog-submit-audit-review.component';
+import { TokenInterceptor } from "@app/interceptor/token-interceptor.service";
+import { DialogJoinDiscordComponent } from './components/home/dialog-join-discord/dialog-join-discord.component';
 
 const maskConfig: Partial<IConfig> = {
 	validation: false
@@ -97,7 +100,9 @@ const maskConfig: Partial<IConfig> = {
 		DialogAddGameplayHistoryComponent,
 		DialogAddAarComponent,
 		DialogViewGmNotesComponent,
-		VotedMissionsComponent
+		VotedMissionsComponent,
+		DialogSubmitAuditReviewComponent,
+		DialogJoinDiscordComponent
 	],
 	imports: [
 		CommonModule,
@@ -184,6 +189,12 @@ const maskConfig: Partial<IConfig> = {
 		{
 			provide: HTTP_INTERCEPTORS,
 			useClass: HttpErrorInterceptor,
+			multi: true,
+			deps: [MatDialog]
+		},
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: TokenInterceptor,
 			multi: true
 		},
 		{ provide: BrowserXhr, useClass: CustExtBrowserXhr },

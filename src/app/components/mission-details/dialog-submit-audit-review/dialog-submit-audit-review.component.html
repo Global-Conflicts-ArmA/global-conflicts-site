@@ -1,0 +1,30 @@
+<h3 mat-dialog-title>Mission Reviewer Inspection</h3>
+
+<div mat-dialog-content>
+	<div>
+		<div *ngFor="let checkListItem of data.mission.reviewChecklist; let i = index">
+			<div>{{i + 1}}) {{checkListItem.text}}</div>
+			<div class="checkbox-container" *ngIf="checkListItem.type=='radio'">
+				<mat-radio-group [(ngModel)]="checkListItem.value" aria-label="Select an option">
+					<mat-radio-button value="YES">YES</mat-radio-button>
+					<mat-radio-button value="NO">NO</mat-radio-button>
+					<mat-radio-button value="N/A" *ngIf="!checkListItem.mandatory" >N/A</mat-radio-button>
+				</mat-radio-group>
+			</div>
+		</div>
+		<h4 class="notes-label">
+			Notes(Optional):
+		</h4>
+		<angular-markdown-editor
+			textareaId="reviewerNote" [rows]=10
+			name="markdownText" [(ngModel)]="data.mission.reviewerNote">
+		</angular-markdown-editor>
+	</div>
+</div>
+
+<div mat-dialog-actions style="display: flex; justify-content: flex-end">
+	<button mat-button class="approve-btn" (click)="aprove()" [disabled]="isButtonDisabled()">APPROVE</button>
+	<button mat-button class="reprove-btn" (click)="reprove()" [disabled]="isButtonDisabled()">REPROVE</button>
+	<div style="flex: 1"></div>
+	<button mat-button [mat-dialog-close]="">Close</button>
+</div>

@@ -3,19 +3,20 @@
 		<div class="center" *ngIf="!doneLoading">
 			<mat-progress-spinner diameter="100" mode="indeterminate" color="accent">Loading</mat-progress-spinner>
 		</div>
-		<div class="not-allowed-text" *ngIf="!(discordUser && discordUser?.role)">You must join our Discord server and
-			complete the welcoming process to upload missions!
+		<div class="not-allowed-text" *ngIf="!(userService.loggedUser)">You must join our Discord server to see our
+			missions!
 		</div>
 		<div [class.not-allowed-overlay]="!doneLoading" *ngIf="!!mission">
-			<div class="column" [class.not-allowed-overlay]="!(discordUser && discordUser?.role)">
+			<div class="column" [class.not-allowed-overlay]="!(userService.loggedUser)">
 				<div class="mission-title-container">
 					<div class="mission-title">{{ mission?.name }}</div>
 					<div class="mission-buttons">
 
 						<div class="mission-vote-btn">
-							<span>You have {{4-userVotesCount}} votes left</span>
+							<span>You have {{4 - userVotesCount}} votes left</span>
 
-							<button [disabled]="isVotingDisabled(mission) " style="width: 108px;" mat-flat-button class="mission-button" color="accent"
+							<button [disabled]="isVotingDisabled(mission) " style="width: 108px;" mat-flat-button
+											class="mission-button" color="accent"
 											matTooltip=" {{ getVotingTooltip(mission) }} "
 											(click)="vote()">
 								{{ getVotingBtnText(mission) }}
@@ -146,10 +147,10 @@
 									<div class="mission-status-icon-title">Archive</div>
 									<div [ngSwitch]="element.archive">
 										<div *ngSwitchCase="true">
-											<mat-icon class="green-icon">check</mat-icon>
+											<mat-icon [matTooltip]="'File present on the Archive'" class="green-icon">check</mat-icon>
 										</div>
 										<div *ngSwitchDefault>
-											<mat-icon class="red-icon">close</mat-icon>
+											<mat-icon [matTooltip]="'Not on the Archive'" class="white-icon">close</mat-icon>
 										</div>
 									</div>
 								</div>
@@ -157,10 +158,10 @@
 									<div class="mission-status-icon-title">Main</div>
 									<div [ngSwitch]="element.main">
 										<div *ngSwitchCase="true">
-											<mat-icon class="green-icon">check</mat-icon>
+											<mat-icon [matTooltip]="'File present on the Main server'" class="green-icon">check</mat-icon>
 										</div>
 										<div *ngSwitchDefault>
-											<mat-icon class="red-icon">close</mat-icon>
+											<mat-icon [matTooltip]="'Not on the Main server'" class="white-icon">close</mat-icon>
 										</div>
 									</div>
 								</div>
@@ -168,21 +169,29 @@
 									<div class="mission-status-icon-title">Test</div>
 									<div [ngSwitch]="element.test">
 										<div *ngSwitchCase="true">
-											<mat-icon class="green-icon">check</mat-icon>
+											<mat-icon [matTooltip]="'File present on the Test server'" class="green-icon">check</mat-icon>
 										</div>
 										<div *ngSwitchDefault>
-											<mat-icon class="red-icon">close</mat-icon>
+											<mat-icon [matTooltip]="'Not on the Test server'" class="white-icon">close</mat-icon>
 										</div>
 									</div>
 								</div>
 								<div class="col-2">
-									<div class="mission-status-icon-title">Ready</div>
-									<div [ngSwitch]="element.ready">
-										<div *ngSwitchCase="true">
-											<mat-icon class="green-icon">check</mat-icon>
-										</div>
+									<div class="mission-status-icon-title">State</div>
+									<div [ngSwitch]="element.reviewState">
 										<div *ngSwitchDefault>
-											<mat-icon class="red-icon">close</mat-icon>
+											<mat-icon [matTooltip]="'Not submitted for review'" class="material-icons-outlined"
+																[fontSet]="'outlined'">pending
+											</mat-icon>
+										</div>
+										<div *ngSwitchCase="'review_pending'">
+											<mat-icon [matTooltip]="'Pending review'" class="white-icon">pending_actions</mat-icon>
+										</div>
+										<div *ngSwitchCase="'review_reproved'">
+											<mat-icon [matTooltip]="'Rejected'" class="red-icon">error</mat-icon>
+										</div>
+										<div *ngSwitchCase="'review_accepted'">
+											<mat-icon [matTooltip]="'Approved'" class="green-icon">task_alt</mat-icon>
 										</div>
 									</div>
 								</div>
@@ -317,8 +326,11 @@
 						<div *ngIf="canEditHistory()" style="margin-right: 10px">
 							<button class="smaller-button" mat-flat-button (click)="editHistory(history)">Edit History</button>
 						</div>
-						<div style="justify-self: flex-end;" *ngIf="history.gmNote">
+						<div style="justify-self: flex-end; margin-right: 10px" *ngIf="history.gmNote">
 							<button class="smaller-button" mat-flat-button (click)="viewGmNote(history.gmNote)">GM Notes</button>
+						</div>
+						<div style="justify-self: flex-end;" *ngIf="history.aarReplayLink">
+							<a class="smaller-button" mat-flat-button [href]="history.aarReplayLink">AAR Replay</a>
 						</div>
 
 
@@ -340,7 +352,7 @@
 											</div>
 
 
-											<button style="margin-left: 20px; height: 30px" *ngIf="leader.discordID==discordUser?.id"
+											<button style="margin-left: 20px; height: 30px" *ngIf="leader.discordID==userService.loggedUser?.userID"
 															mat-raised-button
 															color="accent" class="smaller-button"
 															(click)="submitAAR(history, leader, leader.aar)">{{leader.aar ? "Edit AAR" : "Submit AAR"}}</button>

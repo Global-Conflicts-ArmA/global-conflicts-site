@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DatabaseUser } from '../../models/databaseUser';
+import { User } from '../../models/user';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -11,7 +11,7 @@ export class UserSettingsComponent implements OnInit {
 	constructor(private userService: UserService) {}
 
 	// TODO: implement formControls for these
-	discordUser: DatabaseUser | null;
+	discordUser: User | null;
 	missionEditDM = false;
 	missionReportDM = false;
 	missionReviewDM = false;

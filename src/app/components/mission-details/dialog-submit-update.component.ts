@@ -5,14 +5,9 @@ import {
 	FormGroup,
 	Validators
 } from '@angular/forms';
-import {
-	MatDialog,
-	MatDialogRef,
-	MAT_DIALOG_DATA
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { MissionConstants } from '@app/constants/missionConstants';
-import { DatabaseUser } from '@app/models/databaseUser';
 import { IMission, IUpdate } from '@app/models/mission';
 import { MissionsService } from '@app/services/missions.service';
 import { SharedService } from '@app/services/shared';
@@ -29,14 +24,13 @@ export class DialogSubmitUpdateComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public mission: IMission,
 		private formBuilder: FormBuilder,
 		private missionsService: MissionsService,
-		private userService: UserService,
+		public userService: UserService,
 		private sharedService: SharedService,
 		private mC: MissionConstants,
 		private router: Router
 	) {}
 
 	updateGroup: FormGroup;
-	discordUser: DatabaseUser | null;
 	versionString: string;
 	missionToUpload: File | null;
 	readonly maxSize: number = 8388608;
@@ -46,7 +40,6 @@ export class DialogSubmitUpdateComponent implements OnInit {
 	};
 
 	ngOnInit(): void {
-		this.discordUser = this.userService.getUserLocally();
 		this.updateGroup = this.formBuilder.group({
 			versionType: [false],
 			changelog: ['', [Validators.required]],
@@ -115,8 +108,10 @@ export class DialogSubmitUpdateComponent implements OnInit {
 						requiredTerrain: true
 					};
 				} else {
-
-					if (fileNameArray[1].toLowerCase() !== uploadedTerrainObject?.class.toLowerCase()) {
+					if (
+						fileNameArray[1].toLowerCase() !==
+						uploadedTerrainObject?.class.toLowerCase()
+					) {
 						return {
 							notSameTerrain: true
 						};
@@ -194,15 +189,13 @@ export class DialogSubmitUpdateComponent implements OnInit {
 			.toUpperCase()
 			.trim();
 
-
 		const safeMissionType = typeObject?.str ?? typeObject?.title;
 		const terrainObj = this.missionsService.getTerrainData(
 			this.mission.terrain
 		);
-		if(terrainObj){
+		if (terrainObj) {
 			return `${safeMissionType}${this.mission.size.max}_${safeMissionName}_V${this.versionString}.${terrainObj.class}.pbo`;
 		}
-
 	}
 
 	buildFormData(
@@ -231,16 +224,20 @@ export class DialogSubmitUpdateComponent implements OnInit {
 	}
 
 	submit() {
+		if (!this.userService.loggedUser) {
+			return;
+		}
+
 		this.sharedService.uploadingState = 'uploading';
 		const fileName = this.buildMissionFileName();
 
-		if(!fileName){
+		if (!fileName) {
 			return;
 		}
 
 		const update: IUpdate = {
 			version: this.newVersion,
-			authorID: this.discordUser?.id ?? '',
+			authorID: this.userService.loggedUser.userID,
 			date: new Date(),
 			fileName,
 			changeLog: this.updateGroup.get('changelog')?.value
