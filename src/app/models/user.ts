@@ -53,7 +53,11 @@ export class User {
 	}
 
 	getAvatarLink() {
-		return `https://cdn.discordapp.com/avatars/${this.userID}/${this.avatar}.webp`;
+		if (!this.avatar) {
+			return null;
+		} else {
+			return `https://cdn.discordapp.com/avatars/${this.userID}/${this.avatar}.webp`;
+		}
 	}
 }
 
