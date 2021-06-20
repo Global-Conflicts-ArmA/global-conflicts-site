@@ -73,7 +73,7 @@
 				class="rounded-circle mr-2 ml-2 nav-avatar img-fluid"
 				*ngIf="userService.loggedUser?.getAvatarLink()"
 				id="userAvatar"
-				src="{{ userService.loggedUser.getAvatarLink() }}"
+				src="{{ userService.loggedUser?.getAvatarLink() }}"
 				alt="avatar"
 				[matMenuTriggerFor]="avatarMenu"
 			/>
