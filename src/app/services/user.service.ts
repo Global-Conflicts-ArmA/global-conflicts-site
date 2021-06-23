@@ -47,7 +47,7 @@ export class UserService {
 			return result.userID === id;
 		});
 		if (user) {
-			return user.nickname ?? user.displayName ?? 'error';
+			return user.nickname ?? user.displayName ?? '~Unkown Member~';
 		} else {
 			return this.httpClient
 				.get<RemoteDiscordUser>('/api/users/fetch/' + id)
@@ -62,19 +62,19 @@ export class UserService {
 							return (
 								remoteUser.nickname ??
 								remoteUser.displayName ??
-								'error'
+								'~Unkown Member~'
 							);
 						} else {
-							return 'error';
+							return '~Unkown Member~';
 						}
 					} catch (err) {
 						console.log('error: ', err);
-						return 'error';
+						return '~Unkown Member~';
 					}
 				})
 				.catch((err) => {
 					console.log('error: ', err);
-					return 'error';
+					return '~Unkown Member~';
 				});
 		}
 	}
