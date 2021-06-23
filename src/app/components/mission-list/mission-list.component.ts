@@ -123,6 +123,9 @@ export class MissionListComponent implements OnInit {
 		].forEach((element) => {
 			this.filterGroup.get(element)?.setValue('ALL');
 		});
+		if (!this.userService.loggedUser) {
+			return;
+		}
 		this.refresh();
 	}
 

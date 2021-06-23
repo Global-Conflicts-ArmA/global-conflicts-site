@@ -21,34 +21,36 @@ export class VotedMissionsComponent implements OnInit {
 	) {}
 
 	getVotedMissions() {
-		this.missionsService.getVotedMissions().subscribe(
-			(missions) => {
-				missions.map(async (mission) => {
-					mission.authorName = await this.userService.getDiscordUsername(
-						mission.authorID
-					);
-				});
-				this.votedMissions = missions.sort((a, b) => {
-					if (a.votes && b.votes) {
-						if (a.votes?.length < b.votes?.length) {
-							return 1;
+		if (this.userService.loggedUser) {
+			this.missionsService.getVotedMissions().subscribe(
+				(missions) => {
+					missions.map(async (mission) => {
+						mission.authorName = await this.userService.getDiscordUsername(
+							mission.authorID
+						);
+					});
+					this.votedMissions = missions.sort((a, b) => {
+						if (a.votes && b.votes) {
+							if (a.votes?.length < b.votes?.length) {
+								return 1;
+							}
+							if (a.votes?.length > b.votes?.length) {
+								return -1;
+							}
 						}
-						if (a.votes?.length > b.votes?.length) {
-							return -1;
+						return 0;
+					});
+					this.missionsService.getUserVotes().subscribe((value) => {
+						if (value && value['votes']) {
+							this.userVotesCount = value['votes'].length;
 						}
-					}
-					return 0;
-				});
-				this.missionsService.getUserVotes().subscribe((value) => {
-					if (value && value['votes']) {
-						this.userVotesCount = value['votes'].length;
-					}
-				});
+					});
 
-				this.doneLoading = true;
-			},
-			(error) => {}
-		);
+					this.doneLoading = true;
+				},
+				(error) => {}
+			);
+		}
 	}
 
 	ngOnInit(): void {
@@ -56,7 +58,6 @@ export class VotedMissionsComponent implements OnInit {
 	}
 
 	vote(mission: IMission) {
-
 		if (mission && this.userService.loggedUser) {
 			this.loadingVote = true;
 			if (

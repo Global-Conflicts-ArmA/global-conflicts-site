@@ -15,6 +15,7 @@ import Terrains from '../../assets/terrains.json';
 import { ILeader } from '@app/models/leader';
 import { DatePipe } from '@angular/common';
 import { ITerrain } from '@app/models/terrain';
+import { UserService } from '@app/services/user.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -24,9 +25,10 @@ export class MissionsService {
 		private httpClient: HttpClient,
 		private mC: MissionConstants,
 		private sanitizer: DomSanitizer,
+		private userService: UserService,
 		private datePipe: DatePipe
 	) {
-		if (this.terrainList.length === 0) {
+		if (this.terrainList.length === 0 && this.userService.loggedUser) {
 			this.httpClient
 				.get<ITerrain[]>('api/configs/terrains')
 				.subscribe((value) => {
@@ -88,7 +90,7 @@ export class MissionsService {
 		if (mission?.image) {
 			return this.sanitizer.bypassSecurityTrustResourceUrl(mission.image);
 		} else {
-			return `https://globalconflicts.net/content/terrain_pics/${mission?.terrain}.jpg`
+			return `https://globalconflicts.net/content/terrain_pics/${mission?.terrain}.jpg`;
 		}
 	}
 
