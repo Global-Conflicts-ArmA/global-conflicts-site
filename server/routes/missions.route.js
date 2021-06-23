@@ -37,7 +37,6 @@ REVIEW_STATE_ACCEPTED = 'review_accepted';
 REVIEW_STATE_ACCEPTS_WITH_CAVEATS = 'review_accepted_with_caveats';
 
 fileFilterFunction = async function (req, file, callback) {
-	console.log('_____________fileFilterFunction');
 	req.missionDataErrors = validateData(req.body, true);
 	if (Object.keys(req.missionDataErrors).length > 0) {
 		callback(null, false);
@@ -83,13 +82,6 @@ const uploadMulter = multer({
 });
 
 updateFileFilterFunction = async function (req, file, callback) {
-	req = await getDiscordUserFromCookies(
-		req,
-		'User is not allowed to upload missions.'
-	);
-	if (req.authError) {
-		return callback(null, false);
-	}
 
 	req.missionDataErrors = validateData(req.body, false);
 	if (file.mimetype !== 'application/octet-stream') {
