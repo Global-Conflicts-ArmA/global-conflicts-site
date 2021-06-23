@@ -77,7 +77,10 @@
 				alt="avatar"
 				[matMenuTriggerFor]="avatarMenu"
 			/>
-			<mat-icon class="rounded-circle mr-2 ml-2 nav-avatar img-fluid" *ngIf="!userService.loggedUser?.getAvatarLink()" [matMenuTriggerFor]="avatarMenu">account_circle</mat-icon>
+			<mat-icon class="rounded-circle mr-2 ml-2 nav-avatar img-fluid"
+								*ngIf="userService.loggedUser!=null && !userService.loggedUser?.getAvatarLink()"
+								[matMenuTriggerFor]="avatarMenu">account_circle
+			</mat-icon>
 		</mat-toolbar>
 		<ng-content></ng-content>
 	</mat-sidenav-content>
