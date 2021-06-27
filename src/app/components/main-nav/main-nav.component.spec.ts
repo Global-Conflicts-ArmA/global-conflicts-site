@@ -1,6 +1,4 @@
-import { LayoutModule } from '@angular/cdk/layout';
 import { async, ComponentFixture, inject, TestBed, waitForAsync } from '@angular/core/testing';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -8,11 +6,12 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MainNavComponent } from './main-nav.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientTestingModule} from '@angular/common/http/testing';
 import {MatMenuModule} from '@angular/material/menu';
 import { UserService } from '../../services/user.service';
 import {Router} from "@angular/router";
 import { environment } from 'src/environments/environment';
+import {MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 
 /**
  * main-nav component unit tests
@@ -37,8 +36,16 @@ describe('MainNavComponent', () => {
 					MatToolbarModule,
 					RouterTestingModule,
 					HttpClientTestingModule,
-					MatMenuModule
-				]
+					MatMenuModule,
+					MatDialogModule
+				],
+				providers: [
+		     {
+		       provide: MatDialogRef,
+		       useValue: {}
+		     },
+     		UserService
+  ]
 			}).compileComponents();
 		})
 	);

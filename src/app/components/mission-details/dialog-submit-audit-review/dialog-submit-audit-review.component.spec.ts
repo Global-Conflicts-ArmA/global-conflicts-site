@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DialogSubmitAuditReviewComponent } from './dialog-submit-audit-review.component';
 
-describe('DialogSubmitAuditReviewComponent', () => {
+xdescribe('DialogSubmitAuditReviewComponent', () => {
   let component: DialogSubmitAuditReviewComponent;
   let fixture: ComponentFixture<DialogSubmitAuditReviewComponent>;
 

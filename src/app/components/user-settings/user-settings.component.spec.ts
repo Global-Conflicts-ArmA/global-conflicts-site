@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientTestingModule} from '@angular/common/http/testing';
 import { UserService } from '../../services/user.service';
 import { UserSettingsComponent } from './user-settings.component';
+import {MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 
 describe('UserSettingsComponent', () => {
 	let component: UserSettingsComponent;
@@ -9,8 +10,14 @@ describe('UserSettingsComponent', () => {
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [HttpClientTestingModule],
-			providers: [UserService],
+			imports: [HttpClientTestingModule, MatDialogModule],
+			providers: [
+			 {
+				 provide: MatDialogRef,
+				 useValue: {}
+			 },
+			UserService
+			],
 			declarations: [UserSettingsComponent]
 		}).compileComponents();
 	});
