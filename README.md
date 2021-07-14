@@ -14,22 +14,28 @@ MEAN is a set of Open Source components that together, provide an end-to-end fra
 * npm - comes with node or download yarn - [Download page](https://yarnpkg.com/lang/en/docs/install) .  
 * mongodb - [Download page](https://www.mongodb.com/download-center/community) .  
 
-### Installation 
-``` 
+### Installation
+```
 git clone https://github.com/linnovate/mean
 cd mean
 cp .env.example .env
 yarn
 yarn start (for development)
 ```
-### Docker based 
+### Docker based
 ``` 
 git clone https://github.com/linnovate/mean
 cd mean
 cp .env.example .env
 docker-compose up -d
 ```
-### Credits 
+
+### Running tests
+```
+ng t --code-coverage
+```
+
+### Credits
 - The MEAN name was coined by Valeri Karpov.
 - Initial concept and development was done by Amos Haviv and sponsered by Linnovate.
 - Inspired by the great work of Madhusudhan Srinivasa.
