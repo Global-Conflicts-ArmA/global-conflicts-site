@@ -11,8 +11,8 @@
 				<a mat-menu-item class="nav-link" routerLinkActive="active" routerLink="mission-list" (click)="drawer.toggle()">List</a>
 				<a mat-menu-item class="nav-link" routerLinkActive="active" routerLink="mission-upload"
 					 (click)="drawer.toggle()">Upload</a>
-				<a mat-menu-item class="nav-link" routerLinkActive="active" routerLink="mission-stats"
-					 (click)="drawer.toggle()">Statistics</a>
+				<a mat-menu-item class="nav-link" routerLinkActive="active" routerLink="top-voted-missions"
+					 (click)="drawer.toggle()">Top voted missions</a>
 			</mat-menu>
 			<button mat-menu-item class="nav-link accent-color" (click)="missionMenuTrigger.openMenu()">
 				Missions
@@ -26,10 +26,11 @@
 	</mat-sidenav>
 	<mat-sidenav-content>
 		<mat-toolbar color="primary">
-			<button type="button" aria-label="Toggle sidenav" class="mat-icon-button sidebar-toggle mr-2"
-							(click)="drawer.toggle()" *ngIf="isHandset$ | async">
-				<mat-icon class="ml-auto mr-auto" color="accent" aria-label="Side nav toggle icon">menu</mat-icon>
+
+			<button mat-icon-button color="accent" aria-label="Toggle sidenav" (click)="drawer.toggle()" *ngIf="isHandset$ | async">
+				<mat-icon>menu</mat-icon>
 			</button>
+
 			<img *ngIf="!(isHandset$ | async)" alt="Logo" src="../../../assets/imgs/logo.png" width="40px" class="mr-2" />
 			<span class="ml-2 accent-color nav-main-link">Global Conflicts</span>
 			<span class="spacer"></span>
