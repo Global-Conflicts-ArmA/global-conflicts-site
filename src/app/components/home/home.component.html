@@ -1,8 +1,12 @@
-<div id="logo" class="flex-center"><img src="../../../assets/imgs/logo.png" height="240" width="240" alt="Global Conflicts Logo" /></div>
+<div id="logo" class="flex-center"><img src="../../../assets/imgs/logo.png" height="240" width="240"
+																				alt="Global Conflicts Logo" /></div>
 <h1 id="title">Global Conflicts</h1>
 <div class="content-width">
 	<div class="embed-container">
-		<iframe title="Global Conflicts Trailer" src="https://www.youtube.com/embed/ekm3kNusrfY?start=19" allowfullscreen></iframe>
+		<iframe width="560" height="315" src="https://www.youtube.com/embed/qGP9CQbwGZM" title="YouTube video player"
+						frameborder="0"
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+						allowfullscreen></iframe>
 	</div>
 </div>
 
@@ -35,18 +39,20 @@
 	<h2 class="section-title">Getting Started</h2>
 	<div class="content-width">
 		<ol class="section-text">
-			<li>Join our <a href="https://discord.globalconflicts.net">Discord</a> and bookmark our <a href="ts3server://globalconflicts.net?port=9987">Teamspeak server</a></li>
+			<li>Join our <a href="https://discord.globalconflicts.net">Discord</a> and bookmark our <a
+				href="ts3server://globalconflicts.net?port=9987">Teamspeak server</a></li>
 			<li>Download the launcher from our Discord server</li>
-			<li>Bookmark our A3 server: <span class="bold-text">51.79.99.90:2302</span> <span class="small-text">(The password is on Teamspeak)</span></li>
+			<li>Bookmark our A3 server: <span class="bold-text">51.79.99.90:2302</span> <span class="small-text">(The password is on Teamspeak)</span>
+			</li>
 			<li>Don’t be a dick</li>
 			<li>That’s it.</li>
 		</ol>
 	</div>
 </section>
 <script type="application/javascript">
-	window.addEventListener('message', function (e) {
-		if (e.data.uid && e.data.type === 'sizeUpdate') {
-			var i = document.querySelector('iframe[name="' + e.data.uid + '"]');
+	window.addEventListener("message", function(e) {
+		if (e.data.uid && e.data.type === "sizeUpdate") {
+			var i = document.querySelector("iframe[name=\"" + e.data.uid + "\"]");
 			i.style.width = e.data.payload.width;
 			i.style.height = e.data.payload.height;
 		}
@@ -64,7 +70,8 @@
 	<h2 class="section-title">First Time Tips</h2>
 	<div class="content-width">
 		<div class="section-text">
-			During the slotting screen, someone will volunteer to lead the mission(it can be you!). The rest of the players will start slotting into the slots that the leader calls
+			During the slotting screen, someone will volunteer to lead the mission(it can be you!). The rest of the players
+			will start slotting into the slots that the leader calls
 			to be filled.
 			<br />
 			Check our <a href="https://globalconflicts.net/wiki/index.php?title=Main_Page">wiki</a> for more tips and guides.
@@ -74,9 +81,9 @@
 
 <div class="margin-top flex-center">
 	<script type="application/javascript">
-		window.addEventListener('message', function (e) {
-			if (e.data.uid && e.data.type === 'sizeUpdate') {
-				var i = document.querySelector('iframe[name="' + e.data.uid + '"]');
+		window.addEventListener("message", function(e) {
+			if (e.data.uid && e.data.type === "sizeUpdate") {
+				var i = document.querySelector("iframe[name=\"" + e.data.uid + "\"]");
 				i.style.width = e.data.payload.width;
 				i.style.height = e.data.payload.height;
 			}
