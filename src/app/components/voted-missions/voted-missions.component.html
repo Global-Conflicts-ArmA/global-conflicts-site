@@ -9,7 +9,7 @@
 			<div class="column" [class.not-allowed-overlay]="!(userService.loggedUser)">
 				<h2>These are the top voted missions for the next play sessions:</h2>
 				<div>
-					<small>Note: This list will be reset every monday. </small>
+					<small>Note: This list will be reset every Monday. </small>
 					<button mat-raised-button class="smaller-button" *ngIf="canResetVotes()" color="warn" (click)="resetVotes()">
 						Reset all votes
 					</button>
