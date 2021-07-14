@@ -64,6 +64,9 @@ export class VotedMissionsComponent implements OnInit {
 				!mission.votes ||
 				!mission.votes?.includes(this.userService.loggedUser.userID)
 			) {
+				if(this.isVotingDisabled(mission)){
+					return;
+				}
 				this.missionsService.submitVote(mission).subscribe((value) => {
 					if (mission && this.userService.loggedUser) {
 						mission.votes?.push(this.userService.loggedUser.userID);
