@@ -106,7 +106,7 @@ const maskConfig: Partial<IConfig> = {
 	],
 	imports: [
 		CommonModule,
-		BrowserModule,
+		BrowserModule.withServerTransition({ appId: 'serverApp' }),
 		AppRoutingModule,
 		RouterModule,
 		BrowserAnimationsModule,
