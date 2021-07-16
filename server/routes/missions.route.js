@@ -654,6 +654,9 @@ router.post(
 			timeOfDay: req.body.timeOfDay,
 			era: req.body.era
 		};
+		if (req.body.image != null) {
+			edit['image'] = req.body.image;
+		}
 
 		Mission.findOneAndUpdate(
 			query,
