@@ -41,7 +41,8 @@ router.post('/submit_audit_review',[requireLogin, requireMissionReviewer], async
 			$set: {
 				'updates.$.reviewState': state,
 				reviewChecklist: reviewChecklist,
-				reviewerNotes: reviewerNotes
+				reviewerNotes: reviewerNotes,
+				reviewerDiscordId: req.discordUser.user.id
 			}
 		},
 		{
