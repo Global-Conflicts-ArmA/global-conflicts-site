@@ -504,7 +504,7 @@ async function postMissionAuditSubmited(
 			`Author: ${author.displayName}`,
 			author.user.displayAvatarURL()
 		)
-		.addFields()
+		.addField('Reviewer', `<@${request.discordUser.user.id}>`)
 		.setDescription(
 			`Version: ${buildVersionStr(update.version)}
 			${
