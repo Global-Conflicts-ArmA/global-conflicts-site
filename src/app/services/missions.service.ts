@@ -1,17 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {
-	IHistory,
-	IMission,
-	IReview,
-	IReviewChecklistItem
-} from '../models/mission';
+import { IHistory, IMission, IReviewChecklistItem } from '../models/mission';
 import { MissionConstants } from '../constants/missionConstants';
 import { DomSanitizer } from '@angular/platform-browser';
 import * as fileSaver from 'file-saver';
 // @ts-ignore
-import Terrains from '../../assets/terrains.json';
 import { ILeader } from '@app/models/leader';
 import { DatePipe } from '@angular/common';
 import { ITerrain } from '@app/models/terrain';
@@ -77,7 +71,7 @@ export class MissionsService {
 
 	public getTerrainData(terrainName: string | undefined) {
 		return terrainName
-			? Terrains.find((terrain) => {
+			? this.terrainList.find((terrain) => {
 					return (
 						terrain.class.toLowerCase() ===
 						terrainName.toLowerCase()
