@@ -18,7 +18,8 @@ const {
 	postMissionCopiedRemovedToServer,
 	postNewMissionHistory,
 	postNewAAR,
-	postMissionAuditSubmited
+	postMissionAuditSubmited,
+	postFirstvoteForAMission
 } = require('../discord-poster');
 const { getDiscordUserFromCookies } = require('../misc/validate-cookies');
 
@@ -82,7 +83,6 @@ const uploadMulter = multer({
 });
 
 updateFileFilterFunction = async function (req, file, callback) {
-
 	req.missionDataErrors = validateData(req.body, false);
 	if (file.mimetype !== 'application/octet-stream') {
 		req.missionDataErrors.file = 'File is not a .pbo.';
@@ -950,12 +950,16 @@ router.post('/:uniqueName/history/aar', [requireLogin], async (req, res) => {
 });
 
 router.put('/:uniqueName/votes/', [requireLogin], async (req, res) => {
-	await Mission.findOneAndUpdate(
+	mission = await Mission.findOneAndUpdate(
 		{ uniqueName: req.params.uniqueName },
 		{
 			$addToSet: {
 				votes: req.discordUser.user.id
 			}
+		},
+		{
+			returnOriginal: true,
+			projection: { image: 0 }
 		}
 	).exec();
 	const user = await User.findOneAndUpdate(
@@ -967,7 +971,10 @@ router.put('/:uniqueName/votes/', [requireLogin], async (req, res) => {
 		},
 		{ upsert: true }
 	).exec();
-	console.log(user);
+	if (mission.votes.length === 0) {
+		postFirstvoteForAMission(req, mission);
+	}
+
 	return res.send({ ok: true });
 });
 

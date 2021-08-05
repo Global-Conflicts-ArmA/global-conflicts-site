@@ -7,6 +7,8 @@ REVIEW_STATE_ACCEPTS_WITH_CAVEATS = 'review_accepted_with_caveats';
 
 const { discordJsClient, Discord } = require('./config/discord-bot');
 
+const disbut = require("discord-buttons");
+
 async function getRemoteUser(id) {
 	const guild = discordJsClient.guilds.cache.get(
 		process.env.DISCORD_SERVER_ID
@@ -552,6 +554,40 @@ async function postMissionAuditSubmited(
 	}
 }
 
+async function postFirstvoteForAMission(request, mission) {
+	const author = await getRemoteUser(mission.authorID);
+
+	const newMissionEmbed = new Discord.MessageEmbed()
+		.setTitle(`${mission.name}`)
+		.setAuthor(
+			`Author: ${author.displayName}`,
+			author.user.displayAvatarURL()
+		)
+		.setDescription(mission.description)
+		.addFields(
+			{
+				name: 'Player Count:',
+				value: `**Min:** ${mission.size.min} **Max:** ${mission.size.max}`,
+				inline: true
+			},
+			{ name: 'Type:', value: mission.type, inline: true },
+			{ name: 'Terrain:', value: mission.terrain, inline: true }
+		)
+		.setURL(
+			`https://globalconflicts.net/mission-details/${mission.uniqueName}`
+		);
+
+	let button = new disbut.MessageButton()
+		.setLabel("Vote for this mission")
+		.setID(mission.uniqueName)
+		.setStyle("blurple");
+
+
+	discordJsClient.channels.cache
+		.get(process.env.DISCORD_ARMA3_CHANNEL)
+		.send(`This mission has received its first vote:`, { embed: newMissionEmbed, buttons: [button] });
+}
+
 module.exports = {
 	postDiscordNewMission,
 	postDiscordReport,
@@ -563,5 +599,6 @@ module.exports = {
 	postMissionCopiedRemovedToServer,
 	postNewMissionHistory,
 	postNewAAR,
-	postMissionAuditSubmited
+	postMissionAuditSubmited,
+	postFirstvoteForAMission
 };
