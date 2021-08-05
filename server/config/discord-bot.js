@@ -213,7 +213,8 @@ discordJsClient.on('clickButton', async (button) => {
 		}
 	).exec();
 
-	if (user.votes && user.votes.length >= 4) {
+
+	if (user && user.votes && user.votes.length >= 4) {
 		await button.reply.send(
 			'You already voted for 4 different missions.',
 			true
